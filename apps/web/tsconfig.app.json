@@ -6,6 +6,7 @@
     "module": "esnext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    "composite": true,
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
