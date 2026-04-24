@@ -5,7 +5,10 @@
     "prepare": "husky",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint:staged": "lint-staged"
+    "lint:staged": "lint-staged",
+    "web:dev": "npm run dev --prefix apps/web",
+    "web:build": "npm run build --prefix apps/web",
+    "web:lint": "npm run lint --prefix apps/web"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md,css}": "prettier --write",
