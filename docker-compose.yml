@@ -1,0 +1,28 @@
+services:
+  juntae_main_db:
+    image: postgres:16-alpine
+    container_name: juntae_main_db
+    environment:
+      POSTGRES_USER: juntae
+      POSTGRES_PASSWORD: juntae
+      POSTGRES_DB: juntae_main
+    ports:
+      - "15432:5432"
+    volumes:
+      - juntae_main_data:/var/lib/postgresql/data
+
+  juntae_audit_db:
+    image: postgres:16-alpine
+    container_name: juntae_audit_db
+    environment:
+      POSTGRES_USER: juntae
+      POSTGRES_PASSWORD: juntae
+      POSTGRES_DB: juntae_audit
+    ports:
+      - "15433:5432"
+    volumes:
+      - juntae_audit_data:/var/lib/postgresql/data
+
+volumes:
+  juntae_main_data:
+  juntae_audit_data:

@@ -1,0 +1,48 @@
+package handler
+
+import (
+	"net/http"
+	"strings"
+
+	"juntae-api/internal/validation"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+)
+
+func respondWithError(c *gin.Context, statusCode int, message string) {
+	c.JSON(statusCode, gin.H{"error": message})
+}
+
+func respondWithJSON(c *gin.Context, statusCode int, payload any) {
+	c.JSON(statusCode, payload)
+}
+
+func bindAndValidate(c *gin.Context, payload any) bool {
+	if err := c.ShouldBindJSON(payload); err != nil {
+		respondWithError(c, http.StatusBadRequest, "invalid request body")
+		return false
+	}
+	if err := validation.ValidateStruct(payload); err != nil {
+		respondWithError(c, http.StatusBadRequest, err.Error())
+		return false
+	}
+	return true
+}
+
+func parseUUIDParam(c *gin.Context, paramName string) (uuid.UUID, bool) {
+	id, err := uuid.Parse(c.Param(paramName))
+	if err != nil {
+		respondWithError(c, http.StatusBadRequest, "invalid id parameter")
+		return uuid.Nil, false
+	}
+	return id, true
+}
+
+func handleServiceError(c *gin.Context, err error) {
+	if strings.Contains(err.Error(), "record not found") {
+		respondWithError(c, http.StatusNotFound, err.Error())
+		return
+	}
+	respondWithError(c, http.StatusInternalServerError, err.Error())
+}
