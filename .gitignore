@@ -21,7 +21,9 @@ coverage.out
 
 # OS/editor
 .DS_Store
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 
 # Docker/database
