@@ -3,9 +3,10 @@ package router
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"juntae-api/internal/domain/handler"
 	"juntae-api/internal/domain/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type RouterDependencies struct {
@@ -34,21 +35,18 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 
 	api := r.Group("/api")
 
-	// Users
 	api.POST("/users", userHandler.CreateUser)
 	api.GET("/users", userHandler.GetUsers)
 	api.GET("/users/:id", userHandler.GetUserByID)
 	api.PUT("/users/:id", userHandler.UpdateUser)
 	api.DELETE("/users/:id", userHandler.DeleteUser)
 
-	// Skills
 	api.POST("/skills", skillHandler.CreateSkill)
 	api.GET("/skills", skillHandler.GetSkills)
 	api.GET("/skills/:id", skillHandler.GetSkillByID)
 	api.PUT("/skills/:id", skillHandler.UpdateSkill)
 	api.DELETE("/skills/:id", skillHandler.DeleteSkill)
 
-	// Projects — static routes must be registered before :id
 	api.POST("/projects", projectHandler.CreateProject)
 	api.GET("/projects", projectHandler.GetProjects)
 	api.GET("/projects/search", projectHandler.SearchProjectsByStatusAndCreatorCity)
@@ -58,14 +56,12 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	api.PUT("/projects/:id", projectHandler.UpdateProject)
 	api.DELETE("/projects/:id", projectHandler.DeleteProject)
 
-	// Project Roles
 	api.POST("/project-roles", projectRoleHandler.CreateProjectRole)
 	api.GET("/project-roles", projectRoleHandler.GetProjectRoles)
 	api.GET("/project-roles/:id", projectRoleHandler.GetProjectRoleByID)
 	api.PUT("/project-roles/:id", projectRoleHandler.UpdateProjectRole)
 	api.DELETE("/project-roles/:id", projectRoleHandler.DeleteProjectRole)
 
-	// Applications
 	api.POST("/applications", applicationHandler.CreateApplication)
 	api.GET("/applications", applicationHandler.GetApplications)
 	api.GET("/applications/:id", applicationHandler.GetApplicationByID)
