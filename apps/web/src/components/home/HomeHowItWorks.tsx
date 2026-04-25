@@ -20,7 +20,7 @@ const steps = [
 
 export function HomeHowItWorks() {
   return (
-    <section id="como-funciona" className="border-t hairline">
+    <section id="como-funciona" className="scroll-mt-20 border-t hairline bg-cream-2">
       <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-24">
         <div className="mb-14 max-w-[640px]">
           <div className="mb-3 text-[11.5px] font-medium uppercase tracking-[.18em] text-mute">

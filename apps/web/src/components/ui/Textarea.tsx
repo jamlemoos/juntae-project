@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { TextareaHTMLAttributes } from 'react';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -6,7 +7,8 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 }
 
 export function Textarea({ label, error, id, rows = 4, className, ...props }: TextareaProps) {
-  const textareaId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+  const generatedId = useId();
+  const textareaId = id ?? generatedId;
   const errorId = error ? `${textareaId}-error` : undefined;
   return (
     <div className="flex flex-col gap-1.5">

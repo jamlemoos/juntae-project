@@ -2,7 +2,10 @@ const EXAMPLE_ROLES = ['dev front-end', 'dev back-end', 'designer de produto'];
 
 export function HomeCreateIdea() {
   return (
-    <section id="sua-vez" className="relative overflow-hidden border-t hairline bg-cream-2">
+    <section
+      id="sua-vez"
+      className="scroll-mt-24 relative overflow-hidden border-t hairline bg-cream-2"
+    >
       <div className="relative mx-auto grid max-w-[1200px] grid-cols-12 items-center gap-8 px-6 py-24 md:py-28">
         <div className="col-span-12 lg:col-span-7">
           <div className="mb-4 text-[11.5px] font-medium uppercase tracking-[.18em] text-mute">

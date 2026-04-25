@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import type { SelectHTMLAttributes } from 'react';
 
 interface SelectOption {
@@ -23,7 +24,9 @@ export function Select({
   defaultValue,
   ...props
 }: SelectProps) {
-  const selectId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+  const generatedId = useId();
+  const selectId = id ?? generatedId;
+  const errorId = error ? `${selectId}-error` : undefined;
   const shouldUsePlaceholderDefault =
     placeholder !== undefined && value === undefined && defaultValue === undefined;
   return (
@@ -38,6 +41,8 @@ export function Select({
         value={value}
         defaultValue={shouldUsePlaceholderDefault ? '' : defaultValue}
         {...props}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={errorId}
         className={[
           'w-full rounded-lg border bg-surface px-3 py-2.5 text-sm text-content',
           'transition-colors duration-150',
@@ -60,7 +65,11 @@ export function Select({
           </option>
         ))}
       </select>
-      {error && <p className="text-xs text-error">{error}</p>}
+      {error && (
+        <p id={errorId} className="text-xs text-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
