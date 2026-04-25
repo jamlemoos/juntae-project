@@ -16,9 +16,9 @@ export function Header() {
             className="hidden items-center gap-7 text-[14px] md:flex"
             aria-label="Navegação principal"
           >
-            <a href="/#como-funciona" className="ulink text-ink-2">
+            <Link to="/" hash="como-funciona" className="ulink text-ink-2">
               Como funciona
-            </a>
+            </Link>
             <Link to="/projects" className="ulink text-ink-2">
               Projetos
             </Link>
