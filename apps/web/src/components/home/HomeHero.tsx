@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { ArrowIcon } from '../ui/ArrowIcon';
 
 export function HomeHero() {
@@ -15,13 +16,13 @@ export function HomeHero() {
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-5">
-            <a
-              href="#sua-vez"
+            <Link
+              to="/projects/new"
               className="inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
             >
               Criar um projeto
               <ArrowIcon />
-            </a>
+            </Link>
             <a href="#como-funciona" className="ulink text-[14px] font-medium text-ink-2">
               ou veja como funciona →
             </a>

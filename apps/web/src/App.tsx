@@ -1,10 +1,6 @@
-import { PublicLayout } from './layouts/PublicLayout';
-import { HomePage } from './pages/HomePage';
+import { RouterProvider } from '@tanstack/react-router';
+import { router } from './router';
 
 export default function App() {
-  return (
-    <PublicLayout>
-      <HomePage />
-    </PublicLayout>
-  );
+  return <RouterProvider router={router} />;
 }

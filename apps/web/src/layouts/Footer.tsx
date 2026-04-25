@@ -1,3 +1,5 @@
+import { Link } from '@tanstack/react-router';
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
   return (
@@ -20,14 +22,14 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
               <li>
-                <a href="#como-funciona" className="ulink">
+                <Link to="/" hash="como-funciona" className="ulink">
                   Como funciona
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#sua-vez" className="ulink">
+                <Link to="/projects/new" className="ulink">
                   Criar projeto
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
