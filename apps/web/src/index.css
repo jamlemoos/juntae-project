@@ -18,6 +18,9 @@
   --color-sky: #7fa3b8;
 
   /* ── Legacy aliases (kept for existing UI components) ── */
+  --color-brand-50: #fbeee9;
+  --color-brand-100: #f6d8cd;
+  --color-brand-200: #e9b6a3;
   --color-brand-500: #c8563c;
   --color-brand-600: #a8451e;
   --color-surface: #f7f1e6;
@@ -28,6 +31,12 @@
   --color-content-secondary: #4a4339;
   --color-content-tertiary: #8a8070;
   --color-content-inverse: #f7f1e6;
+  --color-success: #4f6f52;
+  --color-success-light: #e6ede1;
+  --color-warning: #9a6a1f;
+  --color-warning-light: #f5e8c8;
+  --color-error: #b13a2e;
+  --color-error-light: #f4d8d3;
 }
 
 @layer base {

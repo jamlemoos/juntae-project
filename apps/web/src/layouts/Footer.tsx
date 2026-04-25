@@ -1,4 +1,5 @@
 export function Footer() {
+  const currentYear = new Date().getFullYear();
   return (
     <footer className="bg-ink text-cream">
       <div className="mx-auto max-w-[1200px] px-6 py-16">
@@ -19,19 +20,19 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
               <li>
-                <a href="#" className="ulink">
+                <button type="button" className="ulink text-left">
                   Manifesto
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="ulink">
+                <button type="button" className="ulink text-left">
                   Comunidade
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="ulink">
+                <button type="button" className="ulink text-left">
                   Contato
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -42,9 +43,9 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
               <li>
-                <a href="#projetos" className="ulink">
+                <button type="button" className="ulink text-left">
                   Projetos
-                </a>
+                </button>
               </li>
               <li>
                 <a href="#como-funciona" className="ulink">
@@ -52,9 +53,9 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="ulink">
+                <button type="button" className="ulink text-left">
                   Criar projeto
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -65,21 +66,21 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
               <li>
-                <a href="#" className="ulink">
+                <button type="button" className="ulink text-left">
                   Termos
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="ulink">
+                <button type="button" className="ulink text-left">
                   Privacidade
-                </a>
+                </button>
               </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-[12.5px] text-white/50">
-          <span>© 2026 Juntaê · feito devagar, no Nordeste</span>
+          <span>© {currentYear} Juntaê · feito devagar, no Nordeste</span>
           <span className="serif text-white/70">até logo 👋</span>
         </div>
       </div>

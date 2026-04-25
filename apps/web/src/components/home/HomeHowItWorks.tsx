@@ -9,7 +9,7 @@ const steps = [
   {
     n: '02',
     title: 'Forma um time',
-    body: 'A gente te conecta com pessoas que têm as habilidades que faltam  dev, design, produto, o que for.',
+    body: 'A gente te conecta com pessoas que têm as habilidades que faltam — dev, design, produto, o que for.',
   },
   {
     n: '03',
@@ -38,7 +38,7 @@ export function HomeHowItWorks() {
                 <span className="display tnum text-[44px] font-bold leading-none text-accent">
                   {s.n}
                 </span>
-                {i < 2 && (
+                {i < steps.length - 1 && (
                   <span
                     className="relative -top-2.5 hidden h-px flex-1 bg-line-2 md:block"
                     aria-hidden="true"

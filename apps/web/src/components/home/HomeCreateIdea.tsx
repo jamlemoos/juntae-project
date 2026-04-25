@@ -25,9 +25,9 @@ export function HomeCreateIdea() {
             </button>
             <span className="text-[13.5px] text-mute">
               ou{' '}
-              <a href="#" className="ulink text-ink">
+              <button type="button" className="ulink text-ink">
                 veja exemplos de convite
-              </a>
+              </button>
             </span>
           </div>
         </div>
