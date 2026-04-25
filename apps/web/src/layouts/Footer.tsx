@@ -27,7 +27,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/" hash="sua-vez" className="ulink">
+                <Link to="/projects/new" className="ulink">
                   Criar projeto
                 </Link>
               </li>
