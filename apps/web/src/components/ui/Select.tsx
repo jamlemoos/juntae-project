@@ -19,9 +19,13 @@ export function Select({
   placeholder,
   id,
   className,
+  value,
+  defaultValue,
   ...props
 }: SelectProps) {
   const selectId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+  const shouldUsePlaceholderDefault =
+    placeholder !== undefined && value === undefined && defaultValue === undefined;
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
@@ -31,6 +35,8 @@ export function Select({
       )}
       <select
         id={selectId}
+        value={value}
+        defaultValue={shouldUsePlaceholderDefault ? '' : defaultValue}
         {...props}
         className={[
           'w-full rounded-lg border bg-surface px-3 py-2.5 text-sm text-content',

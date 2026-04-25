@@ -2,7 +2,7 @@ const EXAMPLE_ROLES = ['dev front-end', 'dev back-end', 'designer de produto'];
 
 export function HomeCreateIdea() {
   return (
-    <section className="relative overflow-hidden border-t hairline bg-cream-2">
+    <section id="sua-vez" className="relative overflow-hidden border-t hairline bg-cream-2">
       <div className="relative mx-auto grid max-w-[1200px] grid-cols-12 items-center gap-8 px-6 py-24 md:py-28">
         <div className="col-span-12 lg:col-span-7">
           <div className="mb-4 text-[11.5px] font-medium uppercase tracking-[.18em] text-mute">
@@ -23,12 +23,7 @@ export function HomeCreateIdea() {
             >
               Contar minha ideia
             </button>
-            <span className="text-[13.5px] text-mute">
-              ou{' '}
-              <button type="button" className="ulink text-ink">
-                veja exemplos de convite
-              </button>
-            </span>
+            <span className="text-[13.5px] text-mute">ou veja exemplos de convite</span>
           </div>
         </div>
 

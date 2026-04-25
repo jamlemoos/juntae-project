@@ -55,12 +55,12 @@ export function HomeHowItWorks() {
           <p className="max-w-lg text-[14.5px] text-ink-2">
             É de graça pra sempre pra quem constrói. A gente só está começando, então entra junto.
           </p>
-          <button
-            type="button"
+          <a
+            href="#sua-vez"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             Criar um projeto <ArrowIcon />
-          </button>
+          </a>
         </div>
       </div>
     </section>

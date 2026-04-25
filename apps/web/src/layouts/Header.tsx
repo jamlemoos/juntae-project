@@ -21,18 +21,15 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            className="inline-flex h-9 items-center justify-center rounded-full px-4 text-[13px] font-medium text-ink transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-          >
+          <span className="inline-flex h-9 cursor-default items-center justify-center rounded-full px-4 text-[13px] font-medium text-ink select-none">
             Entrar
-          </button>
-          <button
-            type="button"
+          </span>
+          <a
+            href="#sua-vez"
             className="inline-flex h-9 items-center justify-center rounded-full bg-ink px-4 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             Criar projeto
-          </button>
+          </a>
         </div>
       </div>
     </header>

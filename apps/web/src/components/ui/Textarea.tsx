@@ -7,6 +7,7 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 
 export function Textarea({ label, error, id, rows = 4, className, ...props }: TextareaProps) {
   const textareaId = id ?? label?.toLowerCase().replace(/\s+/g, '-');
+  const errorId = error ? `${textareaId}-error` : undefined;
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
@@ -18,6 +19,8 @@ export function Textarea({ label, error, id, rows = 4, className, ...props }: Te
         id={textareaId}
         rows={rows}
         {...props}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={errorId}
         className={[
           'w-full rounded-lg border bg-surface px-3 py-2.5 text-sm text-content resize-y',
           'placeholder:text-content-tertiary',
@@ -30,7 +33,11 @@ export function Textarea({ label, error, id, rows = 4, className, ...props }: Te
           .filter(Boolean)
           .join(' ')}
       />
-      {error && <p className="text-xs text-error">{error}</p>}
+      {error && (
+        <p id={errorId} className="text-xs text-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

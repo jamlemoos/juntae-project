@@ -20,19 +20,13 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
               <li>
-                <button type="button" className="ulink text-left">
-                  Manifesto
-                </button>
+                <span className="text-white/70">Manifesto</span>
               </li>
               <li>
-                <button type="button" className="ulink text-left">
-                  Comunidade
-                </button>
+                <span className="text-white/70">Comunidade</span>
               </li>
               <li>
-                <button type="button" className="ulink text-left">
-                  Contato
-                </button>
+                <span className="text-white/70">Contato</span>
               </li>
             </ul>
           </div>
@@ -43,9 +37,7 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
               <li>
-                <button type="button" className="ulink text-left">
-                  Projetos
-                </button>
+                <span className="text-white/70">Projetos</span>
               </li>
               <li>
                 <a href="#como-funciona" className="ulink">
@@ -53,9 +45,9 @@ export function Footer() {
                 </a>
               </li>
               <li>
-                <button type="button" className="ulink text-left">
+                <a href="#sua-vez" className="ulink">
                   Criar projeto
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -66,14 +58,10 @@ export function Footer() {
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
               <li>
-                <button type="button" className="ulink text-left">
-                  Termos
-                </button>
+                <span className="text-white/70">Termos</span>
               </li>
               <li>
-                <button type="button" className="ulink text-left">
-                  Privacidade
-                </button>
+                <span className="text-white/70">Privacidade</span>
               </li>
             </ul>
           </div>
