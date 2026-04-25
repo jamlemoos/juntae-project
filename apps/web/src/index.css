@@ -121,7 +121,7 @@
 
   /* Hairline border colour */
   .hairline {
-    border-color: #e2d6bd;
+    border-color: var(--color-line);
   }
 
   /* Dotted horizontal connector */

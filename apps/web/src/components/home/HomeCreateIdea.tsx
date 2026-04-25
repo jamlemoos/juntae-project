@@ -22,11 +22,15 @@ export function HomeCreateIdea() {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <button
               type="button"
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              disabled
+              aria-disabled="true"
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white opacity-60 disabled:cursor-not-allowed"
             >
               Contar minha ideia
             </button>
-            <span className="text-[13.5px] text-mute">ou veja exemplos de convite</span>
+            <span className="text-[13.5px] text-mute">
+              em breve — por enquanto, veja exemplos de convite
+            </span>
           </div>
         </div>
 
@@ -34,8 +38,7 @@ export function HomeCreateIdea() {
           <div className="lift relative rounded-[28px] bg-cream-2 p-7 ring-1 ring-line">
             <div className="mb-5 flex items-center gap-3">
               <span
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[12px] font-semibold text-cream"
-                style={{ background: '#2a2620' }}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink text-[12px] font-semibold text-cream"
                 aria-hidden="true"
               >
                 Vo
