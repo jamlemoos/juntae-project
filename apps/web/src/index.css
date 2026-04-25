@@ -99,8 +99,13 @@
     transform-origin: left;
     transition: transform 0.3s ease;
   }
-  .ulink:hover::after {
+  .ulink:hover::after,
+  .ulink:focus-visible::after {
     transform: scaleX(1);
+  }
+  .ulink:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
   }
 
   /* Card lift on hover */
