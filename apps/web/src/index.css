@@ -42,8 +42,8 @@
 @layer base {
   html,
   body {
-    background-color: #f7f1e6;
-    color: #2a2620;
+    background-color: var(--color-surface);
+    color: var(--color-content);
   }
   body {
     font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;

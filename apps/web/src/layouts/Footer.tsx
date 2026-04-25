@@ -14,31 +14,11 @@ export function Footer() {
             </p>
           </div>
 
-          <div className="col-span-6 md:col-span-2">
-            <div className="mb-3 text-[11.5px] font-medium uppercase tracking-[.2em] text-white/40">
-              a gente
-            </div>
-            <ul className="space-y-2 text-[14px] text-white/85">
-              <li>
-                <span className="text-white/70">Manifesto</span>
-              </li>
-              <li>
-                <span className="text-white/70">Comunidade</span>
-              </li>
-              <li>
-                <span className="text-white/70">Contato</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="col-span-6 md:col-span-2">
+          <div className="col-span-12 md:col-span-3">
             <div className="mb-3 text-[11.5px] font-medium uppercase tracking-[.2em] text-white/40">
               explorar
             </div>
             <ul className="space-y-2 text-[14px] text-white/85">
-              <li>
-                <span className="text-white/70">Projetos</span>
-              </li>
               <li>
                 <a href="#como-funciona" className="ulink">
                   Como funciona
@@ -48,20 +28,6 @@ export function Footer() {
                 <a href="#sua-vez" className="ulink">
                   Criar projeto
                 </a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="col-span-12 md:col-span-2">
-            <div className="mb-3 text-[11.5px] font-medium uppercase tracking-[.2em] text-white/40">
-              legal
-            </div>
-            <ul className="space-y-2 text-[14px] text-white/85">
-              <li>
-                <span className="text-white/70">Termos</span>
-              </li>
-              <li>
-                <span className="text-white/70">Privacidade</span>
               </li>
             </ul>
           </div>

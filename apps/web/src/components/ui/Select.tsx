@@ -27,8 +27,10 @@ export function Select({
   const generatedId = useId();
   const selectId = id ?? generatedId;
   const errorId = error ? `${selectId}-error` : undefined;
-  const shouldUsePlaceholderDefault =
-    placeholder !== undefined && value === undefined && defaultValue === undefined;
+  const isControlled = value !== undefined;
+  const placeholderDefault =
+    !isControlled && placeholder !== undefined && defaultValue === undefined ? '' : defaultValue;
+  const modeProps = isControlled ? { value } : { defaultValue: placeholderDefault };
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
@@ -38,8 +40,7 @@ export function Select({
       )}
       <select
         id={selectId}
-        value={value}
-        defaultValue={shouldUsePlaceholderDefault ? '' : defaultValue}
+        {...modeProps}
         {...props}
         aria-invalid={error ? true : undefined}
         aria-describedby={errorId}
