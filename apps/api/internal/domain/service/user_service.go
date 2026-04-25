@@ -3,10 +3,12 @@ package service
 import (
 	"fmt"
 
-	"github.com/google/uuid"
 	"juntae-api/internal/domain/dto"
 	"juntae-api/internal/domain/model"
 	"juntae-api/internal/domain/repository"
+	"juntae-api/internal/security"
+
+	"github.com/google/uuid"
 )
 
 type UserService struct {
@@ -20,11 +22,17 @@ func NewUserService(repo *repository.UserRepository, skillRepo *repository.Skill
 }
 
 func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.UserResponse, error) {
+	hashedPassword, err := security.HashPassword(req.Password)
+	if err != nil {
+		return nil, fmt.Errorf("hash password: %w", err)
+	}
 	user := &model.User{
-		Name:  req.Name,
-		Email: req.Email,
-		Bio:   req.Bio,
-		City:  req.City,
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: hashedPassword,
+		Role:     "member",
+		Bio:      req.Bio,
+		City:     req.City,
 	}
 	if len(req.SkillIDs) > 0 {
 		skills, err := s.skillRepo.FindByIDs(req.SkillIDs)
@@ -96,6 +104,23 @@ func (s *UserService) DeleteUser(id uuid.UUID) error {
 		return fmt.Errorf("delete user: %w", err)
 	}
 	return nil
+}
+
+func (s *UserService) Login(email, password string) (string, *dto.UserResponse, error) {
+	user, err := s.repo.FindByEmail(email)
+	if err != nil {
+		return "", nil, fmt.Errorf("user not found")
+	}
+	if !security.CheckPasswordHash(password, user.Password) {
+		return "", nil, fmt.Errorf("invalid credentials")
+	}
+	token, err := security.GenerateToken(user.ID, user.Role)
+	if err != nil {
+		return "", nil, fmt.Errorf("generate token: %w", err)
+	}
+	_ = s.audit.LogCreate("Login", user.ID, fmt.Sprintf("User logged in: %s", user.Email))
+	resp := mapUserResponse(user)
+	return token, &resp, nil
 }
 
 func mapUserResponse(u *model.User) dto.UserResponse {

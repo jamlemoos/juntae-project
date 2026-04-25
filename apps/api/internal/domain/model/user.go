@@ -11,6 +11,8 @@ type User struct {
 	ID           uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Name         string    `gorm:"not null"`
 	Email        string    `gorm:"not null;uniqueIndex"`
+	Password     string    `gorm:"not null"`
+	Role         string    `gorm:"not null;default:'member'"`
 	Bio          string
 	City         string        `gorm:"not null"`
 	Skills       []Skill       `gorm:"many2many:user_skills"`

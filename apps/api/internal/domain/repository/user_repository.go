@@ -1,9 +1,10 @@
 package repository
 
 import (
+	"juntae-api/internal/domain/model"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"juntae-api/internal/domain/model"
 )
 
 type UserRepository struct {
@@ -49,4 +50,12 @@ func (r *UserRepository) FindSkillsByIDs(ids []uuid.UUID) ([]model.Skill, error)
 	var skills []model.Skill
 	err := r.db.Where("id IN ?", ids).Find(&skills).Error
 	return skills, err
+}
+
+func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
+	var user model.User
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
