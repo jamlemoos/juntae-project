@@ -9,6 +9,16 @@ import { Header } from '../layouts/Header';
 const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail inválido');
 const passwordSchema = z.string().min(1, 'Senha obrigatória');
 
+function validateEmail(value: string) {
+  const r = emailSchema.safeParse(value);
+  return r.success ? undefined : r.error.issues[0]?.message;
+}
+
+function validatePassword(value: string) {
+  const r = passwordSchema.safeParse(value);
+  return r.success ? undefined : r.error.issues[0]?.message;
+}
+
 export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -69,10 +79,8 @@ export function LoginPage() {
                 <form.Field
                   name="email"
                   validators={{
-                    onBlur: ({ value }) => {
-                      const r = emailSchema.safeParse(value);
-                      return r.success ? undefined : r.error.issues[0]?.message;
-                    },
+                    onBlur: ({ value }) => validateEmail(value),
+                    onSubmit: ({ value }) => validateEmail(value),
                   }}
                 >
                   {(field) => (
@@ -92,10 +100,8 @@ export function LoginPage() {
                 <form.Field
                   name="password"
                   validators={{
-                    onBlur: ({ value }) => {
-                      const r = passwordSchema.safeParse(value);
-                      return r.success ? undefined : r.error.issues[0]?.message;
-                    },
+                    onBlur: ({ value }) => validatePassword(value),
+                    onSubmit: ({ value }) => validatePassword(value),
                   }}
                 >
                   {(field) => (

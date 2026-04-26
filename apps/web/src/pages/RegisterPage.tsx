@@ -11,6 +11,26 @@ const nameSchema = z.string().min(2, 'Nome deve ter pelo menos 2 caracteres');
 const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail inválido');
 const passwordSchema = z.string().min(8, 'Senha deve ter pelo menos 8 caracteres');
 
+function validateName(value: string) {
+  const r = nameSchema.safeParse(value);
+  return r.success ? undefined : r.error.issues[0]?.message;
+}
+
+function validateEmail(value: string) {
+  const r = emailSchema.safeParse(value);
+  return r.success ? undefined : r.error.issues[0]?.message;
+}
+
+function validatePassword(value: string) {
+  const r = passwordSchema.safeParse(value);
+  return r.success ? undefined : r.error.issues[0]?.message;
+}
+
+function validateConfirmPassword(value: string, password: string) {
+  if (!value) return 'Confirme sua senha';
+  if (value !== password) return 'As senhas não coincidem';
+}
+
 const BENEFITS = [
   { key: 'de graça', value: 'pra sempre, pra quem constrói.' },
   { key: 'só o essencial', value: 'nome, email, senha. nada de questionário.' },
@@ -93,10 +113,8 @@ export function RegisterPage() {
                 <form.Field
                   name="name"
                   validators={{
-                    onBlur: ({ value }) => {
-                      const r = nameSchema.safeParse(value);
-                      return r.success ? undefined : r.error.issues[0]?.message;
-                    },
+                    onBlur: ({ value }) => validateName(value),
+                    onSubmit: ({ value }) => validateName(value),
                   }}
                 >
                   {(field) => (
@@ -116,10 +134,8 @@ export function RegisterPage() {
                 <form.Field
                   name="email"
                   validators={{
-                    onBlur: ({ value }) => {
-                      const r = emailSchema.safeParse(value);
-                      return r.success ? undefined : r.error.issues[0]?.message;
-                    },
+                    onBlur: ({ value }) => validateEmail(value),
+                    onSubmit: ({ value }) => validateEmail(value),
                   }}
                 >
                   {(field) => (
@@ -140,10 +156,8 @@ export function RegisterPage() {
                 <form.Field
                   name="password"
                   validators={{
-                    onBlur: ({ value }) => {
-                      const r = passwordSchema.safeParse(value);
-                      return r.success ? undefined : r.error.issues[0]?.message;
-                    },
+                    onBlur: ({ value }) => validatePassword(value),
+                    onSubmit: ({ value }) => validatePassword(value),
                   }}
                 >
                   {(field) => {
@@ -180,11 +194,10 @@ export function RegisterPage() {
                 <form.Field
                   name="confirmPassword"
                   validators={{
-                    onBlur: ({ value, fieldApi }) => {
-                      if (!value) return 'Confirme sua senha';
-                      const password = fieldApi.form.getFieldValue('password');
-                      if (value !== password) return 'As senhas não coincidem';
-                    },
+                    onBlur: ({ value, fieldApi }) =>
+                      validateConfirmPassword(value, fieldApi.form.getFieldValue('password')),
+                    onSubmit: ({ value, fieldApi }) =>
+                      validateConfirmPassword(value, fieldApi.form.getFieldValue('password')),
                   }}
                 >
                   {(field) => (

@@ -22,7 +22,7 @@ export function AuthField({ label, error, hint, rightLabel, className, ...props 
           {label}
         </label>
         {error ? (
-          <span id={`${id}-error`} className="text-[11.5px] font-medium text-accent">
+          <span id={`${id}-error`} role="alert" className="text-[11.5px] font-medium text-accent">
             {error}
           </span>
         ) : (
