@@ -1,10 +1,12 @@
 import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
+import { AppLayout } from './layouts/AppLayout';
 import { AuthLayout } from './layouts/AuthLayout';
 import { PublicLayout } from './layouts/PublicLayout';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NewProjectPage } from './pages/NewProjectPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { RegisterPage } from './pages/RegisterPage';
 
@@ -29,22 +31,17 @@ const authLayoutRoute = createRoute({
   component: AuthLayout,
 });
 
+// Authenticated app pages — app shell; guard blocks access until backend auth is ready
+const appLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'app-layout',
+  component: AppLayout,
+});
+
 const indexRoute = createRoute({
   getParentRoute: () => publicLayoutRoute,
   path: '/',
   component: HomePage,
-});
-
-const projectsRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/projects',
-  component: ProjectsPage,
-});
-
-const newProjectRoute = createRoute({
-  getParentRoute: () => publicLayoutRoute,
-  path: '/projects/new',
-  component: NewProjectPage,
 });
 
 const loginRoute = createRoute({
@@ -59,9 +56,28 @@ const registerRoute = createRoute({
   component: RegisterPage,
 });
 
+const projectsRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/projects',
+  component: ProjectsPage,
+});
+
+const newProjectRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/projects/new',
+  component: NewProjectPage,
+});
+
+const profileRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/profile',
+  component: ProfilePage,
+});
+
 const routeTree = rootRoute.addChildren([
-  publicLayoutRoute.addChildren([indexRoute, projectsRoute, newProjectRoute]),
+  publicLayoutRoute.addChildren([indexRoute]),
   authLayoutRoute.addChildren([loginRoute, registerRoute]),
+  appLayoutRoute.addChildren([projectsRoute, newProjectRoute, profileRoute]),
 ]);
 
 export const router = createRouter({ routeTree });
