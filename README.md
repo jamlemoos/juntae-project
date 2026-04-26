@@ -14,7 +14,7 @@ docker-compose.yml  # bancos de dados (PostgreSQL)
 ## Pré-requisitos
 
 - Go 1.21+
-- Node.js 20+
+- Node.js 20.19+ (apps/web)
 - Docker + Docker Compose
 
 ## Subindo os bancos de dados

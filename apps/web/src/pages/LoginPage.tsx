@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
+import { login } from '../features/auth/api/authApi';
 import { AuthField } from '../components/auth/AuthField';
 import { ArrowIcon } from '../components/ui/ArrowIcon';
 import { Header } from '../layouts/Header';
@@ -19,21 +20,7 @@ export function LoginPage() {
     onSubmit: async ({ value }) => {
       setServerError(null);
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL ?? 'http://localhost:8080'}/api/auth/login`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-              email: value.email,
-              password: value.password,
-              rememberMe,
-            }),
-          }
-        );
+        const response = await login({ email: value.email, password: value.password, rememberMe });
 
         if (response.ok) {
           await navigate({ to: '/' });
