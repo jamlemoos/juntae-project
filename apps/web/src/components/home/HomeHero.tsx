@@ -17,10 +17,10 @@ export function HomeHero() {
 
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link
-              to="/projects/new"
+              to="/register"
               className="inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
             >
-              Criar um projeto
+              Criar uma conta
               <ArrowIcon />
             </Link>
             <a href="#como-funciona" className="ulink text-[14px] font-medium text-ink-2">

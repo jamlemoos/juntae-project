@@ -1,7 +1,8 @@
 import { Link } from '@tanstack/react-router';
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export function Footer() {
-  const currentYear = new Date().getFullYear();
   return (
     <footer className="bg-ink text-cream">
       <div className="mx-auto max-w-[1200px] px-6 py-16">
@@ -36,8 +37,10 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-[12.5px] text-white/50">
-          <span>© {currentYear} Juntaê · feito devagar, no Nordeste</span>
-          <span className="serif text-white/70">até logo 👋</span>
+          <span>© {CURRENT_YEAR} Juntaê · feito devagar, no Nordeste</span>
+          <span className="serif text-white/70">
+            até logo <span aria-hidden="true">👋</span>
+          </span>
         </div>
       </div>
     </footer>

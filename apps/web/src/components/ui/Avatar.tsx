@@ -18,6 +18,7 @@ export function Avatar({ name, initials, avatarColor, size = 'md' }: AvatarProps
   const style: CSSProperties = { backgroundColor: avatarColor };
   return (
     <span
+      role="img"
       className={[
         'rounded-full flex items-center justify-center font-semibold text-white flex-shrink-0 ring-2 ring-surface',
         sizeClasses[size],

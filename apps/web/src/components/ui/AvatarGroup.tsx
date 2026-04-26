@@ -28,6 +28,7 @@ export function AvatarGroup({ members, max = 4 }: AvatarGroupProps) {
       ))}
       {overflow > 0 && (
         <span
+          role="img"
           className="w-7 h-7 rounded-full bg-surface-subtle border border-border text-xs font-medium text-content-secondary flex items-center justify-center flex-shrink-0 ring-2 ring-surface"
           aria-label={`Mais ${overflow} pessoas`}
         >

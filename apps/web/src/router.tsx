@@ -1,12 +1,20 @@
 import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/react-router';
+import { AuthLayout } from './layouts/AuthLayout';
 import { PublicLayout } from './layouts/PublicLayout';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NewProjectPage } from './pages/NewProjectPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { RegisterPage } from './pages/RegisterPage';
 
-const rootRoute = createRootRoute({
+// Bare root — child layout routes handle their own shell
+const rootRoute = createRootRoute({ component: Outlet, notFoundComponent: NotFoundPage });
+
+// Public pages — Header + main + Footer
+const publicLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'public-layout',
   component: () => (
     <PublicLayout>
       <Outlet />
@@ -14,42 +22,46 @@ const rootRoute = createRootRoute({
   ),
 });
 
-const indexRoute = createRoute({
+// Auth pages — bare shell wrapping <Outlet />; each page owns its own Header and two-panel layout
+const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: 'auth-layout',
+  component: AuthLayout,
+});
+
+const indexRoute = createRoute({
+  getParentRoute: () => publicLayoutRoute,
   path: '/',
   component: HomePage,
 });
 
 const projectsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => publicLayoutRoute,
   path: '/projects',
   component: ProjectsPage,
 });
 
 const newProjectRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => publicLayoutRoute,
   path: '/projects/new',
   component: NewProjectPage,
 });
 
 const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authLayoutRoute,
   path: '/login',
   component: LoginPage,
 });
 
 const registerRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => authLayoutRoute,
   path: '/register',
   component: RegisterPage,
 });
 
 const routeTree = rootRoute.addChildren([
-  indexRoute,
-  projectsRoute,
-  newProjectRoute,
-  loginRoute,
-  registerRoute,
+  publicLayoutRoute.addChildren([indexRoute, projectsRoute, newProjectRoute]),
+  authLayoutRoute.addChildren([loginRoute, registerRoute]),
 ]);
 
 export const router = createRouter({ routeTree });
