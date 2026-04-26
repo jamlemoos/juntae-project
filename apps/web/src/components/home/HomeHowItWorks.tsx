@@ -21,7 +21,7 @@ const steps = [
 
 export function HomeHowItWorks() {
   return (
-    <section id="como-funciona" className="scroll-mt-20 border-t hairline bg-cream-2">
+    <section id="como-funciona" className="scroll-mt-20 border-t hairline">
       <div className="mx-auto max-w-[1200px] px-6 py-20 md:py-24">
         <div className="mb-14 max-w-[640px]">
           <div className="mb-3 text-[11.5px] font-medium uppercase tracking-[.18em] text-mute">
@@ -57,7 +57,7 @@ export function HomeHowItWorks() {
             É de graça pra sempre pra quem constrói. A gente só está começando, então entra junto.
           </p>
           <Link
-            to="/projects/new"
+            to="/register"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
             Criar um projeto <ArrowIcon />
