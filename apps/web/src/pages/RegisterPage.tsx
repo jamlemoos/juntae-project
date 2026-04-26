@@ -25,8 +25,8 @@ export function RegisterPage() {
     defaultValues: { name: '', email: '', password: '', confirmPassword: '' },
     onSubmit: async () => {
       if (!termsAccepted) return;
-      setServerError(null);
-      // TODO: call auth API — on failure: setServerError('Não foi possível criar sua conta.')
+      // TODO: call register API when backend auth endpoint is available.
+      setServerError('Cadastro ainda não está conectado ao backend.');
     },
   });
 

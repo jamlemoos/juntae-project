@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
-import { login } from '../features/auth/api/authApi';
 import { AuthField } from '../components/auth/AuthField';
 import { ArrowIcon } from '../components/ui/ArrowIcon';
 import { Header } from '../layouts/Header';
@@ -11,25 +10,14 @@ const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail invá
 const passwordSchema = z.string().min(1, 'Senha obrigatória');
 
 export function LoginPage() {
-  const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: { email: '', password: '' },
-    onSubmit: async ({ value }) => {
-      setServerError(null);
-      try {
-        const response = await login({ email: value.email, password: value.password, rememberMe });
-
-        if (response.ok) {
-          await navigate({ to: '/' });
-        } else {
-          setServerError('E-mail ou senha incorretos.');
-        }
-      } catch {
-        setServerError('E-mail ou senha incorretos.');
-      }
+    onSubmit: async () => {
+      // TODO: call login API when backend exposes auth endpoints.
+      setServerError('Login ainda não está conectado ao backend.');
     },
   });
 
@@ -134,9 +122,7 @@ export function LoginPage() {
                     />
                     lembrar de mim
                   </label>
-                  <button type="button" className="ulink text-[13px] text-mute">
-                    esqueci a senha
-                  </button>
+                  <span className="text-[13px] text-mute">esqueci a senha</span>
                 </div>
               </div>
 

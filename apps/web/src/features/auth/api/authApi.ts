@@ -1,4 +1,5 @@
-import { apiFetch } from '../../../shared/api/http';
+// TODO: implement when backend exposes auth endpoints.
+// The backend currently has no /api/auth/* routes.
 
 export type LoginInput = {
   email: string;
@@ -6,9 +7,8 @@ export type LoginInput = {
   rememberMe: boolean;
 };
 
-export function login(input: LoginInput) {
-  return apiFetch('/api/auth/login', {
-    method: 'POST',
-    body: JSON.stringify(input),
-  });
-}
+export type RegisterInput = {
+  name: string;
+  email: string;
+  password: string;
+};
