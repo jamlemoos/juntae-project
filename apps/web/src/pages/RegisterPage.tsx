@@ -10,16 +10,83 @@ const nameSchema = z.string().min(2, 'Nome deve ter pelo menos 2 caracteres');
 const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail inválido');
 const passwordSchema = z.string().min(8, 'Senha deve ter pelo menos 8 caracteres');
 
-function getPasswordStrength(pw: string): number {
-  let s = 0;
-  if (pw.length >= 8) s++;
-  if (/[A-Z]/.test(pw)) s++;
-  if (/[0-9]/.test(pw)) s++;
-  if (/[^A-Za-z0-9]/.test(pw)) s++;
-  return s;
-}
+type PasswordStrengthLevel = 'empty' | 'weak' | 'medium' | 'strong';
 
-const STRENGTH_LABELS = ['curtinha', 'curtinha', 'dá pra melhorar', 'boa', 'ótima'];
+type PasswordStrength = {
+  level: PasswordStrengthLevel;
+  score: 0 | 1 | 2 | 3;
+  label: string;
+  feedback: string;
+  checks: {
+    hasMinimumLength: boolean;
+    hasUppercase: boolean;
+    hasNumber: boolean;
+    hasSymbol: boolean;
+  };
+};
+
+const MIN_PASSWORD_LENGTH = 8;
+
+function assessPasswordStrength(password: string): PasswordStrength {
+  const checks = {
+    hasMinimumLength: password.length >= MIN_PASSWORD_LENGTH,
+    hasUppercase: /[A-Z]/.test(password),
+    hasNumber: /\d/.test(password),
+    hasSymbol: /[^A-Za-z0-9]/.test(password),
+  };
+
+  if (password.length === 0) {
+    return {
+      level: 'empty',
+      score: 0,
+      label: 'vazia',
+      feedback: `Use pelo menos ${MIN_PASSWORD_LENGTH} caracteres.`,
+      checks,
+    };
+  }
+
+  if (!checks.hasMinimumLength) {
+    return {
+      level: 'weak',
+      score: 1,
+      label: 'fraca',
+      feedback: `Use pelo menos ${MIN_PASSWORD_LENGTH} caracteres.`,
+      checks,
+    };
+  }
+
+  const complexityScore = [checks.hasUppercase, checks.hasNumber, checks.hasSymbol].filter(
+    Boolean
+  ).length;
+
+  if (complexityScore >= 2) {
+    return {
+      level: 'strong',
+      score: 3,
+      label: 'forte',
+      feedback: 'Boa senha.',
+      checks,
+    };
+  }
+
+  if (complexityScore === 1) {
+    return {
+      level: 'medium',
+      score: 2,
+      label: 'média',
+      feedback: 'Boa base. Adicione mais variedade para fortalecer.',
+      checks,
+    };
+  }
+
+  return {
+    level: 'weak',
+    score: 1,
+    label: 'fraca',
+    feedback: 'Adicione letras maiúsculas, números ou símbolos.',
+    checks,
+  };
+}
 
 const BENEFITS = [
   { key: 'de graça', value: 'pra sempre, pra quem constrói.' },
@@ -158,8 +225,9 @@ export function RegisterPage() {
                 >
                   {(field) => {
                     const pw = field.state.value;
-                    const strength = getPasswordStrength(pw);
-                    const rightLabel = pw === '' ? '8+ caracteres' : STRENGTH_LABELS[strength];
+                    const passwordStrength = assessPasswordStrength(pw);
+                    const rightLabel =
+                      passwordStrength.level === 'empty' ? '8+ caracteres' : passwordStrength.label;
                     return (
                       <div>
                         <AuthField
@@ -177,7 +245,7 @@ export function RegisterPage() {
                           {[0, 1, 2, 3].map((i) => (
                             <span
                               key={i}
-                              className={`h-[3px] flex-1 rounded-full transition-colors ${i < strength ? 'bg-accent' : 'bg-line'}`}
+                              className={`h-[3px] flex-1 rounded-full transition-colors ${i < passwordStrength.score ? 'bg-accent' : 'bg-line'}`}
                             />
                           ))}
                         </div>

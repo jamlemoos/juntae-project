@@ -60,7 +60,7 @@ export function HomeHowItWorks() {
             to="/register"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
-            Criar um projeto <ArrowIcon />
+            Criar uma conta <ArrowIcon />
           </Link>
         </div>
       </div>

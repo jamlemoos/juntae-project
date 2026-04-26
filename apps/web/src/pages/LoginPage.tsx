@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 import { AuthField } from '../components/auth/AuthField';
@@ -10,6 +10,7 @@ const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail invá
 const passwordSchema = z.string().min(1, 'Senha obrigatória');
 
 export function LoginPage() {
+  const navigate = useNavigate();
   const [rememberMe, setRememberMe] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -34,7 +35,9 @@ export function LoginPage() {
           }
         );
 
-        if (!response.ok) {
+        if (response.ok) {
+          await navigate({ to: '/' });
+        } else {
           setServerError('E-mail ou senha incorretos.');
         }
       } catch {

@@ -22,7 +22,7 @@ const publicLayoutRoute = createRoute({
   ),
 });
 
-// Auth pages — Header + two-panel, no Footer
+// Auth pages — bare shell wrapping <Outlet />; each page owns its own Header and two-panel layout
 const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'auth-layout',
