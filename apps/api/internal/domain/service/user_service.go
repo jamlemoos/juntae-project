@@ -8,6 +8,7 @@ import (
 	"juntae-api/internal/domain/model"
 	"juntae-api/internal/domain/repository"
 	"juntae-api/internal/security"
+	"strings"
 
 	"gorm.io/gorm"
 
@@ -25,6 +26,7 @@ func NewUserService(repo *repository.UserRepository, skillRepo *repository.Skill
 }
 
 func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.UserResponse, error) {
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	hashedPassword, err := security.HashPassword(req.Password)
 	if err != nil {
 		return nil, fmt.Errorf("hash password: %w", err)
@@ -81,7 +83,7 @@ func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.
 		return nil, fmt.Errorf("user not found: %w", err)
 	}
 	user.Name = req.Name
-	user.Email = req.Email
+	user.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	user.Bio = req.Bio
 	user.City = req.City
 
@@ -98,6 +100,11 @@ func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.
 	if err := s.repo.Update(user); err != nil {
 		return nil, fmt.Errorf("update user: %w", err)
 	}
+
+	if err := s.audit.LogAction("UPDATE", "User", user.ID, fmt.Sprintf("User updated profile: %s", user.Email)); err != nil {
+		fmt.Printf("Warning: failed to log audit for update: %v\n", err)
+	}
+
 	resp := mapUserResponse(user)
 	return &resp, nil
 }
@@ -110,7 +117,8 @@ func (s *UserService) DeleteUser(id uuid.UUID) error {
 }
 
 func (s *UserService) Login(email, password string) (string, *dto.UserResponse, error) {
-	user, err := s.repo.FindByEmail(email)
+	normalizedEmail := strings.ToLower(strings.TrimSpace(email))
+	user, err := s.repo.FindByEmail(normalizedEmail)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return "", nil, fmt.Errorf("invalid credentials")
@@ -125,7 +133,7 @@ func (s *UserService) Login(email, password string) (string, *dto.UserResponse, 
 	if err != nil {
 		return "", nil, fmt.Errorf("generate token: %w", err)
 	}
-	if err := s.audit.LogCreate("Login", user.ID, fmt.Sprintf("User logged in: %s", user.Email)); err != nil {
+	if err := s.audit.LogAction("LOGIN", "User", user.ID, fmt.Sprintf("User logged in: %s", user.Email)); err != nil {
 		return "", nil, fmt.Errorf("audit login: %w", err)
 	}
 

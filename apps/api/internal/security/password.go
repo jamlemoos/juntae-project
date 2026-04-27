@@ -2,16 +2,34 @@ package security
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
-const bcryptCost = 14
+func bcryptCost() int {
+	costValue := os.Getenv("BCRYPT_COST")
+	if costValue == "" {
+		return bcrypt.DefaultCost
+	}
+
+	cost, err := strconv.Atoi(costValue)
+	if err != nil {
+		return bcrypt.DefaultCost
+	}
+
+	if cost < bcrypt.MinCost || cost > bcrypt.MaxCost {
+		return bcrypt.DefaultCost
+	}
+
+	return cost
+}
 
 func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcryptCost())
 	if err != nil {
-		return "", fmt.Errorf("failed to hash password: %w", err)
+		return "", err
 	}
 	return string(bytes), nil
 }

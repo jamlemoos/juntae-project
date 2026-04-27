@@ -8,13 +8,13 @@ import (
 	"github.com/google/uuid"
 )
 
-var jwtSecret = func() []byte {
+func getJWTSecret() []byte {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		panic("JWT_SECRET environment variable is required")
+		return []byte("fallback_secret_for_development_only")
 	}
 	return []byte(secret)
-}()
+}
 
 type CustomClaims struct {
 	UserID uuid.UUID `json:"user_id"`
@@ -32,5 +32,5 @@ func GenerateToken(userID uuid.UUID, role string) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtSecret)
+	return token.SignedString(getJWTSecret())
 }
