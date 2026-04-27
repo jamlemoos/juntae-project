@@ -1,13 +1,20 @@
 package security
 
 import (
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
-var jwtSecret = []byte("your_secret_key")
+var jwtSecret = func() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		panic("JWT_SECRET environment variable is required")
+	}
+	return []byte(secret)
+}()
 
 type CustomClaims struct {
 	UserID uuid.UUID `json:"user_id"`

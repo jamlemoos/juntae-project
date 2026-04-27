@@ -1,12 +1,15 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 
 	"juntae-api/internal/domain/dto"
 	"juntae-api/internal/domain/model"
 	"juntae-api/internal/domain/repository"
 	"juntae-api/internal/security"
+
+	"gorm.io/gorm"
 
 	"github.com/google/uuid"
 )
@@ -109,16 +112,23 @@ func (s *UserService) DeleteUser(id uuid.UUID) error {
 func (s *UserService) Login(email, password string) (string, *dto.UserResponse, error) {
 	user, err := s.repo.FindByEmail(email)
 	if err != nil {
-		return "", nil, fmt.Errorf("user not found")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", nil, fmt.Errorf("invalid credentials")
+		}
+		return "", nil, fmt.Errorf("failed to fetch user: %w", err)
 	}
-	if !security.CheckPasswordHash(password, user.Password) {
+	isValid, err := security.CheckPasswordHash(password, user.Password)
+	if err != nil || !isValid {
 		return "", nil, fmt.Errorf("invalid credentials")
 	}
 	token, err := security.GenerateToken(user.ID, user.Role)
 	if err != nil {
 		return "", nil, fmt.Errorf("generate token: %w", err)
 	}
-	_ = s.audit.LogCreate("Login", user.ID, fmt.Sprintf("User logged in: %s", user.Email))
+	if err := s.audit.LogCreate("Login", user.ID, fmt.Sprintf("User logged in: %s", user.Email)); err != nil {
+		return "", nil, fmt.Errorf("audit login: %w", err)
+	}
+
 	resp := mapUserResponse(user)
 	return token, &resp, nil
 }
