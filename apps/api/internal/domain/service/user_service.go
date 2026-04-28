@@ -102,7 +102,7 @@ func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.
 	}
 
 	if err := s.audit.LogAction("UPDATE", "User", user.ID, fmt.Sprintf("User updated profile: %s", user.Email)); err != nil {
-		fmt.Printf("Warning: failed to log audit for update: %v\n", err)
+		return nil, fmt.Errorf("failed to log audit for update: %w", err)
 	}
 
 	resp := mapUserResponse(user)
