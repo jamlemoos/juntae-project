@@ -1,22 +1,37 @@
 package security
 
 import (
+	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
-func getJWTSecret() []byte {
+var jwtSecret []byte
+
+func InitJWT() error {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		if os.Getenv("APP_ENV") == "development" {
-			return []byte("fallback_secret_for_development_only")
+			secret = "fallback_secret_for_development_only"
+		} else {
+			return fmt.Errorf("JWT_SECRET must be set")
 		}
-		panic("JWT_SECRET must be set")
 	}
-	return []byte(secret)
+	jwtSecret = []byte(secret)
+	return nil
+}
+
+func getTokenTTL() time.Duration {
+	if val := os.Getenv("JWT_TTL_HOURS"); val != "" {
+		if hours, err := strconv.Atoi(val); err == nil && hours > 0 {
+			return time.Duration(hours) * time.Hour
+		}
+	}
+	return 24 * time.Hour
 }
 
 type CustomClaims struct {
@@ -26,14 +41,15 @@ type CustomClaims struct {
 }
 
 func GenerateToken(userID uuid.UUID, role string) (string, error) {
+	now := time.Now()
 	claims := CustomClaims{
 		UserID: userID,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(now.Add(getTokenTTL())),
+			IssuedAt:  jwt.NewNumericDate(now),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(getJWTSecret())
+	return token.SignedString(jwtSecret)
 }

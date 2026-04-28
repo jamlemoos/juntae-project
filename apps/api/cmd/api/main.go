@@ -8,6 +8,7 @@ import (
 	"juntae-api/internal/domain/repository"
 	"juntae-api/internal/domain/service"
 	"juntae-api/internal/router"
+	"juntae-api/internal/security"
 
 	"github.com/joho/godotenv"
 )
@@ -15,6 +16,10 @@ import (
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, reading environment variables directly")
+	}
+
+	if err := security.InitJWT(); err != nil {
+		log.Fatalf("Failed to initialize JWT: %v", err)
 	}
 
 	cfg, err := config.Load()

@@ -105,7 +105,7 @@ func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.
 	}
 
 	if err := s.audit.LogAction("UPDATE", "User", user.ID, fmt.Sprintf("User updated profile: %s", user.Email)); err != nil {
-		return nil, fmt.Errorf("failed to log audit for update: %w", err)
+		log.Printf("WARN: audit log failed for user update %s: %v", user.ID, err)
 	}
 
 	resp := mapUserResponse(user)
@@ -129,7 +129,6 @@ func (s *UserService) Login(email, password string) (string, *dto.UserResponse, 
 		return "", nil, fmt.Errorf("failed to fetch user: %w", err)
 	}
 
-	// Password NULL significa conta sem senha definida (ex: OAuth) — bloquear login
 	if user.Password == nil {
 		return "", nil, ErrInvalidCredentials
 	}
@@ -144,7 +143,6 @@ func (s *UserService) Login(email, password string) (string, *dto.UserResponse, 
 		return "", nil, fmt.Errorf("generate token: %w", err)
 	}
 
-	// Audit best-effort: falha no log não bloqueia o login do usuário
 	if err := s.audit.LogAction("LOGIN", "User", user.ID, fmt.Sprintf("User logged in: %s", user.Email)); err != nil {
 		log.Printf("WARN: audit log failed for user %s: %v", user.ID, err)
 	}
