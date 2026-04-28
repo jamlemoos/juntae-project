@@ -4,7 +4,7 @@ import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 import { assessPasswordStrength } from '../features/auth/utils/passwordStrength';
 import { AuthField } from '../components/auth/AuthField';
-import { ArrowIcon } from '../components/ui/ArrowIcon';
+import { ArrowRight } from 'lucide-react';
 import { Header } from '../layouts/Header';
 
 const nameSchema = z.string().min(2, 'Nome deve ter pelo menos 2 caracteres');
@@ -249,7 +249,7 @@ export function RegisterPage() {
                 className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {form.state.isSubmitting ? 'Criando conta…' : 'Criar conta'}
-                {!form.state.isSubmitting && <ArrowIcon />}
+                {!form.state.isSubmitting && <ArrowRight size={14} aria-hidden="true" />}
               </button>
 
               <p className="mt-5 text-center text-[13.5px] text-ink-2">

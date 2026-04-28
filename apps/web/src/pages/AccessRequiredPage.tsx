@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowIcon } from '../components/ui/ArrowIcon';
+import { ArrowRight } from 'lucide-react';
 
 export function AccessRequiredPage() {
   return (
@@ -23,7 +23,7 @@ export function AccessRequiredPage() {
             to="/login"
             className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
-            Entrar <ArrowIcon />
+            Entrar <ArrowRight size={14} aria-hidden="true" />
           </Link>
           <Link
             to="/register"

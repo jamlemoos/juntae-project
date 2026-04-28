@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowIcon } from '../ui/ArrowIcon';
+import { ArrowRight } from 'lucide-react';
 
 const steps = [
   {
@@ -60,7 +60,7 @@ export function HomeHowItWorks() {
             to="/register"
             className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
           >
-            Criar uma conta <ArrowIcon />
+            Criar uma conta <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </div>
       </div>

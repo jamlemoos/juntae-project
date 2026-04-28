@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowIcon } from '../ui/ArrowIcon';
+import { ArrowRight } from 'lucide-react';
 
 export function HomeHero() {
   return (
@@ -21,7 +21,7 @@ export function HomeHero() {
               className="inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
             >
               Criar uma conta
-              <ArrowIcon />
+              <ArrowRight size={14} aria-hidden="true" />
             </Link>
             <a href="#como-funciona" className="ulink text-[14px] font-medium text-ink-2">
               ou veja como funciona →

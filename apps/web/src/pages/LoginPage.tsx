@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 import { AuthField } from '../components/auth/AuthField';
-import { ArrowIcon } from '../components/ui/ArrowIcon';
+import { ArrowRight } from 'lucide-react';
 import { Header } from '../layouts/Header';
 
 const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail inválido');
@@ -146,7 +146,7 @@ export function LoginPage() {
                 className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
               >
                 {form.state.isSubmitting ? 'Entrando…' : 'Entrar'}
-                {!form.state.isSubmitting && <ArrowIcon />}
+                {!form.state.isSubmitting && <ArrowRight size={14} aria-hidden="true" />}
               </button>
 
               <p className="mt-5 text-center text-[13.5px] text-ink-2">
