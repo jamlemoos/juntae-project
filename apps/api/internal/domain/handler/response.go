@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
+	"juntae-api/internal/domain/service"
 	"juntae-api/internal/validation"
 
 	"github.com/gin-gonic/gin"
@@ -40,6 +42,10 @@ func parseUUIDParam(c *gin.Context, paramName string) (uuid.UUID, bool) {
 }
 
 func handleServiceError(c *gin.Context, err error) {
+	if errors.Is(err, service.ErrInvalidCredentials) {
+		respondWithError(c, http.StatusUnauthorized, "invalid credentials")
+		return
+	}
 	if strings.Contains(err.Error(), "record not found") {
 		respondWithError(c, http.StatusNotFound, err.Error())
 		return

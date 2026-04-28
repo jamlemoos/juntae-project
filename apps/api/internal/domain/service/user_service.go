@@ -3,17 +3,20 @@ package service
 import (
 	"errors"
 	"fmt"
+	"log"
+	"strings"
 
 	"juntae-api/internal/domain/dto"
 	"juntae-api/internal/domain/model"
 	"juntae-api/internal/domain/repository"
 	"juntae-api/internal/security"
-	"strings"
 
 	"gorm.io/gorm"
 
 	"github.com/google/uuid"
 )
+
+var ErrInvalidCredentials = errors.New("invalid credentials")
 
 type UserService struct {
 	repo      *repository.UserRepository
@@ -34,7 +37,7 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.UserResponse, 
 	user := &model.User{
 		Name:     req.Name,
 		Email:    req.Email,
-		Password: hashedPassword,
+		Password: &hashedPassword,
 		Role:     "member",
 		Bio:      req.Bio,
 		City:     req.City,
@@ -121,20 +124,29 @@ func (s *UserService) Login(email, password string) (string, *dto.UserResponse, 
 	user, err := s.repo.FindByEmail(normalizedEmail)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return "", nil, fmt.Errorf("invalid credentials")
+			return "", nil, ErrInvalidCredentials
 		}
 		return "", nil, fmt.Errorf("failed to fetch user: %w", err)
 	}
-	isValid, err := security.CheckPasswordHash(password, user.Password)
-	if err != nil || !isValid {
-		return "", nil, fmt.Errorf("invalid credentials")
+
+	// Password NULL significa conta sem senha definida (ex: OAuth) — bloquear login
+	if user.Password == nil {
+		return "", nil, ErrInvalidCredentials
 	}
+
+	isValid, err := security.CheckPasswordHash(password, *user.Password)
+	if err != nil || !isValid {
+		return "", nil, ErrInvalidCredentials
+	}
+
 	token, err := security.GenerateToken(user.ID, user.Role)
 	if err != nil {
 		return "", nil, fmt.Errorf("generate token: %w", err)
 	}
+
+	// Audit best-effort: falha no log não bloqueia o login do usuário
 	if err := s.audit.LogAction("LOGIN", "User", user.ID, fmt.Sprintf("User logged in: %s", user.Email)); err != nil {
-		return "", nil, fmt.Errorf("audit login: %w", err)
+		log.Printf("WARN: audit log failed for user %s: %v", user.ID, err)
 	}
 
 	resp := mapUserResponse(user)

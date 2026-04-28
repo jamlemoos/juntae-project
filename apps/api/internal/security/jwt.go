@@ -11,7 +11,10 @@ import (
 func getJWTSecret() []byte {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
-		return []byte("fallback_secret_for_development_only")
+		if os.Getenv("APP_ENV") == "development" {
+			return []byte("fallback_secret_for_development_only")
+		}
+		panic("JWT_SECRET must be set")
 	}
 	return []byte(secret)
 }
