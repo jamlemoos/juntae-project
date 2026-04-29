@@ -1,35 +1,17 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
-import { z } from 'zod';
 import { assessPasswordStrength } from '../features/auth/utils/passwordStrength';
+import { PasswordStrengthBar } from '../features/auth/components/PasswordStrengthBar';
 import { AuthField } from '../components/auth/AuthField';
 import { ArrowRight } from 'lucide-react';
 import { Header } from '../layouts/Header';
-
-const nameSchema = z.string().min(2, 'Nome deve ter pelo menos 2 caracteres');
-const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail inválido');
-const passwordSchema = z.string().min(8, 'Senha deve ter pelo menos 8 caracteres');
-
-function validateName(value: string) {
-  const r = nameSchema.safeParse(value);
-  return r.success ? undefined : r.error.issues[0]?.message;
-}
-
-function validateEmail(value: string) {
-  const r = emailSchema.safeParse(value);
-  return r.success ? undefined : r.error.issues[0]?.message;
-}
-
-function validatePassword(value: string) {
-  const r = passwordSchema.safeParse(value);
-  return r.success ? undefined : r.error.issues[0]?.message;
-}
-
-function validateConfirmPassword(value: string, password: string) {
-  if (!value) return 'Confirme sua senha';
-  if (value !== password) return 'As senhas não coincidem';
-}
+import {
+  validateName,
+  validateEmail,
+  validateRegisterPassword as validatePassword,
+  validateConfirmPassword,
+} from '../features/auth/utils/authValidation';
 
 const BENEFITS = [
   { key: 'de graça', value: 'pra sempre, pra quem constrói.' },
@@ -178,14 +160,7 @@ export function RegisterPage() {
                           error={field.state.meta.errors[0] as string | undefined}
                           rightLabel={rightLabel}
                         />
-                        <div className="mt-2 flex gap-1.5" aria-hidden="true">
-                          {[0, 1, 2, 3].map((i) => (
-                            <span
-                              key={i}
-                              className={`h-[3px] flex-1 rounded-full transition-colors ${i < passwordStrength.score ? 'bg-accent' : 'bg-line'}`}
-                            />
-                          ))}
-                        </div>
+                        <PasswordStrengthBar score={passwordStrength.score} />
                       </div>
                     );
                   }}

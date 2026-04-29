@@ -1,3 +1,6 @@
+import { RailCard } from '../../../shared/ui/RailCard';
+import { ChecklistItem } from '../../../shared/ui/ChecklistItem';
+
 interface GuidanceCardProps {
   titleFilled: boolean;
   descriptionFilled: boolean;
@@ -5,7 +8,7 @@ interface GuidanceCardProps {
   hasRoles: boolean;
 }
 
-interface ChecklistItem {
+interface ChecklistItemData {
   label: string;
   done: boolean;
 }
@@ -16,7 +19,7 @@ export function GuidanceCard({
   statusFilled,
   hasRoles,
 }: GuidanceCardProps) {
-  const items: ChecklistItem[] = [
+  const items: ChecklistItemData[] = [
     { label: 'Nome claro', done: titleFilled },
     { label: 'Ideia explicada', done: descriptionFilled },
     { label: 'Pelo menos uma pessoa no time', done: hasRoles },
@@ -27,7 +30,7 @@ export function GuidanceCard({
   const pct = Math.round((done / items.length) * 100);
 
   return (
-    <aside className="lift rounded-[28px] bg-cream-2 p-7 ring-1 ring-line">
+    <RailCard>
       <div className="mono text-[11px] uppercase tracking-[.22em] text-mute">checklist</div>
 
       <div className="mt-3 flex items-baseline gap-2">
@@ -50,17 +53,7 @@ export function GuidanceCard({
 
       <ul className="mt-6 space-y-3 text-[14px]">
         {items.map((it) => (
-          <li key={it.label} className="flex items-center gap-3">
-            <span
-              className={[
-                'inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-[11px] font-semibold leading-none',
-                it.done ? 'bg-ink text-cream' : 'bg-cream ring-1 ring-line-2 text-mute',
-              ].join(' ')}
-            >
-              {it.done ? '✓' : ''}
-            </span>
-            <span className={it.done ? 'text-ink-2' : 'text-ink'}>{it.label}</span>
-          </li>
+          <ChecklistItem key={it.label} label={it.label} done={it.done} />
         ))}
       </ul>
 
@@ -69,6 +62,6 @@ export function GuidanceCard({
       <p className="serif italic text-[13px] leading-[1.55] text-ink-2">
         Quanto mais claro, mais fácil formar seu time.
       </p>
-    </aside>
+    </RailCard>
   );
 }

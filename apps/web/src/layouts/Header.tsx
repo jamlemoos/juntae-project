@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 
 interface HeaderProps {
-  variant: 'home' | 'login' | 'register';
+  variant: 'home' | 'login' | 'register' | 'app';
 }
 
 export function Header({ variant }: HeaderProps) {
@@ -16,17 +16,41 @@ export function Header({ variant }: HeaderProps) {
             Juntaê
             <span className="serif relative -top-0.5 text-[26px] leading-none text-accent">,</span>
           </Link>
-          <nav
-            className="hidden items-center gap-7 text-[14px] md:flex"
-            aria-label="Navegação principal"
-          >
-            <Link to="/" hash="como-funciona" className="ulink text-ink-2">
-              Como funciona
-            </Link>
-          </nav>
+          {variant === 'app' ? (
+            <nav
+              className="hidden items-center gap-7 text-[14px] md:flex"
+              aria-label="Navegação do app"
+            >
+              <Link to="/projects" className="ulink text-ink-2">
+                Projetos
+              </Link>
+            </nav>
+          ) : (
+            <nav
+              className="hidden items-center gap-7 text-[14px] md:flex"
+              aria-label="Navegação principal"
+            >
+              <Link to="/" hash="como-funciona" className="ulink text-ink-2">
+                Como funciona
+              </Link>
+            </nav>
+          )}
         </div>
 
         <div className="flex items-center gap-3">
+          {variant === 'app' && (
+            <div className="flex items-center gap-4 text-[13.5px]">
+              <Link to="/projects/new" className="ulink hidden text-ink-2 sm:inline">
+                Começar projeto
+              </Link>
+              <span className="hidden h-4 w-px bg-line sm:inline" />
+              <Link to="/profile" aria-label="Meu perfil" className="flex items-center gap-2.5">
+                <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-ink-2 text-[11px] font-semibold text-cream">
+                  ?
+                </div>
+              </Link>
+            </div>
+          )}
           {variant === 'home' && (
             <>
               <Link to="/login" className="ulink text-[13px] text-ink-2">
