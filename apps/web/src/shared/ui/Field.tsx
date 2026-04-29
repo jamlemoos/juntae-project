@@ -30,10 +30,10 @@ export function Field({ label, error, hint, rightLabel, className, ...props }: F
         )}
       </div>
       <input
+        {...props}
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        {...props}
         className={[
           'h-12 w-full rounded-xl bg-cream px-4 text-[15px] text-ink',
           'placeholder:font-normal placeholder:text-mute',
