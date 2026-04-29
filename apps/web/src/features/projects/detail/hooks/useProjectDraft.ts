@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { ProjectData, StoredDraft } from '../types';
 
 export function emptyProject(): ProjectData {
@@ -13,6 +13,11 @@ function readStoredArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
 }
 
+function readStoredWorkMode(value: unknown): ProjectData['workMode'] {
+  if (value === 'remote' || value === 'presential' || value === 'hybrid') return value;
+  return '';
+}
+
 function readStored(projectId: string): ProjectData {
   try {
     const raw = sessionStorage.getItem(`project-draft-${projectId}`);
@@ -21,7 +26,7 @@ function readStored(projectId: string): ProjectData {
     return {
       title: readStoredString(stored.title),
       description: readStoredString(stored.description),
-      workMode: readStoredString(stored.workMode) as ProjectData['workMode'],
+      workMode: readStoredWorkMode(stored.workMode),
       city: readStoredString(stored.city),
       roles: readStoredArray(stored.roles),
       members: readStoredArray(stored.members),
@@ -48,13 +53,15 @@ export function saveProjectDraft(
 }
 
 export function useProjectDraft(projectId: string) {
+  const [trackedId, setTrackedId] = useState(projectId);
   const [project, setProjectState] = useState<ProjectData>(() =>
     projectId ? readStored(projectId) : emptyProject()
   );
 
-  useEffect(() => {
+  if (trackedId !== projectId) {
+    setTrackedId(projectId);
     setProjectState(projectId ? readStored(projectId) : emptyProject());
-  }, [projectId]);
+  }
 
   function setProject(next: ProjectData) {
     if (projectId) writeStored(projectId, next);

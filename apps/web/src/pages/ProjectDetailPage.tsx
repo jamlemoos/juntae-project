@@ -12,8 +12,7 @@ import { ProjectNeededRolesSection } from '../features/projects/detail/component
 import type { PublishStatus } from '../features/projects/detail/types';
 
 export function ProjectDetailPage() {
-  const params = useParams({ strict: false });
-  const projectId = params.projectId ?? '';
+  const { projectId } = useParams({ from: '/app-layout/projects/$projectId' });
 
   const { project, setProject } = useProjectDraft(projectId);
   const [publishStatus, setPublishStatus] = useState<PublishStatus>('draft');

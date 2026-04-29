@@ -1,6 +1,6 @@
-import type { RoleDraft } from '../../types';
+import type { RoleDraft, RoleStatus } from '../../types';
 
-const ROLE_STATUS_LABELS: Record<string, string> = {
+const ROLE_STATUS_LABELS: Record<RoleStatus, string> = {
   open: 'aberta',
   filled: 'preenchida',
 };

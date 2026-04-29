@@ -22,7 +22,6 @@ export type ProjectData = {
 export type StoredDraft = {
   title?: unknown;
   description?: unknown;
-  status?: unknown;
   workMode?: unknown;
   city?: unknown;
   roles?: unknown;
