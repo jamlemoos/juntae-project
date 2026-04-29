@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 import { ArrowRight, Plus } from 'lucide-react';
@@ -11,6 +12,7 @@ import {
   useProjectRoles,
   validateRolesForSubmit,
 } from '../features/projects/hooks/useProjectRoles';
+import { saveProjectDraft } from '../features/projects/detail/hooks/useProjectDraft';
 
 const PROJECT_STATUS_OPTIONS = [
   { value: 'idea', label: 'Só uma ideia ainda' },
@@ -39,36 +41,44 @@ function validateStatus(value: string) {
 }
 
 export function NewProjectPage() {
+  const navigate = useNavigate();
   const { roles, roleErrors, addRole, removeRole, updateRole, applyRoleValidation } =
     useProjectRoles();
   const [noRolesError, setNoRolesError] = useState<string | null>(null);
-  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [tracked, setTracked] = useState({ title: '', description: '', status: '' });
 
   const form = useForm({
     defaultValues: { title: '', description: '', status: '' },
-    onSubmit: async () => {
+    onSubmit: async ({ value }) => {
       if (roles.length === 0) return;
       const errors = validateRolesForSubmit(roles);
       if (errors.some((e) => e.title || e.description || e.status)) return;
-      setSubmitMessage('Criação de projeto ainda não está conectada ao backend.');
+      const projectId = crypto.randomUUID();
+      saveProjectDraft(projectId, {
+        title: value.title,
+        description: value.description,
+        roles: roles.map((role) => ({
+          id: role.id,
+          title: role.title,
+          description: role.description,
+          status: role.status,
+        })),
+      });
+      void navigate({ to: '/projects/$projectId', params: { projectId } });
     },
   });
 
   function handleAddRole() {
     addRole();
     setNoRolesError(null);
-    setSubmitMessage(null);
   }
 
   function handleRemoveRole(id: string) {
     removeRole(id);
-    setSubmitMessage(null);
   }
 
   function handleUpdateRole(id: string, field: 'title' | 'description' | 'status', value: string) {
     updateRole(id, field, value);
-    setSubmitMessage(null);
   }
 
   return (
@@ -112,8 +122,6 @@ export function NewProjectPage() {
                   e.preventDefault();
                   e.stopPropagation();
 
-                  setSubmitMessage(null);
-
                   if (roles.length === 0) {
                     setNoRolesError('Adicione pelo menos uma pessoa para formar o time.');
                   } else {
@@ -156,7 +164,6 @@ export function NewProjectPage() {
                           onChange={(e) => {
                             field.handleChange(e.target.value);
                             setTracked((prev) => ({ ...prev, title: e.target.value }));
-                            setSubmitMessage(null);
                           }}
                           onBlur={field.handleBlur}
                           error={field.state.meta.errors[0] as string | undefined}
@@ -179,7 +186,6 @@ export function NewProjectPage() {
                           onChange={(e) => {
                             field.handleChange(e.target.value);
                             setTracked((prev) => ({ ...prev, description: e.target.value }));
-                            setSubmitMessage(null);
                           }}
                           onBlur={field.handleBlur}
                           rows={5}
@@ -204,7 +210,6 @@ export function NewProjectPage() {
                           onChange={(v) => {
                             field.handleChange(v);
                             setTracked((prev) => ({ ...prev, status: v }));
-                            setSubmitMessage(null);
                           }}
                           onBlur={field.handleBlur}
                           error={field.state.meta.errors[0] as string | undefined}
@@ -272,15 +277,6 @@ export function NewProjectPage() {
                 </section>
 
                 <div className="flex flex-col items-start gap-4 border-t py-10 hairline">
-                  {submitMessage && (
-                    <p
-                      role="status"
-                      className="serif italic rounded-xl bg-cream-2 px-4 py-3 text-[14px] text-ink-2 ring-1 ring-line"
-                    >
-                      {submitMessage}
-                    </p>
-                  )}
-
                   <button
                     type="submit"
                     disabled={form.state.isSubmitting}

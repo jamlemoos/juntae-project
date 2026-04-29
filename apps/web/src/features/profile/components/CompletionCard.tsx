@@ -1,5 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import type { CompletionItem } from '../types';
+import { RailCard } from '../../../shared/ui/RailCard';
+import { ChecklistItem } from '../../../shared/ui/ChecklistItem';
 
 interface CompletionCardProps {
   items: CompletionItem[];
@@ -12,7 +14,7 @@ export function CompletionCard({ items }: CompletionCardProps) {
   const ctaLabel = isComplete ? 'Editar perfil' : 'Completar perfil';
 
   return (
-    <aside className="lift rounded-[28px] bg-cream-2 p-7 ring-1 ring-line">
+    <RailCard>
       <div className="mono text-[11px] uppercase tracking-[.22em] text-mute">seu perfil</div>
 
       <div className="mt-3 flex items-baseline gap-2">
@@ -35,17 +37,7 @@ export function CompletionCard({ items }: CompletionCardProps) {
 
       <ul className="mt-6 space-y-3 text-[14px]">
         {items.map((it) => (
-          <li key={it.label} className="flex items-center gap-3">
-            <span
-              className={[
-                'inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full text-[11px] font-semibold leading-none',
-                it.done ? 'bg-ink text-cream' : 'bg-cream ring-1 ring-line-2 text-mute',
-              ].join(' ')}
-            >
-              {it.done ? '✓' : ''}
-            </span>
-            <span className={it.done ? 'text-ink-2' : 'text-ink'}>{it.label}</span>
-          </li>
+          <ChecklistItem key={it.label} label={it.label} done={it.done} />
         ))}
       </ul>
 
@@ -67,6 +59,6 @@ export function CompletionCard({ items }: CompletionCardProps) {
         {ctaLabel}
         <ArrowRight size={14} aria-hidden="true" />
       </button>
-    </aside>
+    </RailCard>
   );
 }

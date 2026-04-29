@@ -1,14 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowRight, ExternalLink, Globe } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { CompletionCard } from '../features/profile/components/CompletionCard';
 import { ProfileEmptyState } from '../features/profile/components/ProfileEmptyState';
 import { ProfileSection } from '../features/profile/components/ProfileSection';
+import { getLinkIcon } from '../features/profile/utils';
 import type { CompletionItem, LinkKind } from '../features/profile/types';
-
-function getLinkIcon(kind: LinkKind) {
-  if (kind === 'portfolio') return <Globe size={14} aria-hidden="true" />;
-  return <ExternalLink size={14} aria-hidden="true" />;
-}
 
 const COMPLETION_ITEMS: CompletionItem[] = [
   { label: 'Nome', done: false },

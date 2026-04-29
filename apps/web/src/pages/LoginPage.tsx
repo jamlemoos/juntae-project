@@ -1,23 +1,13 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
-import { z } from 'zod';
 import { AuthField } from '../components/auth/AuthField';
 import { ArrowRight } from 'lucide-react';
 import { Header } from '../layouts/Header';
-
-const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail inválido');
-const passwordSchema = z.string().min(1, 'Senha obrigatória');
-
-function validateEmail(value: string) {
-  const r = emailSchema.safeParse(value);
-  return r.success ? undefined : r.error.issues[0]?.message;
-}
-
-function validatePassword(value: string) {
-  const r = passwordSchema.safeParse(value);
-  return r.success ? undefined : r.error.issues[0]?.message;
-}
+import {
+  validateEmail,
+  validateLoginPassword as validatePassword,
+} from '../features/auth/utils/authValidation';
 
 export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);

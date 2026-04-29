@@ -1,4 +1,5 @@
-import { ArrowRight, ExternalLink, Globe } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import { getLinkIcon } from '../utils';
 import type { ProfileLink } from '../types';
 
 const KIND_LABEL: Record<ProfileLink['kind'], string> = {
@@ -8,11 +9,6 @@ const KIND_LABEL: Record<ProfileLink['kind'], string> = {
   dribbble: 'dribbble',
   behance: 'behance',
 };
-
-function getLinkIcon(kind: ProfileLink['kind']) {
-  if (kind === 'portfolio') return <Globe size={14} aria-hidden="true" />;
-  return <ExternalLink size={14} aria-hidden="true" />;
-}
 
 interface LinkRowProps {
   link: ProfileLink;

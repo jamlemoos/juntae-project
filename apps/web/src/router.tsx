@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage';
 import { NewProjectPage } from './pages/NewProjectPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { RegisterPage } from './pages/RegisterPage';
 
@@ -68,6 +69,12 @@ const newProjectRoute = createRoute({
   component: NewProjectPage,
 });
 
+const projectDetailRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/projects/$projectId',
+  component: ProjectDetailPage,
+});
+
 const profileRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/profile',
@@ -77,7 +84,7 @@ const profileRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   publicLayoutRoute.addChildren([indexRoute]),
   authLayoutRoute.addChildren([loginRoute, registerRoute]),
-  appLayoutRoute.addChildren([projectsRoute, newProjectRoute, profileRoute]),
+  appLayoutRoute.addChildren([projectsRoute, newProjectRoute, projectDetailRoute, profileRoute]),
 ]);
 
 export const router = createRouter({ routeTree });
