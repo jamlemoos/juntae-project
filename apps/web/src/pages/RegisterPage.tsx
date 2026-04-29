@@ -160,7 +160,7 @@ export function RegisterPage() {
                           error={field.state.meta.errors[0] as string | undefined}
                           rightLabel={rightLabel}
                         />
-                        <PasswordStrengthBar score={passwordStrength.score as 0 | 1 | 2 | 3} />
+                        <PasswordStrengthBar score={passwordStrength.score} />
                       </div>
                     );
                   }}

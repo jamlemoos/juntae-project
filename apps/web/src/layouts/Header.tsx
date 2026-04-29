@@ -44,7 +44,7 @@ export function Header({ variant }: HeaderProps) {
                 Começar projeto
               </Link>
               <span className="hidden h-4 w-px bg-line sm:inline" />
-              <Link to="/profile" className="flex items-center gap-2.5">
+              <Link to="/profile" aria-label="Meu perfil" className="flex items-center gap-2.5">
                 <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-ink-2 text-[11px] font-semibold text-cream">
                   ?
                 </div>
