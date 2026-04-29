@@ -45,6 +45,7 @@ export function NewProjectPage() {
   const { roles, roleErrors, addRole, removeRole, updateRole, applyRoleValidation } =
     useProjectRoles();
   const [noRolesError, setNoRolesError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [tracked, setTracked] = useState({ title: '', description: '', status: '' });
 
   const form = useForm({
@@ -54,7 +55,7 @@ export function NewProjectPage() {
       const errors = validateRolesForSubmit(roles);
       if (errors.some((e) => e.title || e.description || e.status)) return;
       const projectId = crypto.randomUUID();
-      saveProjectDraft(projectId, {
+      const ok = saveProjectDraft(projectId, {
         title: value.title,
         description: value.description,
         roles: roles.map((role) => ({
@@ -64,6 +65,11 @@ export function NewProjectPage() {
           status: role.status,
         })),
       });
+      if (!ok) {
+        setSaveError('Não foi possível salvar o rascunho. Tente novamente.');
+        return;
+      }
+      setSaveError(null);
       void navigate({ to: '/projects/$projectId', params: { projectId } });
     },
   });
@@ -285,6 +291,11 @@ export function NewProjectPage() {
                     {form.state.isSubmitting ? 'Criando…' : 'Criar projeto'}
                     {!form.state.isSubmitting && <ArrowRight size={14} aria-hidden="true" />}
                   </button>
+                  {saveError && (
+                    <p role="alert" className="text-[13px] text-red-600">
+                      {saveError}
+                    </p>
+                  )}
                 </div>
               </form>
             </div>

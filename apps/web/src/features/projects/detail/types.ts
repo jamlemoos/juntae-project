@@ -20,10 +20,13 @@ export type ProjectData = {
 };
 
 export type StoredDraft = {
-  title?: string;
-  description?: string;
-  status?: string;
-  roles?: RoleDraft[];
+  title?: unknown;
+  description?: unknown;
+  status?: unknown;
+  workMode?: unknown;
+  city?: unknown;
+  roles?: unknown;
+  members?: unknown;
 };
 
 export type ChecklistItem = {

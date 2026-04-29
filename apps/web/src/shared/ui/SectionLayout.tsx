@@ -21,7 +21,7 @@ export function SectionLayout({
 }: SectionLayoutProps) {
   return (
     <section
-      {...(id ? { 'aria-labelledby': id } : {})}
+      {...(id && title ? { 'aria-labelledby': id } : {})}
       className={['grid grid-cols-12 gap-8 py-14', divider ? 'border-t hairline' : '', className]
         .filter(Boolean)
         .join(' ')}
