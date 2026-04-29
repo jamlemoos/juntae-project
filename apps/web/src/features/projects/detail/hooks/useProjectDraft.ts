@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import type { ProjectData, StoredDraft } from '../types';
+import { useState, useEffect } from 'react';
+import type { RoleDraft } from '../../types';
+import type { MemberDraft, ProjectData, StoredDraft } from '../types';
 
 export function emptyProject(): ProjectData {
   return { title: '', description: '', workMode: '', city: '', roles: [], members: [] };
@@ -9,13 +10,26 @@ function readStoredString(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
-function readStoredArray<T>(value: unknown): T[] {
-  return Array.isArray(value) ? (value as T[]) : [];
-}
-
 function readStoredWorkMode(value: unknown): ProjectData['workMode'] {
   if (value === 'remote' || value === 'presential' || value === 'hybrid') return value;
   return '';
+}
+
+function isValidRoleDraft(value: unknown): value is RoleDraft {
+  if (!value || typeof value !== 'object') return false;
+  const obj = value as Record<string, unknown>;
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.title === 'string' &&
+    typeof obj.description === 'string' &&
+    (obj.status === '' || obj.status === 'open' || obj.status === 'filled')
+  );
+}
+
+function isValidMemberDraft(value: unknown): value is MemberDraft {
+  if (!value || typeof value !== 'object') return false;
+  const obj = value as Record<string, unknown>;
+  return typeof obj.id === 'string' && typeof obj.name === 'string' && typeof obj.role === 'string';
 }
 
 function readStored(projectId: string): ProjectData {
@@ -28,8 +42,8 @@ function readStored(projectId: string): ProjectData {
       description: readStoredString(stored.description),
       workMode: readStoredWorkMode(stored.workMode),
       city: readStoredString(stored.city),
-      roles: readStoredArray(stored.roles),
-      members: readStoredArray(stored.members),
+      roles: Array.isArray(stored.roles) ? stored.roles.filter(isValidRoleDraft) : [],
+      members: Array.isArray(stored.members) ? stored.members.filter(isValidMemberDraft) : [],
     };
   } catch {
     return emptyProject();
@@ -53,15 +67,15 @@ export function saveProjectDraft(
 }
 
 export function useProjectDraft(projectId: string) {
-  const [trackedId, setTrackedId] = useState(projectId);
   const [project, setProjectState] = useState<ProjectData>(() =>
     projectId ? readStored(projectId) : emptyProject()
   );
 
-  if (trackedId !== projectId) {
-    setTrackedId(projectId);
+  useEffect(() => {
+    // sessionStorage is an external system; reading from it in an effect is correct.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setProjectState(projectId ? readStored(projectId) : emptyProject());
-  }
+  }, [projectId]);
 
   function setProject(next: ProjectData) {
     if (projectId) writeStored(projectId, next);
