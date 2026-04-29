@@ -1,5 +1,5 @@
 import { Check, ChevronDown } from 'lucide-react';
-import { useEffect, useId, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
 
 interface SelectOption {
   value: string;
@@ -66,7 +66,7 @@ export function ProjectSelect({
     triggerRef.current?.focus();
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLButtonElement>) {
+  function handleKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
     if (!open) {
       if (['Enter', ' ', 'ArrowDown', 'ArrowUp'].includes(e.key)) {
         e.preventDefault();
