@@ -30,12 +30,12 @@ export function ProjectSelect({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const labelId = useId();
+  const valueTextId = useId();
   const listboxId = useId();
   const errorId = error ? `${labelId}-error` : undefined;
 
   const selectedLabel = options.find((o) => o.value === value)?.label;
 
-  // Close when clicking outside the component
   useEffect(() => {
     if (!open) return;
     function handleOutside(e: MouseEvent) {
@@ -93,7 +93,6 @@ export function ProjectSelect({
         closeDropdown();
         break;
       case 'Tab':
-        // Allow focus to move naturally; close without forcing focus back
         setOpen(false);
         break;
     }
@@ -127,7 +126,7 @@ export function ProjectSelect({
           type="button"
           aria-haspopup="listbox"
           aria-expanded={open}
-          aria-labelledby={labelId}
+          aria-labelledby={`${labelId} ${valueTextId}`}
           aria-controls={open ? listboxId : undefined}
           aria-activedescendant={
             open && highlighted >= 0 ? `${listboxId}-opt-${highlighted}` : undefined
@@ -144,7 +143,7 @@ export function ProjectSelect({
             !selectedLabel ? 'text-mute' : 'text-ink',
           ].join(' ')}
         >
-          <span>{selectedLabel ?? placeholder}</span>
+          <span id={valueTextId}>{selectedLabel ?? placeholder}</span>
           <ChevronDown
             size={16}
             aria-hidden="true"

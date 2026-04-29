@@ -7,7 +7,10 @@ import { ProjectField } from '../features/projects/components/ProjectField';
 import { ProjectSelect } from '../features/projects/components/ProjectSelect';
 import { ProjectTextarea } from '../features/projects/components/ProjectTextarea';
 import { RoleCard } from '../features/projects/components/RoleCard';
-import type { RoleDraft, RoleErrors } from '../features/projects/types';
+import {
+  useProjectRoles,
+  validateRolesForSubmit,
+} from '../features/projects/hooks/useProjectRoles';
 
 const PROJECT_STATUS_OPTIONS = [
   { value: 'idea', label: 'Só uma ideia ainda' },
@@ -16,9 +19,9 @@ const PROJECT_STATUS_OPTIONS = [
   { value: 'paused', label: 'Em pausa' },
 ];
 
-const titleSchema = z.string().min(1, 'Nome do projeto obrigatório');
-const descriptionSchema = z.string().min(1, 'Conta a ideia do projeto');
-const statusSchema = z.string().min(1, 'Escolha o momento do projeto');
+const titleSchema = z.string().trim().min(1, 'Nome do projeto obrigatório');
+const descriptionSchema = z.string().trim().min(1, 'Conta a ideia do projeto');
+const statusSchema = z.string().trim().min(1, 'Escolha o momento do projeto');
 
 function validateTitle(value: string) {
   const r = titleSchema.safeParse(value);
@@ -35,63 +38,41 @@ function validateStatus(value: string) {
   return r.success ? undefined : r.error.issues[0]?.message;
 }
 
-function validateRoles(roles: RoleDraft[]): RoleErrors[] {
-  return roles.map((role) => ({
-    title: role.title.trim() ? undefined : 'Nome do papel obrigatório',
-    description: role.description.trim() ? undefined : 'Descrição obrigatória',
-    status: role.status ? undefined : 'Selecione a situação',
-  }));
-}
-
 export function NewProjectPage() {
-  const [roles, setRoles] = useState<RoleDraft[]>([]);
-  const [roleErrors, setRoleErrors] = useState<RoleErrors[]>([]);
+  const { roles, roleErrors, addRole, removeRole, updateRole, applyRoleValidation } =
+    useProjectRoles();
+  const [noRolesError, setNoRolesError] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [tracked, setTracked] = useState({ title: '', description: '', status: '' });
 
   const form = useForm({
-    defaultValues: {
-      title: '',
-      description: '',
-      status: '',
-    },
+    defaultValues: { title: '', description: '', status: '' },
     onSubmit: async () => {
-      const errors = validateRoles(roles);
-      const hasRoleErrors = errors.some((e) => e.title || e.description || e.status);
-      if (hasRoleErrors) {
-        setRoleErrors(errors);
-        return;
-      }
+      if (roles.length === 0) return;
+      const errors = validateRolesForSubmit(roles);
+      if (errors.some((e) => e.title || e.description || e.status)) return;
       setSubmitMessage('Criação de projeto ainda não está conectada ao backend.');
     },
   });
 
-  const [tracked, setTracked] = useState({ title: '', description: '', status: '' });
-
-  function addRole() {
-    setRoles((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), title: '', description: '', status: '' },
-    ]);
-    setRoleErrors((prev) => [...prev, {}]);
+  function handleAddRole() {
+    addRole();
+    setNoRolesError(null);
+    setSubmitMessage(null);
   }
 
-  function removeRole(id: string) {
-    const idx = roles.findIndex((r) => r.id === id);
-    setRoles((prev) => prev.filter((r) => r.id !== id));
-    setRoleErrors((prev) => prev.filter((_, i) => i !== idx));
+  function handleRemoveRole(id: string) {
+    removeRole(id);
+    setSubmitMessage(null);
   }
 
-  function updateRole(id: string, field: 'title' | 'description' | 'status', value: string) {
-    setRoles((prev) => prev.map((r) => (r.id === id ? { ...r, [field]: value } : r)));
-    const idx = roles.findIndex((r) => r.id === id);
-    if (value && roleErrors[idx]?.[field]) {
-      setRoleErrors((prev) => prev.map((e, i) => (i === idx ? { ...e, [field]: undefined } : e)));
-    }
+  function handleUpdateRole(id: string, field: 'title' | 'description' | 'status', value: string) {
+    updateRole(id, field, value);
+    setSubmitMessage(null);
   }
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
-      {/* ── Hero ── */}
       <section className="relative overflow-hidden paper-tex">
         <div className="mx-auto max-w-[1200px] px-6 pb-10 pt-14">
           <div className="mb-7 flex items-center gap-3">
@@ -124,12 +105,21 @@ export function NewProjectPage() {
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <div className="grid grid-cols-12 gap-10">
+            {/* Left — form */}
             <div className="col-span-12 lg:col-span-8">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  setRoleErrors(validateRoles(roles));
+
+                  setSubmitMessage(null);
+
+                  if (roles.length === 0) {
+                    setNoRolesError('Adicione pelo menos uma pessoa para formar o time.');
+                  } else {
+                    setNoRolesError(null);
+                    applyRoleValidation();
+                  }
                   void form.handleSubmit();
                 }}
                 noValidate
@@ -166,6 +156,7 @@ export function NewProjectPage() {
                           onChange={(e) => {
                             field.handleChange(e.target.value);
                             setTracked((prev) => ({ ...prev, title: e.target.value }));
+                            setSubmitMessage(null);
                           }}
                           onBlur={field.handleBlur}
                           error={field.state.meta.errors[0] as string | undefined}
@@ -188,6 +179,7 @@ export function NewProjectPage() {
                           onChange={(e) => {
                             field.handleChange(e.target.value);
                             setTracked((prev) => ({ ...prev, description: e.target.value }));
+                            setSubmitMessage(null);
                           }}
                           onBlur={field.handleBlur}
                           rows={5}
@@ -212,6 +204,7 @@ export function NewProjectPage() {
                           onChange={(v) => {
                             field.handleChange(v);
                             setTracked((prev) => ({ ...prev, status: v }));
+                            setSubmitMessage(null);
                           }}
                           onBlur={field.handleBlur}
                           error={field.state.meta.errors[0] as string | undefined}
@@ -246,6 +239,11 @@ export function NewProjectPage() {
                         <p className="serif italic mt-2 text-[16px] leading-[1.55] text-ink-2">
                           Adicione pelo menos uma pessoa pra esse projeto sair do papel.
                         </p>
+                        {noRolesError && (
+                          <p role="alert" className="mt-3 text-[13px] font-medium text-accent">
+                            {noRolesError}
+                          </p>
+                        )}
                       </div>
                     ) : (
                       <div className="flex flex-col gap-4">
@@ -255,8 +253,8 @@ export function NewProjectPage() {
                             index={idx}
                             role={role}
                             errors={roleErrors[idx] ?? {}}
-                            onChange={(field, value) => updateRole(role.id, field, value)}
-                            onRemove={() => removeRole(role.id)}
+                            onChange={(field, value) => handleUpdateRole(role.id, field, value)}
+                            onRemove={() => handleRemoveRole(role.id)}
                           />
                         ))}
                       </div>
@@ -264,7 +262,7 @@ export function NewProjectPage() {
 
                     <button
                       type="button"
-                      onClick={addRole}
+                      onClick={handleAddRole}
                       className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
                     >
                       <Plus size={14} aria-hidden="true" />
