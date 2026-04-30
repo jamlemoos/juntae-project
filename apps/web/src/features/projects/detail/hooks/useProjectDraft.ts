@@ -68,9 +68,11 @@ export function saveProjectDraft(
   return writeStored(projectId, { workMode: '', city: '', members: [], ...data });
 }
 
-export function readAllProjectDrafts(): { id: string; data: ProjectData }[] {
+export type ProjectDraftEntry = { id: string; data: ProjectData };
+
+export function readAllProjectDrafts(): ProjectDraftEntry[] {
   try {
-    const result: { id: string; data: ProjectData }[] = [];
+    const result: ProjectDraftEntry[] = [];
     for (let i = 0; i < sessionStorage.length; i++) {
       const key = sessionStorage.key(i);
       if (key?.startsWith(DRAFT_KEY_PREFIX)) {
@@ -78,6 +80,7 @@ export function readAllProjectDrafts(): { id: string; data: ProjectData }[] {
         if (id) result.push({ id, data: readStored(id) });
       }
     }
+    result.sort((a, b) => a.id.localeCompare(b.id));
     return result;
   } catch {
     return [];

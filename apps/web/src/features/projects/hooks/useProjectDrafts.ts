@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
-import { readAllProjectDrafts } from '../detail/hooks/useProjectDraft';
-import type { ProjectData } from '../detail/types';
+import { readAllProjectDrafts, type ProjectDraftEntry } from '../detail/hooks/useProjectDraft';
 
-export type ProjectDraftEntry = {
-  id: string;
-  data: ProjectData;
-};
+export type { ProjectDraftEntry };
 
 export function useProjectDrafts(): ProjectDraftEntry[] {
   const [drafts, setDrafts] = useState<ProjectDraftEntry[]>(() => readAllProjectDrafts());
