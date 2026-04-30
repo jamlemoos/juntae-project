@@ -32,9 +32,11 @@ function isValidMemberDraft(value: unknown): value is MemberDraft {
   return typeof obj.id === 'string' && typeof obj.name === 'string' && typeof obj.role === 'string';
 }
 
+const DRAFT_KEY_PREFIX = 'project-draft-';
+
 function readStored(projectId: string): ProjectData {
   try {
-    const raw = sessionStorage.getItem(`project-draft-${projectId}`);
+    const raw = sessionStorage.getItem(`${DRAFT_KEY_PREFIX}${projectId}`);
     if (!raw) return emptyProject();
     const stored = JSON.parse(raw) as StoredDraft;
     return {
@@ -52,7 +54,7 @@ function readStored(projectId: string): ProjectData {
 
 function writeStored(projectId: string, data: ProjectData): boolean {
   try {
-    sessionStorage.setItem(`project-draft-${projectId}`, JSON.stringify(data));
+    sessionStorage.setItem(`${DRAFT_KEY_PREFIX}${projectId}`, JSON.stringify(data));
     return true;
   } catch {
     return false;
@@ -64,6 +66,25 @@ export function saveProjectDraft(
   data: Omit<ProjectData, 'workMode' | 'city' | 'members'>
 ): boolean {
   return writeStored(projectId, { workMode: '', city: '', members: [], ...data });
+}
+
+export type ProjectDraftEntry = { id: string; data: ProjectData };
+
+export function readAllProjectDrafts(): ProjectDraftEntry[] {
+  try {
+    const result: ProjectDraftEntry[] = [];
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      if (key?.startsWith(DRAFT_KEY_PREFIX)) {
+        const id = key.slice(DRAFT_KEY_PREFIX.length);
+        if (id) result.push({ id, data: readStored(id) });
+      }
+    }
+    result.sort((a, b) => a.id.localeCompare(b.id));
+    return result;
+  } catch {
+    return [];
+  }
 }
 
 export function useProjectDraft(projectId: string) {
