@@ -66,6 +66,20 @@ export function saveProjectDraft(
   return writeStored(projectId, { workMode: '', city: '', members: [], ...data });
 }
 
+const DRAFT_KEY_PREFIX = 'project-draft-';
+
+export function readAllProjectDrafts(): { id: string; data: ProjectData }[] {
+  const result: { id: string; data: ProjectData }[] = [];
+  for (let i = 0; i < sessionStorage.length; i++) {
+    const key = sessionStorage.key(i);
+    if (key?.startsWith(DRAFT_KEY_PREFIX)) {
+      const id = key.slice(DRAFT_KEY_PREFIX.length);
+      if (id) result.push({ id, data: readStored(id) });
+    }
+  }
+  return result;
+}
+
 export function useProjectDraft(projectId: string) {
   const [project, setProjectState] = useState<ProjectData>(() =>
     projectId ? readStored(projectId) : emptyProject()
