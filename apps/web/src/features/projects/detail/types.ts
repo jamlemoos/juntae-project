@@ -17,6 +17,7 @@ export type ProjectData = {
   city: string;
   roles: RoleDraft[];
   members: MemberDraft[];
+  publishStatus: PublishStatus;
 };
 
 export type StoredDraft = {
@@ -26,6 +27,7 @@ export type StoredDraft = {
   city?: unknown;
   roles?: unknown;
   members?: unknown;
+  publishStatus?: unknown;
 };
 
 export type ChecklistItem = {

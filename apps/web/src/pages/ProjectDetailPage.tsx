@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
 import { useProjectDraft } from '../features/projects/detail/hooks/useProjectDraft';
@@ -9,13 +8,11 @@ import { ProjectStatusRail } from '../features/projects/detail/components/Projec
 import { ProjectAboutSection } from '../features/projects/detail/components/ProjectAboutSection';
 import { ProjectTeamSection } from '../features/projects/detail/components/ProjectTeamSection';
 import { ProjectNeededRolesSection } from '../features/projects/detail/components/ProjectNeededRolesSection';
-import type { PublishStatus } from '../features/projects/detail/types';
 
 export function ProjectDetailPage() {
   const { projectId } = useParams({ from: '/app-layout/projects/$projectId' });
 
   const { project, setProject } = useProjectDraft(projectId);
-  const [publishStatus, setPublishStatus] = useState<PublishStatus>('draft');
   const { editingSection, editDraft, setEditDraft, startEditing, cancelEditing } =
     useProjectDetailEditing();
 
@@ -39,7 +36,7 @@ export function ProjectDetailPage() {
         title={project.title}
         description={project.description}
         workModeDisplay={workModeDisplay}
-        publishStatus={publishStatus}
+        publishStatus={project.publishStatus}
       />
 
       <section className="flex-1 bg-cream">
@@ -91,9 +88,9 @@ export function ProjectDetailPage() {
             <div className="col-span-12 lg:col-span-4">
               <div className="lg:sticky lg:top-24 lg:pt-14">
                 <ProjectStatusRail
-                  publishStatus={publishStatus}
+                  publishStatus={project.publishStatus}
                   checklist={checklist}
-                  onPublish={() => setPublishStatus('published')}
+                  onPublish={() => setProject({ ...project, publishStatus: 'published' })}
                   onEditProject={() => startEditing('sobre', project)}
                 />
               </div>
