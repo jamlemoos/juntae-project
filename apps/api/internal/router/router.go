@@ -35,6 +35,8 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 
 	api := r.Group("/api")
 
+	api.POST("/login", userHandler.Login)
+
 	api.POST("/users", userHandler.CreateUser)
 	api.GET("/users", userHandler.GetUsers)
 	api.GET("/users/:id", userHandler.GetUserByID)

@@ -10,10 +10,12 @@ import (
 type User struct {
 	ID           uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Name         string    `gorm:"not null"`
-	Email        string    `gorm:"not null;uniqueIndex"`
+	Email        string    `gorm:"uniqueIndex;not null"`
+	Password     *string   `gorm:"default:null"`
+	Role         string    `gorm:"not null;default:'member'"`
 	Bio          string
 	City         string        `gorm:"not null"`
-	Skills       []Skill       `gorm:"many2many:user_skills"`
+	Skills       []Skill       `gorm:"many2many:user_skills;"`
 	Projects     []Project     `gorm:"foreignKey:CreatorID"`
 	Applications []Application `gorm:"foreignKey:UserID"`
 	CreatedAt    time.Time

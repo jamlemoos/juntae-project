@@ -1,13 +1,22 @@
 package service
 
 import (
+	"errors"
 	"fmt"
+	"log"
+	"strings"
 
-	"github.com/google/uuid"
 	"juntae-api/internal/domain/dto"
 	"juntae-api/internal/domain/model"
 	"juntae-api/internal/domain/repository"
+	"juntae-api/internal/security"
+
+	"gorm.io/gorm"
+
+	"github.com/google/uuid"
 )
+
+var ErrInvalidCredentials = errors.New("invalid credentials")
 
 type UserService struct {
 	repo      *repository.UserRepository
@@ -20,11 +29,18 @@ func NewUserService(repo *repository.UserRepository, skillRepo *repository.Skill
 }
 
 func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.UserResponse, error) {
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
+	hashedPassword, err := security.HashPassword(req.Password)
+	if err != nil {
+		return nil, fmt.Errorf("hash password: %w", err)
+	}
 	user := &model.User{
-		Name:  req.Name,
-		Email: req.Email,
-		Bio:   req.Bio,
-		City:  req.City,
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: &hashedPassword,
+		Role:     "member",
+		Bio:      req.Bio,
+		City:     req.City,
 	}
 	if len(req.SkillIDs) > 0 {
 		skills, err := s.skillRepo.FindByIDs(req.SkillIDs)
@@ -70,7 +86,7 @@ func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.
 		return nil, fmt.Errorf("user not found: %w", err)
 	}
 	user.Name = req.Name
-	user.Email = req.Email
+	user.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	user.Bio = req.Bio
 	user.City = req.City
 
@@ -87,6 +103,11 @@ func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.
 	if err := s.repo.Update(user); err != nil {
 		return nil, fmt.Errorf("update user: %w", err)
 	}
+
+	if err := s.audit.LogAction("UPDATE", "User", user.ID, fmt.Sprintf("User updated profile: %s", user.Email)); err != nil {
+		log.Printf("WARN: audit log failed for user update %s: %v", user.ID, err)
+	}
+
 	resp := mapUserResponse(user)
 	return &resp, nil
 }
@@ -96,6 +117,41 @@ func (s *UserService) DeleteUser(id uuid.UUID) error {
 		return fmt.Errorf("delete user: %w", err)
 	}
 	return nil
+}
+
+func (s *UserService) Login(email, password string) (string, *dto.UserResponse, error) {
+	normalizedEmail := strings.ToLower(strings.TrimSpace(email))
+	user, err := s.repo.FindByEmail(normalizedEmail)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", nil, ErrInvalidCredentials
+		}
+		return "", nil, fmt.Errorf("failed to fetch user: %w", err)
+	}
+
+	if user.Password == nil {
+		return "", nil, ErrInvalidCredentials
+	}
+
+	isValid, err := security.CheckPasswordHash(password, *user.Password)
+	if err != nil {
+		return "", nil, fmt.Errorf("check password hash: %w", err)
+	}
+	if !isValid {
+		return "", nil, ErrInvalidCredentials
+	}
+
+	token, err := security.GenerateToken(user.ID, user.Role)
+	if err != nil {
+		return "", nil, fmt.Errorf("generate token: %w", err)
+	}
+
+	if err := s.audit.LogAction("LOGIN", "User", user.ID, fmt.Sprintf("User logged in: %s", user.Email)); err != nil {
+		log.Printf("WARN: audit log failed for user %s: %v", user.ID, err)
+	}
+
+	resp := mapUserResponse(user)
+	return token, &resp, nil
 }
 
 func mapUserResponse(u *model.User) dto.UserResponse {

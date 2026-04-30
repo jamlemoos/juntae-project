@@ -80,3 +80,22 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	}
 	c.Status(http.StatusNoContent)
 }
+
+func (h *UserHandler) Login(c *gin.Context) {
+	var req struct {
+		Email    string `json:"email" binding:"required,email" validate:"required,email"`
+		Password string `json:"password" binding:"required" validate:"required"`
+	}
+	if !bindAndValidate(c, &req) {
+		return
+	}
+	token, user, err := h.userService.Login(req.Email, req.Password)
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+	respondWithJSON(c, http.StatusOK, gin.H{
+		"token": token,
+		"user":  user,
+	})
+}
