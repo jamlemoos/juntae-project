@@ -30,7 +30,7 @@ export function ProjectsPage() {
             <div className="col-span-12 lg:col-span-4 lg:text-right">
               <Link
                 to="/projects/new"
-                className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-cream transition-opacity hover:opacity-80"
+                className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-cream transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
               >
                 <Plus size={15} aria-hidden="true" />
                 Começar projeto
@@ -49,7 +49,7 @@ export function ProjectsPage() {
                 <p className="text-[14px] text-ink-2">Você ainda não começou nenhum projeto.</p>
                 <Link
                   to="/projects/new"
-                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-accent transition-opacity hover:opacity-70"
+                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-accent transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
                 >
                   <Plus size={13} aria-hidden="true" />
                   Começar projeto

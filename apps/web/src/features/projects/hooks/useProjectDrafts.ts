@@ -8,9 +8,13 @@ export type ProjectDraftEntry = {
 };
 
 export function useProjectDrafts(): ProjectDraftEntry[] {
-  const [drafts, setDrafts] = useState<ProjectDraftEntry[]>(() => readAllProjectDrafts());
+  const [drafts, setDrafts] = useState<ProjectDraftEntry[]>([]);
 
   useEffect(() => {
+    // sessionStorage is an external system; reading from it in an effect is correct.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDrafts(readAllProjectDrafts());
+
     function handleFocus() {
       setDrafts(readAllProjectDrafts());
     }
