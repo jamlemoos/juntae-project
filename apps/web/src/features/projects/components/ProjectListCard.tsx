@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import type { ProjectData } from '../detail/types';
+import type { ProjectData, PublishStatus } from '../detail/types';
 import { formatWorkMode } from '../detail/utils';
 
 const DESCRIPTION_PREVIEW_LENGTH = 120;
@@ -8,7 +8,7 @@ const MAX_ROLE_PREVIEWS = 2;
 interface ProjectListCardProps {
   id: string;
   data: ProjectData;
-  status: 'draft' | 'published';
+  status: PublishStatus;
 }
 
 export function ProjectListCard({ id, data, status }: ProjectListCardProps) {
