@@ -134,7 +134,10 @@ func (s *UserService) Login(email, password string) (string, *dto.UserResponse, 
 	}
 
 	isValid, err := security.CheckPasswordHash(password, *user.Password)
-	if err != nil || !isValid {
+	if err != nil {
+		return "", nil, fmt.Errorf("check password hash: %w", err)
+	}
+	if !isValid {
 		return "", nil, ErrInvalidCredentials
 	}
 

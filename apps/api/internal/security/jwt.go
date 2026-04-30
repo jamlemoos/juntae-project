@@ -1,7 +1,9 @@
 package security
 
 import (
+	"crypto/rand"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -16,10 +18,15 @@ func InitJWT() error {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		if os.Getenv("APP_ENV") == "development" {
-			secret = "fallback_secret_for_development_only"
-		} else {
-			return fmt.Errorf("JWT_SECRET must be set")
+			random := make([]byte, 32)
+			if _, err := rand.Read(random); err != nil {
+				return fmt.Errorf("failed to generate dev JWT secret: %w", err)
+			}
+			jwtSecret = random
+			log.Println("WARN: JWT_SECRET not set — using random secret for this run (tokens won't survive restart)")
+			return nil
 		}
+		return fmt.Errorf("JWT_SECRET must be set")
 	}
 	jwtSecret = []byte(secret)
 	return nil
@@ -41,6 +48,9 @@ type CustomClaims struct {
 }
 
 func GenerateToken(userID uuid.UUID, role string) (string, error) {
+	if len(jwtSecret) == 0 {
+		return "", fmt.Errorf("jwt not initialized: call security.InitJWT() on startup")
+	}
 	now := time.Now()
 	claims := CustomClaims{
 		UserID: userID,
