@@ -65,7 +65,7 @@ export function ProjectListCard({ id, data, status }: ProjectListCardProps) {
   );
 }
 
-function StatusBadge({ status }: { status: 'draft' | 'published' }) {
+function StatusBadge({ status }: { status: PublishStatus }) {
   const config =
     status === 'draft'
       ? { label: 'rascunho', color: 'var(--color-mute)' }
