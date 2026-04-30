@@ -22,7 +22,7 @@ export function ExploreProjectsPage() {
           <div className="mb-7 flex items-center gap-3">
             <div className="mono text-[11px] uppercase tracking-[.22em] text-mute">explorar</div>
             <span className="h-px w-8 bg-line-2" />
-            <span className="serif italic text-[14px] text-mute">projetos da comunidade</span>
+            <span className="serif italic text-[14px] text-mute">projetos publicados</span>
           </div>
 
           <div className="grid grid-cols-12 gap-8">
@@ -31,8 +31,8 @@ export function ExploreProjectsPage() {
                 Encontre projetos para construir junto
               </h1>
               <p className="mt-4 max-w-[52ch] text-[16.5px] leading-[1.6] text-ink-2">
-                Veja projetos publicados por outras pessoas e descubra onde suas habilidades podem
-                ajudar.
+                Aqui aparecerão os projetos publicados quando a descoberta da comunidade estiver
+                conectada ao backend.
               </p>
             </div>
           </div>
@@ -54,8 +54,8 @@ export function ExploreProjectsPage() {
                   Ainda não há projetos publicados.
                 </p>
                 <p className="mx-auto mt-2 max-w-[44ch] text-[14px] leading-relaxed text-mute">
-                  Quando alguém publicar um projeto, ele aparecerá aqui para outras pessoas
-                  encontrarem e participarem.
+                  Quando a descoberta estiver conectada ao backend, projetos publicados por outras
+                  pessoas aparecerão aqui.
                 </p>
                 <Link
                   to="/projects/new"
@@ -67,7 +67,7 @@ export function ExploreProjectsPage() {
             ) : (
               <div className="flex flex-col gap-3">
                 {publishedProjects.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status="published" />
+                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
                 ))}
               </div>
             )}
