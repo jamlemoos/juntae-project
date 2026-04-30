@@ -1,11 +1,20 @@
 import { Link } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
-import { useProjectDrafts } from '../features/projects/hooks/useProjectDrafts';
+import {
+  useProjectDrafts,
+  type ProjectDraftEntry,
+} from '../features/projects/hooks/useProjectDrafts';
 import { ProjectListCard } from '../features/projects/components/ProjectListCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ProjectsPage() {
-  const drafts = useProjectDrafts();
+  const allProjects = useProjectDrafts();
+  const draftProjects = allProjects.filter(
+    ({ data }: ProjectDraftEntry) => data.publishStatus !== 'published'
+  );
+  const publishedProjects = allProjects.filter(
+    ({ data }: ProjectDraftEntry) => data.publishStatus === 'published'
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
@@ -44,7 +53,7 @@ export function ProjectsPage() {
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <SectionLayout eyebrow="01 · rascunhos" title="Meus rascunhos" divider={false}>
-            {drafts.length === 0 ? (
+            {draftProjects.length === 0 ? (
               <div className="rounded-xl border border-dashed hairline px-6 py-10 text-center">
                 <p className="text-[14px] text-ink-2">Você ainda não começou nenhum projeto.</p>
                 <Link
@@ -57,20 +66,28 @@ export function ProjectsPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {drafts.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status="draft" />
+                {draftProjects.map(({ id, data }) => (
+                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
                 ))}
               </div>
             )}
           </SectionLayout>
 
           <SectionLayout eyebrow="02 · publicados" title="Projetos publicados" divider>
-            <div className="rounded-xl border border-dashed hairline px-6 py-10 text-center">
-              <p className="text-[14px] text-ink-2">Você ainda não publicou nenhum projeto.</p>
-              <p className="mt-1.5 text-[13px] text-mute">
-                Seus projetos aparecerão aqui quando estiverem prontos para receber pessoas.
-              </p>
-            </div>
+            {publishedProjects.length === 0 ? (
+              <div className="rounded-xl border border-dashed hairline px-6 py-10 text-center">
+                <p className="text-[14px] text-ink-2">Você ainda não publicou nenhum projeto.</p>
+                <p className="mt-1.5 text-[13px] text-mute">
+                  Seus projetos aparecerão aqui quando estiverem prontos para receber pessoas.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {publishedProjects.map(({ id, data }) => (
+                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                ))}
+              </div>
+            )}
           </SectionLayout>
         </div>
       </section>
