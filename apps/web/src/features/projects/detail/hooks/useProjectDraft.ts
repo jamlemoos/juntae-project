@@ -3,7 +3,15 @@ import type { RoleDraft } from '../../types';
 import type { MemberDraft, ProjectData, StoredDraft } from '../types';
 
 export function emptyProject(): ProjectData {
-  return { title: '', description: '', workMode: '', city: '', roles: [], members: [] };
+  return {
+    title: '',
+    description: '',
+    workMode: '',
+    city: '',
+    roles: [],
+    members: [],
+    publishStatus: 'draft',
+  };
 }
 
 function readStoredString(value: unknown): string {
@@ -13,6 +21,11 @@ function readStoredString(value: unknown): string {
 function readStoredWorkMode(value: unknown): ProjectData['workMode'] {
   if (value === 'remote' || value === 'presential' || value === 'hybrid') return value;
   return '';
+}
+
+function readStoredPublishStatus(value: unknown): ProjectData['publishStatus'] {
+  if (value === 'published') return 'published';
+  return 'draft';
 }
 
 function isValidRoleDraft(value: unknown): value is RoleDraft {
@@ -46,6 +59,7 @@ function readStored(projectId: string): ProjectData {
       city: readStoredString(stored.city),
       roles: Array.isArray(stored.roles) ? stored.roles.filter(isValidRoleDraft) : [],
       members: Array.isArray(stored.members) ? stored.members.filter(isValidMemberDraft) : [],
+      publishStatus: readStoredPublishStatus(stored.publishStatus),
     };
   } catch {
     return emptyProject();
@@ -63,9 +77,15 @@ function writeStored(projectId: string, data: ProjectData): boolean {
 
 export function saveProjectDraft(
   projectId: string,
-  data: Omit<ProjectData, 'workMode' | 'city' | 'members'>
+  data: Omit<ProjectData, 'workMode' | 'city' | 'members' | 'publishStatus'>
 ): boolean {
-  return writeStored(projectId, { workMode: '', city: '', members: [], ...data });
+  return writeStored(projectId, {
+    workMode: '',
+    city: '',
+    members: [],
+    publishStatus: 'draft',
+    ...data,
+  });
 }
 
 export type ProjectDraftEntry = { id: string; data: ProjectData };

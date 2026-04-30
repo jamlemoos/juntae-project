@@ -2,6 +2,7 @@ import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/re
 import { AppLayout } from './layouts/AppLayout';
 import { AuthLayout } from './layouts/AuthLayout';
 import { PublicLayout } from './layouts/PublicLayout';
+import { ExploreProjectsPage } from './pages/ExploreProjectsPage';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NewProjectPage } from './pages/NewProjectPage';
@@ -57,6 +58,12 @@ const registerRoute = createRoute({
   component: RegisterPage,
 });
 
+const exploreRoute = createRoute({
+  getParentRoute: () => appLayoutRoute,
+  path: '/explore',
+  component: ExploreProjectsPage,
+});
+
 const projectsRoute = createRoute({
   getParentRoute: () => appLayoutRoute,
   path: '/projects',
@@ -84,7 +91,13 @@ const profileRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   publicLayoutRoute.addChildren([indexRoute]),
   authLayoutRoute.addChildren([loginRoute, registerRoute]),
-  appLayoutRoute.addChildren([projectsRoute, newProjectRoute, projectDetailRoute, profileRoute]),
+  appLayoutRoute.addChildren([
+    exploreRoute,
+    projectsRoute,
+    newProjectRoute,
+    projectDetailRoute,
+    profileRoute,
+  ]),
 ]);
 
 export const router = createRouter({ routeTree });

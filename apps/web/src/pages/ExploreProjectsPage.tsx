@@ -1,0 +1,79 @@
+import { Link } from '@tanstack/react-router';
+import {
+  useProjectDrafts,
+  type ProjectDraftEntry,
+} from '../features/projects/hooks/useProjectDrafts';
+import { ProjectListCard } from '../features/projects/components/ProjectListCard';
+import { SectionLayout } from '../shared/ui/SectionLayout';
+
+function filterPublished(drafts: ProjectDraftEntry[]): ProjectDraftEntry[] {
+  return drafts.filter(({ data }) => data.publishStatus === 'published');
+}
+
+export function ExploreProjectsPage() {
+  const allDrafts = useProjectDrafts();
+  const publishedProjects = filterPublished(allDrafts);
+
+  return (
+    <div className="flex min-h-screen flex-col bg-cream">
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden paper-tex">
+        <div className="mx-auto max-w-[1200px] px-6 pb-10 pt-14">
+          <div className="mb-7 flex items-center gap-3">
+            <div className="mono text-[11px] uppercase tracking-[.22em] text-mute">explorar</div>
+            <span className="h-px w-8 bg-line-2" />
+            <span className="serif italic text-[14px] text-mute">projetos da comunidade</span>
+          </div>
+
+          <div className="grid grid-cols-12 gap-8">
+            <div className="col-span-12 lg:col-span-8">
+              <h1 className="display text-[44px] font-bold leading-[1.05] text-ink md:text-[56px]">
+                Encontre projetos para construir junto
+              </h1>
+              <p className="mt-4 max-w-[52ch] text-[16.5px] leading-[1.6] text-ink-2">
+                Veja projetos publicados por outras pessoas e descubra onde suas habilidades podem
+                ajudar.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Body ── */}
+      <section className="flex-1 bg-cream">
+        <div className="mx-auto max-w-[1200px] px-6 pb-24">
+          <SectionLayout
+            eyebrow="projetos publicados"
+            title="Projetos publicados"
+            id="published-projects"
+            divider={false}
+          >
+            {publishedProjects.length === 0 ? (
+              <div className="rounded-xl border border-dashed hairline px-6 py-12 text-center">
+                <p className="text-[16px] font-medium text-ink">
+                  Ainda não há projetos publicados.
+                </p>
+                <p className="mx-auto mt-2 max-w-[44ch] text-[14px] leading-relaxed text-mute">
+                  Quando alguém publicar um projeto, ele aparecerá aqui para outras pessoas
+                  encontrarem e participarem.
+                </p>
+                <Link
+                  to="/projects/new"
+                  className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-cream transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                >
+                  Começar um projeto
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {publishedProjects.map(({ id, data }) => (
+                  <ProjectListCard key={id} id={id} data={data} status="published" />
+                ))}
+              </div>
+            )}
+          </SectionLayout>
+        </div>
+      </section>
+    </div>
+  );
+}

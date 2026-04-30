@@ -21,6 +21,9 @@ export function Header({ variant }: HeaderProps) {
               className="hidden items-center gap-7 text-[14px] md:flex"
               aria-label="Navegação do app"
             >
+              <Link to="/explore" className="ulink text-ink-2">
+                Explorar
+              </Link>
               <Link to="/projects" className="ulink text-ink-2">
                 Projetos
               </Link>
