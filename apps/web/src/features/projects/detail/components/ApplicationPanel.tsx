@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { X } from 'lucide-react';
 import { ProjectTextarea } from '../../components/ProjectTextarea';
 
@@ -23,7 +24,7 @@ export function ApplicationPanel({ roleTitle, onClose }: ApplicationPanelProps) 
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!validate()) return;
     setPanelState('submitted');

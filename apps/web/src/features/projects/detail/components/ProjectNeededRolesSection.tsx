@@ -109,17 +109,19 @@ export function ProjectNeededRolesSection({
               <ProjectRoleCard
                 role={role}
                 onApply={
-                  publishStatus === 'published'
+                  publishStatus === 'published' && role.status === 'open'
                     ? () => setOpenApplicationRoleId((prev) => (prev === role.id ? null : role.id))
                     : undefined
                 }
               />
-              {publishStatus === 'published' && openApplicationRoleId === role.id && (
-                <ApplicationPanel
-                  roleTitle={role.title}
-                  onClose={() => setOpenApplicationRoleId(null)}
-                />
-              )}
+              {publishStatus === 'published' &&
+                role.status === 'open' &&
+                openApplicationRoleId === role.id && (
+                  <ApplicationPanel
+                    roleTitle={role.title}
+                    onClose={() => setOpenApplicationRoleId(null)}
+                  />
+                )}
             </div>
           ))}
         </div>
