@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { Pencil, Plus } from 'lucide-react';
 import { SectionLayout } from '../../../../shared/ui/SectionLayout';
-import type { ProjectData } from '../types';
+import type { ProjectData, PublishStatus } from '../types';
 import type { RoleDraft } from '../../types';
 import { RoleCard } from '../../components/RoleCard';
 import { ProjectRoleCard } from './ProjectRoleCard';
+import { ApplicationPanel } from './ApplicationPanel';
 
 interface ProjectNeededRolesSectionProps {
   isEditing: boolean;
   editDraft: ProjectData;
   setEditDraft: (updater: (prev: ProjectData) => ProjectData) => void;
   roles: RoleDraft[];
+  publishStatus: PublishStatus;
   onStartEditing: () => void;
   onSave: () => void;
   onCancel: () => void;
@@ -20,10 +23,12 @@ export function ProjectNeededRolesSection({
   editDraft,
   setEditDraft,
   roles,
+  publishStatus,
   onStartEditing,
   onSave,
   onCancel,
 }: ProjectNeededRolesSectionProps) {
+  const [openApplicationRoleId, setOpenApplicationRoleId] = useState<string | null>(null);
   function addRole() {
     const newRole: RoleDraft = { id: crypto.randomUUID(), title: '', description: '', status: '' };
     setEditDraft((p) => ({ ...p, roles: [...p.roles, newRole] }));
@@ -99,9 +104,27 @@ export function ProjectNeededRolesSection({
         </div>
       ) : roles.length > 0 ? (
         <div className="flex flex-col gap-4">
-          {roles.map((role) => (
-            <ProjectRoleCard key={role.id} role={role} />
-          ))}
+          {roles.map((role) => {
+            const canApply = publishStatus === 'published' && role.status === 'open';
+            return (
+              <div key={role.id}>
+                <ProjectRoleCard
+                  role={role}
+                  onApply={
+                    canApply
+                      ? () => setOpenApplicationRoleId((prev) => (prev === role.id ? null : role.id))
+                      : undefined
+                  }
+                />
+                {canApply && openApplicationRoleId === role.id && (
+                  <ApplicationPanel
+                    roleTitle={role.title}
+                    onClose={() => setOpenApplicationRoleId(null)}
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-line-2 bg-cream-2/50 p-5 md:p-6">

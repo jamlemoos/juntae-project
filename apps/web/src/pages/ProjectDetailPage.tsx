@@ -69,6 +69,7 @@ export function ProjectDetailPage() {
                 editDraft={editDraft}
                 setEditDraft={setEditDraft}
                 roles={project.roles}
+                publishStatus={project.publishStatus}
                 onStartEditing={() => startEditing('procurando', project)}
                 onSave={handleSave}
                 onCancel={cancelEditing}

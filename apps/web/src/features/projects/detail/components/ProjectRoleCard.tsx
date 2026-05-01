@@ -7,9 +7,10 @@ const ROLE_STATUS_LABELS: Record<RoleStatus, string> = {
 
 interface ProjectRoleCardProps {
   role: RoleDraft;
+  onApply?: () => void;
 }
 
-export function ProjectRoleCard({ role }: ProjectRoleCardProps) {
+export function ProjectRoleCard({ role, onApply }: ProjectRoleCardProps) {
   return (
     <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6">
       <div className="flex items-start justify-between gap-4">
@@ -27,6 +28,17 @@ export function ProjectRoleCard({ role }: ProjectRoleCardProps) {
           </span>
         )}
       </div>
+      {onApply && (
+        <div className="mt-4 border-t pt-4 hairline">
+          <button
+            type="button"
+            onClick={onApply}
+            className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          >
+            Quero participar
+          </button>
+        </div>
+      )}
     </div>
   );
 }
