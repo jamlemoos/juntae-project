@@ -104,26 +104,27 @@ export function ProjectNeededRolesSection({
         </div>
       ) : roles.length > 0 ? (
         <div className="flex flex-col gap-4">
-          {roles.map((role) => (
-            <div key={role.id}>
-              <ProjectRoleCard
-                role={role}
-                onApply={
-                  publishStatus === 'published' && role.status === 'open'
-                    ? () => setOpenApplicationRoleId((prev) => (prev === role.id ? null : role.id))
-                    : undefined
-                }
-              />
-              {publishStatus === 'published' &&
-                role.status === 'open' &&
-                openApplicationRoleId === role.id && (
+          {roles.map((role) => {
+            const canApply = publishStatus === 'published' && role.status === 'open';
+            return (
+              <div key={role.id}>
+                <ProjectRoleCard
+                  role={role}
+                  onApply={
+                    canApply
+                      ? () => setOpenApplicationRoleId((prev) => (prev === role.id ? null : role.id))
+                      : undefined
+                  }
+                />
+                {canApply && openApplicationRoleId === role.id && (
                   <ApplicationPanel
                     roleTitle={role.title}
                     onClose={() => setOpenApplicationRoleId(null)}
                   />
                 )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-line-2 bg-cream-2/50 p-5 md:p-6">
