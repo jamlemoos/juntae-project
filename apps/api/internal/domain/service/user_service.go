@@ -50,6 +50,9 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.UserResponse, 
 		user.Skills = skills
 	}
 	if err := s.repo.Create(user); err != nil {
+		if isUniqueViolation(err) {
+			return nil, ErrConflict
+		}
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 	if err := s.audit.LogCreate("User", user.ID, fmt.Sprintf("User created: %s", user.Email)); err != nil {

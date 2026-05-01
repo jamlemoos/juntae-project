@@ -1,4 +1,6 @@
-// TODO: implement when backend exposes auth endpoints.
+// Auth API integration for existing endpoints:
+// POST /api/auth/login
+// POST /api/auth/register
 
 export type LoginInput = {
   email: string;
