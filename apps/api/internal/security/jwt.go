@@ -52,7 +52,7 @@ func ValidateToken(tokenString string) (*CustomClaims, error) {
 		return nil, fmt.Errorf("jwt not initialized: call security.InitJWT() on startup")
 	}
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
-		if t.Method != jwt.SigningMethodHS256 {
+		if t.Method == nil || t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
 		return jwtSecret, nil
