@@ -48,6 +48,7 @@ func (r *ApplicationRepository) FindWithProjectChain(id uuid.UUID) (*model.Appli
 func (r *ApplicationRepository) FindByProjectID(projectID uuid.UUID) ([]model.Application, error) {
 	var applications []model.Application
 	err := r.db.
+		Select("applications.*").
 		Joins("JOIN project_roles ON project_roles.id = applications.project_role_id").
 		Where("project_roles.project_id = ?", projectID).
 		Preload("User.Skills").

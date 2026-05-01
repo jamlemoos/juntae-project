@@ -41,6 +41,7 @@ func (r *ProjectRepository) FindByStatusAndCreatorCityForList(status, city strin
 		Preload("Creator").
 		Preload("Creator.Skills").
 		Preload("Roles").
+		Select("projects.*").
 		Joins("JOIN users ON users.id = projects.creator_id").
 		Where("projects.status = ? AND users.city = ?", status, city).
 		Find(&projects).Error
