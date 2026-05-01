@@ -1,28 +1,78 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080';
+export const TOKEN_KEY = 'auth_token';
 
-function shouldSetJsonContentType(body: RequestInit['body']): boolean {
-  if (body === null || body === undefined) return false;
-  if (
-    body instanceof FormData ||
-    body instanceof URLSearchParams ||
-    body instanceof Blob ||
-    body instanceof ArrayBuffer ||
-    body instanceof ReadableStream ||
-    ArrayBuffer.isView(body)
+const BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api').replace(/\/$/, '');
+
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    message: string
   ) {
-    return false;
+    super(message);
+    this.name = 'ApiError';
   }
-  return true;
 }
 
-export async function apiFetch(path: string, init?: RequestInit) {
-  const headers = new Headers(init?.headers);
-  if (shouldSetJsonContentType(init?.body) && !headers.has('Content-Type')) {
+function getToken(): string | null {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const headers = new Headers(options?.headers);
+
+  const token = getToken();
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  if (options?.body !== undefined && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
-  return fetch(`${API_BASE_URL}${path}`, {
-    credentials: 'include',
-    ...init,
-    headers,
+
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  } catch {
+    throw new ApiError(0, 'Network error');
+  }
+
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new ApiError(response.status, payload?.message ?? response.statusText);
+  }
+
+  if (response.status === 204) return undefined as T;
+
+  const text = await response.text();
+  return (text ? JSON.parse(text) : undefined) as T;
+}
+
+function get<T>(path: string): Promise<T> {
+  return request<T>(path, { method: 'GET' });
+}
+
+function post<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'POST',
+    body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 }
+
+function put<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'PUT',
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+}
+
+function patch<T>(path: string, body?: unknown): Promise<T> {
+  return request<T>(path, {
+    method: 'PATCH',
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+}
+
+function del<T>(path: string): Promise<T> {
+  return request<T>(path, { method: 'DELETE' });
+}
+
+export const http = { get, post, put, patch, del };
