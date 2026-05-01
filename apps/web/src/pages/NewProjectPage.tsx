@@ -121,7 +121,6 @@ export function NewProjectPage() {
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <div className="grid grid-cols-12 gap-10">
-            {/* Left — form */}
             <div className="col-span-12 lg:col-span-8">
               <form
                 onSubmit={(e) => {

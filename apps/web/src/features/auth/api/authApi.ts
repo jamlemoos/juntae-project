@@ -1,5 +1,6 @@
-// TODO: implement when backend exposes auth endpoints.
-// The backend currently has no /api/auth/* routes.
+// Auth API integration for existing endpoints:
+// POST /api/auth/login
+// POST /api/auth/register
 
 export type LoginInput = {
   email: string;

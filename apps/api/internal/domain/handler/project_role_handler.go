@@ -7,6 +7,7 @@ import (
 	"juntae-api/internal/domain/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type ProjectRoleHandler struct {
@@ -18,11 +19,15 @@ func NewProjectRoleHandler(projectRoleService *service.ProjectRoleService) *Proj
 }
 
 func (h *ProjectRoleHandler) CreateProjectRole(c *gin.Context) {
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
 	var req dto.CreateProjectRoleRequest
 	if !bindAndValidate(c, &req) {
 		return
 	}
-	resp, err := h.projectRoleService.CreateProjectRole(req)
+	resp, err := h.projectRoleService.CreateProjectRole(callerID, req)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -31,7 +36,42 @@ func (h *ProjectRoleHandler) CreateProjectRole(c *gin.Context) {
 }
 
 func (h *ProjectRoleHandler) GetProjectRoles(c *gin.Context) {
-	roles, err := h.projectRoleService.GetProjectRoles()
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	if raw := c.Query("project_id"); raw != "" {
+		projectID, err := uuid.Parse(raw)
+		if err != nil {
+			respondWithError(c, http.StatusBadRequest, "invalid project_id")
+			return
+		}
+		roles, err := h.projectRoleService.GetProjectRolesByProject(projectID, callerID)
+		if err != nil {
+			handleServiceError(c, err)
+			return
+		}
+		respondWithJSON(c, http.StatusOK, roles)
+		return
+	}
+	roles, err := h.projectRoleService.GetProjectRoles(callerID)
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+	respondWithJSON(c, http.StatusOK, roles)
+}
+
+func (h *ProjectRoleHandler) GetRolesByProject(c *gin.Context) {
+	projectID, ok := parseUUIDParam(c, "id")
+	if !ok {
+		return
+	}
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	roles, err := h.projectRoleService.GetProjectRolesByProject(projectID, callerID)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -44,7 +84,11 @@ func (h *ProjectRoleHandler) GetProjectRoleByID(c *gin.Context) {
 	if !ok {
 		return
 	}
-	role, err := h.projectRoleService.GetProjectRoleByID(id)
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	role, err := h.projectRoleService.GetProjectRoleByID(id, callerID)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -57,11 +101,15 @@ func (h *ProjectRoleHandler) UpdateProjectRole(c *gin.Context) {
 	if !ok {
 		return
 	}
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
 	var req dto.UpdateProjectRoleRequest
 	if !bindAndValidate(c, &req) {
 		return
 	}
-	resp, err := h.projectRoleService.UpdateProjectRole(id, req)
+	resp, err := h.projectRoleService.UpdateProjectRole(id, callerID, req)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -74,7 +122,11 @@ func (h *ProjectRoleHandler) DeleteProjectRole(c *gin.Context) {
 	if !ok {
 		return
 	}
-	if err := h.projectRoleService.DeleteProjectRole(id); err != nil {
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	if err := h.projectRoleService.DeleteProjectRole(id, callerID); err != nil {
 		handleServiceError(c, err)
 		return
 	}

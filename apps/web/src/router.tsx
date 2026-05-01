@@ -12,10 +12,8 @@ import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { RegisterPage } from './pages/RegisterPage';
 
-// Bare root — child layout routes handle their own shell
 const rootRoute = createRootRoute({ component: Outlet, notFoundComponent: NotFoundPage });
 
-// Public pages — Header + main + Footer
 const publicLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'public-layout',
@@ -26,14 +24,12 @@ const publicLayoutRoute = createRoute({
   ),
 });
 
-// Auth pages — bare shell wrapping <Outlet />; each page owns its own Header and two-panel layout
 const authLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'auth-layout',
   component: AuthLayout,
 });
 
-// Authenticated app pages — app shell; guard blocks access until backend auth is ready
 const appLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: 'app-layout',

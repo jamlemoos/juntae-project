@@ -36,12 +36,12 @@ func HashPassword(password string) (string, error) {
 }
 
 func CheckPasswordHash(password, hash string) (bool, error) {
-    err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-    if err != nil {
-        if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-            return false, nil
-        }
-        return false, fmt.Errorf("unexpected security error: %w", err)
-    }
-    return true, nil
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return false, nil
+		}
+		return false, fmt.Errorf("unexpected security error: %w", err)
+	}
+	return true, nil
 }

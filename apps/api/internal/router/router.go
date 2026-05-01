@@ -5,6 +5,7 @@ import (
 
 	"juntae-api/internal/domain/handler"
 	"juntae-api/internal/domain/service"
+	"juntae-api/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,10 +22,7 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status":  "ok",
-			"service": "juntae-api",
-		})
+		c.JSON(http.StatusOK, gin.H{"status": "ok", "service": "juntae-api"})
 	})
 
 	userHandler := handler.NewUserHandler(deps.UserService)
@@ -35,40 +33,47 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 
 	api := r.Group("/api")
 
-	api.POST("/login", userHandler.Login)
+	auth := api.Group("/auth")
+	auth.POST("/register", userHandler.CreateUser)
+	auth.POST("/login", userHandler.Login)
 
-	api.POST("/users", userHandler.CreateUser)
-	api.GET("/users", userHandler.GetUsers)
-	api.GET("/users/:id", userHandler.GetUserByID)
-	api.PUT("/users/:id", userHandler.UpdateUser)
-	api.DELETE("/users/:id", userHandler.DeleteUser)
-
-	api.POST("/skills", skillHandler.CreateSkill)
 	api.GET("/skills", skillHandler.GetSkills)
 	api.GET("/skills/:id", skillHandler.GetSkillByID)
-	api.PUT("/skills/:id", skillHandler.UpdateSkill)
-	api.DELETE("/skills/:id", skillHandler.DeleteSkill)
 
-	api.POST("/projects", projectHandler.CreateProject)
-	api.GET("/projects", projectHandler.GetProjects)
-	api.GET("/projects/search", projectHandler.SearchProjectsByStatusAndCreatorCity)
-	api.GET("/projects/applications-count", projectHandler.CountApplicationsByProject)
-	api.GET("/projects/:id", projectHandler.GetProjectByID)
-	api.GET("/projects/:id/details", projectHandler.GetProjectDetailsByID)
-	api.PUT("/projects/:id", projectHandler.UpdateProject)
-	api.DELETE("/projects/:id", projectHandler.DeleteProject)
+	protected := api.Group("", middleware.RequireAuth())
 
-	api.POST("/project-roles", projectRoleHandler.CreateProjectRole)
-	api.GET("/project-roles", projectRoleHandler.GetProjectRoles)
-	api.GET("/project-roles/:id", projectRoleHandler.GetProjectRoleByID)
-	api.PUT("/project-roles/:id", projectRoleHandler.UpdateProjectRole)
-	api.DELETE("/project-roles/:id", projectRoleHandler.DeleteProjectRole)
+	protected.GET("/users", userHandler.GetUsers)
+	protected.GET("/users/me", userHandler.GetMe)
+	protected.GET("/users/:id", userHandler.GetUserByID)
+	protected.PUT("/users/:id", userHandler.UpdateUser)
+	protected.DELETE("/users/:id", userHandler.DeleteUser)
 
-	api.POST("/applications", applicationHandler.CreateApplication)
-	api.GET("/applications", applicationHandler.GetApplications)
-	api.GET("/applications/:id", applicationHandler.GetApplicationByID)
-	api.PUT("/applications/:id", applicationHandler.UpdateApplication)
-	api.DELETE("/applications/:id", applicationHandler.DeleteApplication)
+	protected.POST("/skills", skillHandler.CreateSkill)
+	protected.PUT("/skills/:id", skillHandler.UpdateSkill)
+	protected.DELETE("/skills/:id", skillHandler.DeleteSkill)
+
+	protected.GET("/projects/stats/applications-count", projectHandler.CountApplicationsByProject)
+	protected.GET("/projects", projectHandler.GetProjects)
+	protected.POST("/projects", projectHandler.CreateProject)
+	protected.GET("/projects/:id", projectHandler.GetProjectByID)
+	protected.GET("/projects/:id/details", projectHandler.GetProjectDetailsByID)
+	protected.GET("/projects/:id/applications", projectHandler.GetProjectApplications)
+	protected.GET("/projects/:id/roles", projectRoleHandler.GetRolesByProject)
+	protected.PUT("/projects/:id", projectHandler.UpdateProject)
+	protected.DELETE("/projects/:id", projectHandler.DeleteProject)
+
+	protected.GET("/project-roles", projectRoleHandler.GetProjectRoles)
+	protected.POST("/project-roles", projectRoleHandler.CreateProjectRole)
+	protected.GET("/project-roles/:id", projectRoleHandler.GetProjectRoleByID)
+	protected.PUT("/project-roles/:id", projectRoleHandler.UpdateProjectRole)
+	protected.DELETE("/project-roles/:id", projectRoleHandler.DeleteProjectRole)
+
+	protected.POST("/applications", applicationHandler.CreateApplication)
+	protected.GET("/applications", applicationHandler.GetApplications)
+	protected.GET("/applications/:id", applicationHandler.GetApplicationByID)
+	protected.PUT("/applications/:id", applicationHandler.UpdateApplication)
+	protected.PATCH("/applications/:id/status", applicationHandler.UpdateApplicationStatus)
+	protected.DELETE("/applications/:id", applicationHandler.DeleteApplication)
 
 	return r
 }

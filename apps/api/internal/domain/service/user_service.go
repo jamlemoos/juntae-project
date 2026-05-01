@@ -50,23 +50,26 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.UserResponse, 
 		user.Skills = skills
 	}
 	if err := s.repo.Create(user); err != nil {
+		if isUniqueViolation(err) {
+			return nil, ErrConflict
+		}
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 	if err := s.audit.LogCreate("User", user.ID, fmt.Sprintf("User created: %s", user.Email)); err != nil {
-		return nil, fmt.Errorf("audit user create: %w", err)
+		log.Printf("WARN: audit log failed for user create %s: %v", user.ID, err)
 	}
 	resp := mapUserResponse(user)
 	return &resp, nil
 }
 
-func (s *UserService) GetUsers() ([]dto.UserResponse, error) {
+func (s *UserService) GetUsers() ([]dto.PublicUserResponse, error) {
 	users, err := s.repo.FindAll()
 	if err != nil {
 		return nil, fmt.Errorf("get users: %w", err)
 	}
-	responses := make([]dto.UserResponse, len(users))
+	responses := make([]dto.PublicUserResponse, len(users))
 	for i := range users {
-		responses[i] = mapUserResponse(&users[i])
+		responses[i] = mapPublicUserResponse(&users[i])
 	}
 	return responses, nil
 }
@@ -80,7 +83,19 @@ func (s *UserService) GetUserByID(id uuid.UUID) (*dto.UserResponse, error) {
 	return &resp, nil
 }
 
-func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.UserResponse, error) {
+func (s *UserService) GetPublicUserByID(id uuid.UUID) (*dto.PublicUserResponse, error) {
+	user, err := s.repo.FindByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("get user: %w", err)
+	}
+	resp := mapPublicUserResponse(user)
+	return &resp, nil
+}
+
+func (s *UserService) UpdateUser(id uuid.UUID, callerID uuid.UUID, req dto.UpdateUserRequest) (*dto.UserResponse, error) {
+	if id != callerID {
+		return nil, ErrForbidden
+	}
 	user, err := s.repo.FindByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("user not found: %w", err)
@@ -112,7 +127,10 @@ func (s *UserService) UpdateUser(id uuid.UUID, req dto.UpdateUserRequest) (*dto.
 	return &resp, nil
 }
 
-func (s *UserService) DeleteUser(id uuid.UUID) error {
+func (s *UserService) DeleteUser(id uuid.UUID, callerID uuid.UUID) error {
+	if id != callerID {
+		return ErrForbidden
+	}
 	if err := s.repo.Delete(id); err != nil {
 		return fmt.Errorf("delete user: %w", err)
 	}
@@ -163,6 +181,7 @@ func mapUserResponse(u *model.User) dto.UserResponse {
 		ID:        u.ID,
 		Name:      u.Name,
 		Email:     u.Email,
+		Role:      u.Role,
 		Bio:       u.Bio,
 		City:      u.City,
 		Skills:    skills,

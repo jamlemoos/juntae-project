@@ -15,7 +15,6 @@ export function useProjectDetailEditing() {
     setEditingSection(null);
   }
 
-  // Wrapper typed narrowly so section components don't need React.Dispatch
   function setEditDraft(updater: (prev: ProjectData) => ProjectData) {
     setEditDraftState(updater);
   }

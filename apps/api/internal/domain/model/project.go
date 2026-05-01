@@ -11,8 +11,8 @@ type Project struct {
 	ID          uuid.UUID `gorm:"type:uuid;primaryKey"`
 	Title       string    `gorm:"not null"`
 	Description string    `gorm:"not null"`
-	Status      string    `gorm:"not null"`
-	CreatorID   uuid.UUID `gorm:"type:uuid;not null"`
+	Status      string    `gorm:"not null;index"`
+	CreatorID   uuid.UUID `gorm:"type:uuid;not null;index"`
 	Creator     User
 	Roles       []ProjectRole `gorm:"foreignKey:ProjectID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	CreatedAt   time.Time

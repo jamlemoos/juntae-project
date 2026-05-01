@@ -14,7 +14,7 @@ type User struct {
 	Password     *string   `gorm:"default:null"`
 	Role         string    `gorm:"not null;default:'member'"`
 	Bio          string
-	City         string        `gorm:"not null"`
+	City         string        `gorm:"not null;index"`
 	Skills       []Skill       `gorm:"many2many:user_skills;"`
 	Projects     []Project     `gorm:"foreignKey:CreatorID"`
 	Applications []Application `gorm:"foreignKey:UserID"`

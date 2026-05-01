@@ -15,13 +15,11 @@ export function validateEmail(value: string) {
   return r.success ? undefined : r.error.issues[0]?.message;
 }
 
-/** Login: required only. */
 export function validateLoginPassword(value: string) {
   const r = loginPasswordSchema.safeParse(value);
   return r.success ? undefined : r.error.issues[0]?.message;
 }
 
-/** Register: minimum 8 characters. */
 export function validateRegisterPassword(value: string) {
   const r = registerPasswordSchema.safeParse(value);
   return r.success ? undefined : r.error.issues[0]?.message;

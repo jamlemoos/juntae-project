@@ -2,11 +2,13 @@ package service
 
 import (
 	"fmt"
+	"log"
 
-	"github.com/google/uuid"
 	"juntae-api/internal/domain/dto"
 	"juntae-api/internal/domain/model"
 	"juntae-api/internal/domain/repository"
+
+	"github.com/google/uuid"
 )
 
 type SkillService struct {
@@ -21,10 +23,13 @@ func NewSkillService(repo *repository.SkillRepository, audit *AuditService) *Ski
 func (s *SkillService) CreateSkill(req dto.CreateSkillRequest) (*dto.SkillResponse, error) {
 	skill := &model.Skill{Name: req.Name}
 	if err := s.repo.Create(skill); err != nil {
+		if isUniqueViolation(err) {
+			return nil, ErrConflict
+		}
 		return nil, fmt.Errorf("create skill: %w", err)
 	}
 	if err := s.audit.LogCreate("Skill", skill.ID, fmt.Sprintf("Skill created: %s", skill.Name)); err != nil {
-		return nil, fmt.Errorf("audit skill create: %w", err)
+		log.Printf("WARN: audit log failed for skill create %s: %v", skill.ID, err)
 	}
 	resp := mapSkillResponse(skill)
 	return &resp, nil

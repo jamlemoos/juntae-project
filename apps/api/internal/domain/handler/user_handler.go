@@ -30,6 +30,19 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	respondWithJSON(c, http.StatusCreated, resp)
 }
 
+func (h *UserHandler) GetMe(c *gin.Context) {
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	user, err := h.userService.GetUserByID(callerID)
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+	respondWithJSON(c, http.StatusOK, user)
+}
+
 func (h *UserHandler) GetUsers(c *gin.Context) {
 	users, err := h.userService.GetUsers()
 	if err != nil {
@@ -44,7 +57,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	if !ok {
 		return
 	}
-	user, err := h.userService.GetUserByID(id)
+	user, err := h.userService.GetPublicUserByID(id)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -57,11 +70,15 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	if !ok {
 		return
 	}
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
 	var req dto.UpdateUserRequest
 	if !bindAndValidate(c, &req) {
 		return
 	}
-	resp, err := h.userService.UpdateUser(id, req)
+	resp, err := h.userService.UpdateUser(id, callerID, req)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -74,7 +91,11 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	if !ok {
 		return
 	}
-	if err := h.userService.DeleteUser(id); err != nil {
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	if err := h.userService.DeleteUser(id, callerID); err != nil {
 		handleServiceError(c, err)
 		return
 	}
@@ -83,8 +104,8 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 func (h *UserHandler) Login(c *gin.Context) {
 	var req struct {
-		Email    string `json:"email" binding:"required,email" validate:"required,email"`
-		Password string `json:"password" binding:"required" validate:"required"`
+		Email    string `json:"email"    validate:"required,email"`
+		Password string `json:"password" validate:"required"`
 	}
 	if !bindAndValidate(c, &req) {
 		return

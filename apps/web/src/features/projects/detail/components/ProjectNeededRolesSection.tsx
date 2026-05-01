@@ -112,7 +112,8 @@ export function ProjectNeededRolesSection({
                   role={role}
                   onApply={
                     canApply
-                      ? () => setOpenApplicationRoleId((prev) => (prev === role.id ? null : role.id))
+                      ? () =>
+                          setOpenApplicationRoleId((prev) => (prev === role.id ? null : role.id))
                       : undefined
                   }
                 />
