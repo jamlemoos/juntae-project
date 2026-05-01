@@ -27,9 +27,18 @@ type UserResponse struct {
 	ID        uuid.UUID       `json:"id"`
 	Name      string          `json:"name"`
 	Email     string          `json:"email"`
+	Role      string          `json:"role"`
 	Bio       string          `json:"bio"`
 	City      string          `json:"city"`
 	Skills    []SkillResponse `json:"skills"`
 	CreatedAt time.Time       `json:"created_at"`
 	UpdatedAt time.Time       `json:"updated_at"`
+}
+
+type PublicUserResponse struct {
+	ID        uuid.UUID       `json:"id"`
+	Name      string          `json:"name"`
+	City      string          `json:"city"`
+	Skills    []SkillResponse `json:"skills"`
+	CreatedAt time.Time       `json:"created_at"`
 }

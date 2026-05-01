@@ -59,9 +59,9 @@ func main() {
 	auditService := service.NewAuditService(auditRepo)
 	userService := service.NewUserService(userRepo, skillRepo, auditService)
 	skillService := service.NewSkillService(skillRepo, auditService)
-	projectService := service.NewProjectService(projectRepo, auditService)
-	projectRoleService := service.NewProjectRoleService(projectRoleRepo, auditService)
-	applicationService := service.NewApplicationService(applicationRepo, auditService)
+	projectService := service.NewProjectService(projectRepo, applicationRepo, auditService)
+	projectRoleService := service.NewProjectRoleService(projectRoleRepo, projectRepo, auditService)
+	applicationService := service.NewApplicationService(applicationRepo, projectRoleRepo, auditService)
 
 	deps := router.RouterDependencies{
 		UserService:        userService,

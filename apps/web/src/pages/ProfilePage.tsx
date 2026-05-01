@@ -36,7 +36,6 @@ const LINK_SUGGESTIONS: { kind: LinkKind; label: string }[] = [
 export function ProfilePage() {
   return (
     <div className="flex min-h-screen flex-col bg-cream">
-      {/* ── Hero ── */}
       <section className="relative overflow-hidden paper-tex">
         <div className="mx-auto max-w-[1200px] px-6 pb-10 pt-14">
           <div className="mb-7 flex items-center gap-3">
@@ -81,11 +80,9 @@ export function ProfilePage() {
         </div>
       </section>
 
-      {/* ── Body ── */}
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <div className="grid grid-cols-12 gap-10">
-            {/* Left — sections */}
             <div className="col-span-12 lg:col-span-8">
               <ProfileSection eyebrow="01 · sobre" title="Bio" divider={false}>
                 <ProfileEmptyState cta="adicionar bio">
@@ -178,7 +175,6 @@ export function ProfilePage() {
               </ProfileSection>
             </div>
 
-            {/* Right rail */}
             <div className="col-span-12 lg:col-span-4">
               <div className="lg:sticky lg:top-24">
                 <CompletionCard items={COMPLETION_ITEMS} />

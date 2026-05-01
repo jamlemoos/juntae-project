@@ -47,6 +47,26 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
+func ValidateToken(tokenString string) (*CustomClaims, error) {
+	if len(jwtSecret) == 0 {
+		return nil, fmt.Errorf("jwt not initialized")
+	}
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return jwtSecret, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	claims, ok := token.Claims.(*CustomClaims)
+	if !ok || !token.Valid {
+		return nil, fmt.Errorf("invalid token claims")
+	}
+	return claims, nil
+}
+
 func GenerateToken(userID uuid.UUID, role string) (string, error) {
 	if len(jwtSecret) == 0 {
 		return "", fmt.Errorf("jwt not initialized: call security.InitJWT() on startup")

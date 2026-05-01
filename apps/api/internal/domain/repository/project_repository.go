@@ -1,11 +1,17 @@
 package repository
 
 import (
+	"juntae-api/internal/domain/model"
+
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"juntae-api/internal/domain/dto"
-	"juntae-api/internal/domain/model"
 )
+
+type ProjectApplicationCount struct {
+	ProjectID         uuid.UUID
+	Title             string
+	ApplicationsCount int64
+}
 
 type ProjectRepository struct {
 	db *gorm.DB
@@ -19,9 +25,25 @@ func (r *ProjectRepository) Create(project *model.Project) error {
 	return r.db.Create(project).Error
 }
 
-func (r *ProjectRepository) FindAll() ([]model.Project, error) {
+func (r *ProjectRepository) FindAllForList() ([]model.Project, error) {
 	var projects []model.Project
-	err := r.db.Find(&projects).Error
+	err := r.db.
+		Preload("Creator").
+		Preload("Creator.Skills").
+		Preload("Roles").
+		Find(&projects).Error
+	return projects, err
+}
+
+func (r *ProjectRepository) FindByStatusAndCreatorCityForList(status, city string) ([]model.Project, error) {
+	var projects []model.Project
+	err := r.db.
+		Preload("Creator").
+		Preload("Creator.Skills").
+		Preload("Roles").
+		Joins("JOIN users ON users.id = projects.creator_id").
+		Where("projects.status = ? AND users.city = ?", status, city).
+		Find(&projects).Error
 	return projects, err
 }
 
@@ -40,8 +62,9 @@ func (r *ProjectRepository) FindDetailsByID(id uuid.UUID) (*model.Project, error
 		Preload("Creator").
 		Preload("Creator.Skills").
 		Preload("Roles").
-		Preload("Roles.Applications").
-		Preload("Roles.Applications.User").
+		Preload("Roles.Applications", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id, user_id, project_role_id")
+		}).
 		First(&project, "id = ?", id).Error
 	if err != nil {
 		return nil, err
@@ -49,17 +72,8 @@ func (r *ProjectRepository) FindDetailsByID(id uuid.UUID) (*model.Project, error
 	return &project, nil
 }
 
-func (r *ProjectRepository) FindByStatusAndCreatorCity(status string, city string) ([]model.Project, error) {
-	var projects []model.Project
-	err := r.db.
-		Joins("JOIN users ON users.id = projects.creator_id").
-		Where("projects.status = ? AND users.city = ?", status, city).
-		Find(&projects).Error
-	return projects, err
-}
-
-func (r *ProjectRepository) CountApplicationsByProject() ([]dto.ProjectApplicationsCountResponse, error) {
-	var results []dto.ProjectApplicationsCountResponse
+func (r *ProjectRepository) CountApplicationsByProject() ([]ProjectApplicationCount, error) {
+	var results []ProjectApplicationCount
 	err := r.db.Raw(`
 		SELECT
 			p.id          AS project_id,

@@ -18,7 +18,6 @@ export function ProjectsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
-      {/* ── Hero ── */}
       <section className="relative overflow-hidden paper-tex">
         <div className="mx-auto max-w-[1200px] px-6 pb-10 pt-14">
           <div className="mb-7 flex items-center gap-3">
@@ -49,7 +48,6 @@ export function ProjectsPage() {
         </div>
       </section>
 
-      {/* ── Body ── */}
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <SectionLayout eyebrow="01 · rascunhos" title="Meus rascunhos" divider={false}>

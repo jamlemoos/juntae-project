@@ -113,7 +113,6 @@ export function useProjectDraft(projectId: string) {
   );
 
   useEffect(() => {
-    // sessionStorage is an external system; reading from it in an effect is correct.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setProjectState(projectId ? readStored(projectId) : emptyProject());
   }, [projectId]);

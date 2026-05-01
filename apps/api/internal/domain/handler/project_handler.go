@@ -18,11 +18,15 @@ func NewProjectHandler(projectService *service.ProjectService) *ProjectHandler {
 }
 
 func (h *ProjectHandler) CreateProject(c *gin.Context) {
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
 	var req dto.CreateProjectRequest
 	if !bindAndValidate(c, &req) {
 		return
 	}
-	resp, err := h.projectService.CreateProject(req)
+	resp, err := h.projectService.CreateProject(callerID, req)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -31,22 +35,17 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 }
 
 func (h *ProjectHandler) GetProjects(c *gin.Context) {
-	projects, err := h.projectService.GetProjects()
-	if err != nil {
-		handleServiceError(c, err)
+	callerID, ok := getAuthUserID(c)
+	if !ok {
 		return
 	}
-	respondWithJSON(c, http.StatusOK, projects)
-}
-
-func (h *ProjectHandler) SearchProjectsByStatusAndCreatorCity(c *gin.Context) {
 	status := c.Query("status")
 	city := c.Query("city")
-	if status == "" || city == "" {
-		respondWithError(c, http.StatusBadRequest, "query params 'status' and 'city' are required")
+	if (status == "") != (city == "") {
+		respondWithError(c, http.StatusBadRequest, "both 'status' and 'city' query params are required when filtering")
 		return
 	}
-	projects, err := h.projectService.SearchProjectsByStatusAndCreatorCity(status, city)
+	projects, err := h.projectService.GetProjectsForList(callerID, status, city)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -81,7 +80,11 @@ func (h *ProjectHandler) GetProjectDetailsByID(c *gin.Context) {
 	if !ok {
 		return
 	}
-	details, err := h.projectService.GetProjectDetailsByID(id)
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	details, err := h.projectService.GetProjectDetailsByID(id, callerID)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -89,8 +92,29 @@ func (h *ProjectHandler) GetProjectDetailsByID(c *gin.Context) {
 	respondWithJSON(c, http.StatusOK, details)
 }
 
+func (h *ProjectHandler) GetProjectApplications(c *gin.Context) {
+	id, ok := parseUUIDParam(c, "id")
+	if !ok {
+		return
+	}
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	applications, err := h.projectService.GetProjectApplications(id, callerID)
+	if err != nil {
+		handleServiceError(c, err)
+		return
+	}
+	respondWithJSON(c, http.StatusOK, applications)
+}
+
 func (h *ProjectHandler) UpdateProject(c *gin.Context) {
 	id, ok := parseUUIDParam(c, "id")
+	if !ok {
+		return
+	}
+	callerID, ok := getAuthUserID(c)
 	if !ok {
 		return
 	}
@@ -98,7 +122,7 @@ func (h *ProjectHandler) UpdateProject(c *gin.Context) {
 	if !bindAndValidate(c, &req) {
 		return
 	}
-	resp, err := h.projectService.UpdateProject(id, req)
+	resp, err := h.projectService.UpdateProject(id, callerID, req)
 	if err != nil {
 		handleServiceError(c, err)
 		return
@@ -111,7 +135,11 @@ func (h *ProjectHandler) DeleteProject(c *gin.Context) {
 	if !ok {
 		return
 	}
-	if err := h.projectService.DeleteProject(id); err != nil {
+	callerID, ok := getAuthUserID(c)
+	if !ok {
+		return
+	}
+	if err := h.projectService.DeleteProject(id, callerID); err != nil {
 		handleServiceError(c, err)
 		return
 	}
