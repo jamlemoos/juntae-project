@@ -3,11 +3,11 @@ export const TOKEN_KEY = 'auth_token';
 const BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api').replace(/\/$/, '');
 
 export class ApiError extends Error {
-  constructor(
-    public readonly status: number,
-    message: string
-  ) {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
     super(message);
+    this.status = status;
     this.name = 'ApiError';
   }
 }
