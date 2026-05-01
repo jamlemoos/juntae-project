@@ -96,7 +96,11 @@ func (s *ProjectRoleService) UpdateProjectRole(id uuid.UUID, callerID uuid.UUID,
 	if err := s.repo.Update(role); err != nil {
 		return nil, fmt.Errorf("update project role: %w", err)
 	}
-	resp := mapProjectRoleResponse(role, callerID)
+	updated, err := s.repo.FindByIDWithApplications(id)
+	if err != nil {
+		return nil, fmt.Errorf("reload project role: %w", err)
+	}
+	resp := mapProjectRoleResponse(updated, callerID)
 	return &resp, nil
 }
 

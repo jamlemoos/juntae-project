@@ -47,6 +47,9 @@ func (s *ApplicationService) CreateApplication(userID uuid.UUID, req dto.CreateA
 		ProjectRoleID: req.ProjectRoleID,
 	}
 	if err := s.repo.Create(application); err != nil {
+		if isUniqueViolation(err) {
+			return nil, ErrConflict
+		}
 		return nil, fmt.Errorf("create application: %w", err)
 	}
 	if err := s.audit.LogCreate("Application", application.ID, fmt.Sprintf("Application created by user %s", application.UserID)); err != nil {
