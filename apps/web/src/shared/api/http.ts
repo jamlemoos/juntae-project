@@ -37,13 +37,19 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const payload = await response.json().catch(() => null);
-    throw new ApiError(response.status, payload?.message ?? response.statusText);
+    throw new ApiError(response.status, payload?.error ?? payload?.message ?? response.statusText);
   }
 
   if (response.status === 204) return undefined as T;
 
-  const text = await response.text();
-  return (text ? JSON.parse(text) : undefined) as T;
+  const text = (await response.text()).trim();
+  if (!text) return undefined as T;
+
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError(response.status, 'Invalid JSON response');
+  }
 }
 
 function get<T>(path: string): Promise<T> {

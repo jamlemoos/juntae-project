@@ -1,4 +1,10 @@
 import { http } from '../../../shared/api/http';
+import {
+  mapApplication,
+  mapApplicationDetail,
+  type ApplicationApiResponse,
+  type ApplicationDetailApiResponse,
+} from './mappers';
 import type {
   ApplicationDetailResponse,
   ApplicationResponse,
@@ -7,40 +13,48 @@ import type {
   UpdateApplicationStatusRequest,
 } from './types';
 
-export function getMyApplications(): Promise<ApplicationResponse[]> {
-  return http.get<ApplicationResponse[]>('/applications');
+export async function getMyApplications(): Promise<ApplicationResponse[]> {
+  const raw = await http.get<ApplicationApiResponse[]>('/applications');
+  return raw.map(mapApplication);
 }
 
-export function getApplicationById(id: string): Promise<ApplicationResponse> {
-  return http.get<ApplicationResponse>(`/applications/${id}`);
+export async function getApplicationById(id: string): Promise<ApplicationResponse> {
+  const raw = await http.get<ApplicationApiResponse>(`/applications/${id}`);
+  return mapApplication(raw);
 }
 
-export function applyToRole(data: CreateApplicationRequest): Promise<ApplicationResponse> {
+export async function applyToRole(data: CreateApplicationRequest): Promise<ApplicationResponse> {
   const { projectRoleId, ...rest } = data;
-  return http.post<ApplicationResponse>('/applications', {
+  const raw = await http.post<ApplicationApiResponse>('/applications', {
     ...rest,
     project_role_id: projectRoleId,
   });
+  return mapApplication(raw);
 }
 
-export function updateApplication(
+export async function updateApplication(
   id: string,
   data: UpdateApplicationRequest
 ): Promise<ApplicationResponse> {
-  return http.put<ApplicationResponse>(`/applications/${id}`, data);
+  const raw = await http.put<ApplicationApiResponse>(`/applications/${id}`, data);
+  return mapApplication(raw);
 }
 
-export function updateApplicationStatus(
+export async function updateApplicationStatus(
   id: string,
   data: UpdateApplicationStatusRequest
 ): Promise<ApplicationResponse> {
-  return http.patch<ApplicationResponse>(`/applications/${id}/status`, data);
+  const raw = await http.patch<ApplicationApiResponse>(`/applications/${id}/status`, data);
+  return mapApplication(raw);
 }
 
-export function getProjectApplications(projectId: string): Promise<ApplicationDetailResponse[]> {
-  return http.get<ApplicationDetailResponse[]>(`/projects/${projectId}/applications`);
+export async function getProjectApplications(
+  projectId: string
+): Promise<ApplicationDetailResponse[]> {
+  const raw = await http.get<ApplicationDetailApiResponse[]>(`/projects/${projectId}/applications`);
+  return raw.map(mapApplicationDetail);
 }
 
-export function deleteApplication(id: string): Promise<void> {
+export async function deleteApplication(id: string): Promise<void> {
   return http.del<void>(`/applications/${id}`);
 }
