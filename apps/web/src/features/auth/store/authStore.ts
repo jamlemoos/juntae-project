@@ -43,8 +43,11 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       const user = await getMe();
       set({ user, isAuthenticated: true, isLoading: false, hasInitialized: true, initError: null });
     } catch (err) {
-      if (err instanceof ApiError && err.status === 401) {
-        // Definitively rejected — clear token and mark as done.
+      if (
+        err instanceof ApiError &&
+        (err.status === 401 || err.status === 403 || err.status === 404)
+      ) {
+        // Non-retryable: the current session is invalid or the resource is gone — log out locally.
         logoutApi();
         set({
           user: null,
