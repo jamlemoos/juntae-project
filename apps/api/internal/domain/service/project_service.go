@@ -51,18 +51,34 @@ func (s *ProjectService) CreateProject(creatorID uuid.UUID, req dto.CreateProjec
 	return &resp, nil
 }
 
-func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city string) ([]dto.ProjectListItemResponse, error) {
+func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city string, offset, limit int) ([]dto.ProjectListItemResponse, error) {
 	var (
 		projects []model.Project
 		err      error
 	)
 	if status != "" && city != "" {
-		projects, err = s.repo.FindByStatusAndCreatorCityForList(status, city)
+		projects, err = s.repo.FindByStatusAndCreatorCityForList(status, city, offset, limit)
 	} else {
-		projects, err = s.repo.FindAllForList()
+		projects, err = s.repo.FindAllForList(offset, limit)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get projects: %w", err)
+	}
+	appliedSet, err := s.applicationRepo.FindProjectIDsWhereUserApplied(callerID)
+	if err != nil {
+		return nil, fmt.Errorf("check applied projects: %w", err)
+	}
+	responses := make([]dto.ProjectListItemResponse, len(projects))
+	for i := range projects {
+		responses[i] = mapProjectListItemResponse(&projects[i], callerID, appliedSet)
+	}
+	return responses, nil
+}
+
+func (s *ProjectService) GetProjectsForOwner(callerID uuid.UUID, offset, limit int) ([]dto.ProjectListItemResponse, error) {
+	projects, err := s.repo.FindByCreatorIDForList(callerID, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf("get owner projects: %w", err)
 	}
 	appliedSet, err := s.applicationRepo.FindProjectIDsWhereUserApplied(callerID)
 	if err != nil {
@@ -196,16 +212,27 @@ func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet
 }
 
 func mapProjectDetailsResponse(p *model.Project, callerID uuid.UUID) dto.ProjectDetailsResponse {
-	roles := make([]dto.ProjectRoleResponse, len(p.Roles))
-	for i := range p.Roles {
-		roles[i] = mapProjectRoleResponse(&p.Roles[i], callerID)
+	isOwner := p.CreatorID == callerID
+	var visibleRoles []model.ProjectRole
+	if isOwner {
+		visibleRoles = p.Roles
+	} else {
+		for _, r := range p.Roles {
+			if r.Status == "OPEN" {
+				visibleRoles = append(visibleRoles, r)
+			}
+		}
+	}
+	roles := make([]dto.ProjectRoleResponse, len(visibleRoles))
+	for i := range visibleRoles {
+		roles[i] = mapProjectRoleResponse(&visibleRoles[i], callerID)
 	}
 	return dto.ProjectDetailsResponse{
 		ID:          p.ID,
 		Title:       p.Title,
 		Description: p.Description,
 		Status:      p.Status,
-		IsOwner:     p.CreatorID == callerID,
+		IsOwner:     isOwner,
 		Creator:     mapPublicUserResponse(&p.Creator),
 		Roles:       roles,
 		CreatedAt:   p.CreatedAt,

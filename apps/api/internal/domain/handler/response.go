@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"strconv"
 
 	"juntae-api/internal/domain/service"
 	"juntae-api/internal/middleware"
@@ -67,8 +68,28 @@ func handleServiceError(c *gin.Context, err error) {
 		respondWithError(c, http.StatusForbidden, "forbidden")
 	case errors.Is(err, service.ErrConflict):
 		respondWithError(c, http.StatusConflict, "conflict")
+	case errors.Is(err, service.ErrProjectClosed):
+		respondWithError(c, http.StatusConflict, "project is not open for applications")
+	case errors.Is(err, service.ErrRoleClosed):
+		respondWithError(c, http.StatusConflict, "role is not open for applications")
 	default:
 		log.Printf("ERROR: internal server error: %v", err)
 		respondWithError(c, http.StatusInternalServerError, "internal server error")
 	}
+}
+
+func parsePagination(c *gin.Context) (offset, limit int) {
+	page := 1
+	limit = 20
+	if p, err := strconv.Atoi(c.Query("page")); err == nil && p > 0 {
+		page = p
+	}
+	if l, err := strconv.Atoi(c.Query("limit")); err == nil && l > 0 {
+		if l > 50 {
+			l = 50
+		}
+		limit = l
+	}
+	offset = (page - 1) * limit
+	return
 }

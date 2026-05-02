@@ -33,6 +33,12 @@ func (s *ApplicationService) CreateApplication(userID uuid.UUID, req dto.CreateA
 	if role.Project.CreatorID == userID {
 		return nil, ErrForbidden
 	}
+	if role.Project.Status != "OPEN" {
+		return nil, ErrProjectClosed
+	}
+	if role.Status != "OPEN" {
+		return nil, ErrRoleClosed
+	}
 	exists, err := s.repo.ExistsByUserAndRole(userID, req.ProjectRoleID)
 	if err != nil {
 		return nil, fmt.Errorf("check duplicate application: %w", err)
