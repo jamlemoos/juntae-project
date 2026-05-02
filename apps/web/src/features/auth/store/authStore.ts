@@ -55,7 +55,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         });
       } else if (err instanceof ApiError && (err.status === 0 || err.status >= 500)) {
         // Transient failure (network or server error) — do NOT remove the token or mark
-        // as initialized so initializeAuth can be retried when the app reconnects.
+        // as initialized so initializeAuth can be retried by a future call, such as the retry button.
         set({
           user: null,
           isAuthenticated: false,
@@ -78,7 +78,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   login: async (email: string, password: string) => {
     // loginApi stores the token; user comes directly from the response — no extra getMe call.
     const { user } = await loginApi({ email, password });
-    set({ user, isAuthenticated: true, hasInitialized: true });
+    set({ user, isAuthenticated: true, isLoading: false, hasInitialized: true, initError: null });
   },
 
   logout: () => {
