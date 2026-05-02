@@ -62,11 +62,16 @@ export type ProjectDetail = {
   updatedAt: string;
 };
 
-// Both status and city must be provided together or neither (backend enforces this).
-export type GetProjectsFilter = {
-  status: ProjectStatus;
-  city: string;
+type ProjectSearchFilter =
+  | { status?: never; city?: never }
+  | { status: ProjectStatus; city: string };
+
+export type ProjectsPagination = {
+  page?: number;
+  limit?: number;
 };
+
+export type GetProjectsFilter = ProjectSearchFilter & ProjectsPagination;
 
 // status is required by the backend (validate:"required,oneof=OPEN IN_PROGRESS CLOSED").
 // roles is optional; each role's status must be OPEN or CLOSED.
