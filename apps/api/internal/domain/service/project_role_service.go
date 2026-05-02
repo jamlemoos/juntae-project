@@ -66,25 +66,18 @@ func (s *ProjectRoleService) GetProjectRolesByProject(projectID uuid.UUID, calle
 	if err != nil {
 		return nil, fmt.Errorf("project not found: %w", err)
 	}
-	isOwner := project.CreatorID == callerID
+
+	// Short-circuit: non-owners get no roles when the project is not OPEN.
+	if project.CreatorID != callerID && project.Status != "OPEN" {
+		return []dto.ProjectRoleResponse{}, nil
+	}
 
 	roles, err := s.repo.FindByProjectIDWithApplications(projectID)
 	if err != nil {
 		return nil, fmt.Errorf("get project roles: %w", err)
 	}
 
-	// Visibility rule: owners see all roles; non-owners only see OPEN roles on an OPEN project.
-	var visible []model.ProjectRole
-	if isOwner {
-		visible = roles
-	} else if project.Status == "OPEN" {
-		for _, r := range roles {
-			if r.Status == "OPEN" {
-				visible = append(visible, r)
-			}
-		}
-	}
-
+	visible := filterVisibleProjectRoles(project, roles, callerID)
 	responses := make([]dto.ProjectRoleResponse, len(visible))
 	for i := range visible {
 		responses[i] = mapProjectRoleResponse(&visible[i], callerID)

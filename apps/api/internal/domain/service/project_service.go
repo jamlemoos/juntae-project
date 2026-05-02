@@ -213,20 +213,27 @@ func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet
 	}
 }
 
-func mapProjectDetailsResponse(p *model.Project, callerID uuid.UUID) dto.ProjectDetailsResponse {
-	isOwner := p.CreatorID == callerID
-	var visibleRoles []model.ProjectRole
-	if isOwner {
-		visibleRoles = p.Roles
-	} else if p.Status == "OPEN" {
-		// Non-owners only see OPEN roles on an OPEN project.
-		for _, r := range p.Roles {
-			if r.Status == "OPEN" {
-				visibleRoles = append(visibleRoles, r)
-			}
+// filterVisibleProjectRoles returns the roles a caller is allowed to see for a project.
+// Owners see all roles. Non-owners see only OPEN roles on an OPEN project; otherwise none.
+func filterVisibleProjectRoles(p *model.Project, roles []model.ProjectRole, callerID uuid.UUID) []model.ProjectRole {
+	if p.CreatorID == callerID {
+		return roles
+	}
+	if p.Status != "OPEN" {
+		return nil
+	}
+	var visible []model.ProjectRole
+	for _, r := range roles {
+		if r.Status == "OPEN" {
+			visible = append(visible, r)
 		}
 	}
-	// If the project is not OPEN, non-owners see no roles (visibleRoles stays nil).
+	return visible
+}
+
+func mapProjectDetailsResponse(p *model.Project, callerID uuid.UUID) dto.ProjectDetailsResponse {
+	isOwner := p.CreatorID == callerID
+	visibleRoles := filterVisibleProjectRoles(p, p.Roles, callerID)
 	roles := make([]dto.ProjectRoleResponse, len(visibleRoles))
 	for i := range visibleRoles {
 		roles[i] = mapProjectRoleResponse(&visibleRoles[i], callerID)

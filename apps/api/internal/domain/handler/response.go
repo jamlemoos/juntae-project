@@ -79,6 +79,9 @@ func handleServiceError(c *gin.Context, err error) {
 	}
 }
 
+// parsePagination reads "page" and "limit" query parameters.
+// Project list endpoints are paginated by default: page=1, limit=20, max limit=50.
+// This keeps list responses bounded for MVP performance; no stable unbounded contract exists yet.
 func parsePagination(c *gin.Context) (offset, limit int) {
 	page := 1
 	limit = 20
