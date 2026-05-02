@@ -5,7 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const isAuthenticated = useAuth((s) => s.isAuthenticated);
-  const isLoading = useAuth((s) => s.isLoading);
+  const isInitializingAuth = useAuth((s) => s.isInitializingAuth);
   const hasInitialized = useAuth((s) => s.hasInitialized);
   const initError = useAuth((s) => s.initError);
   const initializeAuth = useAuth((s) => s.initializeAuth);
@@ -21,7 +21,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     }
   }, [hasInitialized, isAuthenticated, navigate]);
 
-  if (isLoading || (!hasInitialized && !initError)) {
+  if (isInitializingAuth || (!hasInitialized && !initError)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-cream">
         <span className="text-sm text-mute">Carregando…</span>

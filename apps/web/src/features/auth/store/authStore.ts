@@ -7,7 +7,7 @@ import type { UserResponse } from '../../users/api/types';
 type AuthState = {
   user: UserResponse | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
+  isInitializingAuth: boolean;
   hasInitialized: boolean;
   initError: string | null;
   initializeAuth: () => Promise<void>;
@@ -19,29 +19,35 @@ type AuthState = {
 export const useAuthStore = create<AuthState>()((set, get) => ({
   user: null,
   isAuthenticated: false,
-  isLoading: false,
+  isInitializingAuth: false,
   hasInitialized: false,
   initError: null,
 
   initializeAuth: async () => {
     // Guard against duplicate calls (Strict Mode double-invoke, concurrent navigations).
-    if (get().hasInitialized || get().isLoading) return;
+    if (get().hasInitialized || get().isInitializingAuth) return;
 
     if (!localStorage.getItem(TOKEN_KEY)) {
       set({
         user: null,
         isAuthenticated: false,
-        isLoading: false,
+        isInitializingAuth: false,
         hasInitialized: true,
         initError: null,
       });
       return;
     }
 
-    set({ isLoading: true, initError: null });
+    set({ isInitializingAuth: true, initError: null });
     try {
       const user = await getMe();
-      set({ user, isAuthenticated: true, isLoading: false, hasInitialized: true, initError: null });
+      set({
+        user,
+        isAuthenticated: true,
+        isInitializingAuth: false,
+        hasInitialized: true,
+        initError: null,
+      });
     } catch (err) {
       if (
         err instanceof ApiError &&
@@ -52,7 +58,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         set({
           user: null,
           isAuthenticated: false,
-          isLoading: false,
+          isInitializingAuth: false,
           hasInitialized: true,
           initError: null,
         });
@@ -62,7 +68,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         set({
           user: null,
           isAuthenticated: false,
-          isLoading: false,
+          isInitializingAuth: false,
           initError: 'Não foi possível validar sua sessão. Tente novamente.',
         });
       } else {
@@ -70,7 +76,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         set({
           user: null,
           isAuthenticated: false,
-          isLoading: false,
+          isInitializingAuth: false,
           initError: 'Não foi possível validar sua sessão. Tente novamente.',
         });
       }
@@ -80,7 +86,13 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   login: async (email: string, password: string) => {
     // loginApi stores the token; user comes directly from the response — no extra getMe call.
     const { user } = await loginApi({ email, password });
-    set({ user, isAuthenticated: true, isLoading: false, hasInitialized: true, initError: null });
+    set({
+      user,
+      isAuthenticated: true,
+      isInitializingAuth: false,
+      hasInitialized: true,
+      initError: null,
+    });
   },
 
   logout: () => {
@@ -88,7 +100,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     set({
       user: null,
       isAuthenticated: false,
-      isLoading: false,
+      isInitializingAuth: false,
       hasInitialized: true,
       initError: null,
     });
