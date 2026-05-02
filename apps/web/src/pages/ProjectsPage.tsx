@@ -8,8 +8,13 @@ import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ProjectsPage() {
   const storedProjects = useProjectDrafts();
-  const draftProjects = storedProjects.filter((p) => p.data.publishStatus !== 'published');
+  // TODO: Once project creation/publish uses the API, filter storedProjects to drafts only.
+  // For now, keep all locally stored projects (including published) visible so they
+  // are not silently lost before the create/publish API integration is complete.
+  const draftProjects = storedProjects;
   const { data: apiProjects = [], isPending, isError } = useProjectsQuery();
+  // TODO: Replace client-side isOwner filter with a dedicated backend endpoint or query param
+  // (e.g. GET /api/projects?owner=me or GET /api/projects/me) once the API exposes it.
   const ownedProjects = apiProjects.filter((p) => p.isOwner);
 
   return (
