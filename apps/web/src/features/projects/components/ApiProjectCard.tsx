@@ -7,7 +7,7 @@ interface ApiProjectCardProps {
 
 export function ApiProjectCard({ project }: ApiProjectCardProps) {
   const footer =
-    project.openRolesCount > 0 ? (
+    project.status === 'OPEN' && project.openRolesCount > 0 ? (
       <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-mute">
         <span className="flex items-center gap-1.5">
           <span>Faltam:</span>

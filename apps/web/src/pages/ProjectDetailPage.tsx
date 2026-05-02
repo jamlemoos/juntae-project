@@ -154,7 +154,14 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
     );
   }
 
-  const openRoles = project.roles.filter((r) => r.status === 'OPEN');
+  // Owners see all roles to review their project's state.
+  // Non-owners only see OPEN roles, and only when the project is accepting applications.
+  const visibleRoles = project.isOwner
+    ? project.roles
+    : project.status === 'OPEN'
+      ? project.roles.filter((r) => r.status === 'OPEN')
+      : [];
+  const canApply = !project.isOwner && project.status === 'OPEN';
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
@@ -194,15 +201,17 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                 id="section-procurando"
                 divider
               >
-                {openRoles.length === 0 ? (
+                {visibleRoles.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-line-2 bg-cream-2/50 p-5 md:p-6">
                     <p className="display text-[17px] font-semibold text-ink">
-                      Sem vagas abertas no momento.
+                      {!project.isOwner && project.status !== 'OPEN'
+                        ? 'Este projeto não está aceitando candidaturas no momento.'
+                        : 'Sem vagas abertas no momento.'}
                     </p>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-4">
-                    {openRoles.map((role) => (
+                    {visibleRoles.map((role) => (
                       <div key={role.id}>
                         <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6">
                           <div className="display text-[16px] font-semibold text-ink">
@@ -213,13 +222,15 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                               {role.description}
                             </p>
                           )}
-                          {!project.isOwner && (
+                          {canApply && (
                             <div className="mt-4">
                               {role.hasApplied ? (
                                 <p className="text-[13px] text-mute">Você já se candidatou.</p>
                               ) : (
                                 <button
                                   type="button"
+                                  aria-expanded={openApplicationRoleId === role.id}
+                                  aria-controls={`application-panel-${role.id}`}
                                   onClick={() =>
                                     setOpenApplicationRoleId((prev) =>
                                       prev === role.id ? null : role.id
@@ -235,21 +246,20 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                             </div>
                           )}
                         </div>
-                        {!project.isOwner &&
-                          !role.hasApplied &&
-                          openApplicationRoleId === role.id && (
-                            <ApplicationPanel
-                              roleTitle={role.title}
-                              onClose={() => setOpenApplicationRoleId(null)}
-                              onSubmit={async (message) => {
-                                await applyToRole({ projectRoleId: role.id, message });
-                                await queryClient.invalidateQueries({
-                                  queryKey: ['project', projectId],
-                                });
-                                setOpenApplicationRoleId(null);
-                              }}
-                            />
-                          )}
+                        {canApply && !role.hasApplied && openApplicationRoleId === role.id && (
+                          <ApplicationPanel
+                            id={`application-panel-${role.id}`}
+                            roleTitle={role.title}
+                            onClose={() => setOpenApplicationRoleId(null)}
+                            onSubmit={async (message) => {
+                              await applyToRole({ projectRoleId: role.id, message });
+                              await queryClient.invalidateQueries({
+                                queryKey: ['project', projectId],
+                              });
+                              setOpenApplicationRoleId(null);
+                            }}
+                          />
+                        )}
                       </div>
                     ))}
                   </div>

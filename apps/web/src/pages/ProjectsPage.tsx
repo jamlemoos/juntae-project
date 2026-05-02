@@ -84,9 +84,8 @@ export function ProjectsPage() {
             >
               <div className="flex flex-col gap-3">
                 <p className="mb-1 text-[13px] text-mute">
-                  Estes projetos foram publicados antes da integração com o servidor e continuam
-                  salvos apenas neste navegador. Eles não aparecem na seção abaixo porque ainda não
-                  foram migrados para a API.
+                  Estes projetos continuam salvos apenas neste navegador. Por isso, eles não
+                  aparecem na seção abaixo, que mostra apenas os projetos carregados pela API.
                 </p>
                 {localPublishedProjects.map(({ id, data }) => (
                   <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />

@@ -5,6 +5,7 @@ import { ApiError } from '../../../../shared/api/http';
 import { ProjectTextarea } from '../../components/ProjectTextarea';
 
 interface ApplicationPanelProps {
+  id?: string;
   roleTitle: string;
   onClose: () => void;
   /** When provided, the panel submits to the API with the composed message. */
@@ -13,7 +14,7 @@ interface ApplicationPanelProps {
 
 type PanelState = 'idle' | 'submitting' | 'submitted';
 
-export function ApplicationPanel({ roleTitle, onClose, onSubmit }: ApplicationPanelProps) {
+export function ApplicationPanel({ id, roleTitle, onClose, onSubmit }: ApplicationPanelProps) {
   const [message, setMessage] = useState('');
   const [relevantSkill, setRelevantSkill] = useState('');
   const [errors, setErrors] = useState<{ message?: string; relevantSkill?: string }>({});
@@ -60,7 +61,7 @@ export function ApplicationPanel({ roleTitle, onClose, onSubmit }: ApplicationPa
   }
 
   return (
-    <div className="mt-3 rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6">
+    <div id={id} className="mt-3 rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <p className="text-[11.5px] font-medium uppercase tracking-[.18em] text-mute">
