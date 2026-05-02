@@ -84,8 +84,9 @@ export function ProjectsPage() {
             >
               <div className="flex flex-col gap-3">
                 <p className="mb-1 text-[13px] text-mute">
-                  Estes projetos foram publicados antes da integração com o servidor. Eles
-                  aparecerão na seção abaixo quando a integração estiver completa.
+                  Estes projetos foram publicados antes da integração com o servidor e continuam
+                  salvos apenas neste navegador. Para que apareçam na seção abaixo, será necessário
+                  recriá-los usando o fluxo atual.
                 </p>
                 {localPublishedProjects.map(({ id, data }) => (
                   <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />

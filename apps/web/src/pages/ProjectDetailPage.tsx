@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
 import { ArrowLeft } from 'lucide-react';
 import {
@@ -14,6 +15,8 @@ import { ProjectTeamSection } from '../features/projects/detail/components/Proje
 import { ProjectNeededRolesSection } from '../features/projects/detail/components/ProjectNeededRolesSection';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 import { RailCard } from '../shared/ui/RailCard';
+import { ApplicationPanel } from '../features/projects/detail/components/ApplicationPanel';
+import { applyToRole } from '../features/applications/api/endpoints';
 import type { ProjectDetail, ProjectStatus } from '../features/projects/api/types';
 
 export function ProjectDetailPage() {
@@ -120,6 +123,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
 
 function ApiProjectDetail({ projectId }: { projectId: string }) {
   const { data: project, isPending, isError } = useProjectDetailQuery(projectId);
+  const [openApplicationRoleId, setOpenApplicationRoleId] = useState<string | null>(null);
 
   if (isPending) {
     return (
@@ -161,6 +165,13 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
 
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
+          {project.isOwner && (
+            <div className="mx-auto max-w-[1200px] pt-6">
+              <p className="rounded-xl bg-cream-2 px-5 py-3 text-[13px] text-mute ring-1 ring-line">
+                A edição de projetos publicados pelo servidor será integrada em uma próxima etapa.
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12 lg:col-span-8">
               <SectionLayout eyebrow="01 · sobre" title="Ideia" id="section-sobre">
@@ -190,18 +201,50 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                 ) : (
                   <div className="flex flex-col gap-4">
                     {openRoles.map((role) => (
-                      <div
-                        key={role.id}
-                        className="rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6"
-                      >
-                        <div className="display text-[16px] font-semibold text-ink">
-                          {role.title || 'Papel sem título'}
+                      <div key={role.id}>
+                        <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6">
+                          <div className="display text-[16px] font-semibold text-ink">
+                            {role.title || 'Papel sem título'}
+                          </div>
+                          {role.description && (
+                            <p className="mt-1.5 text-[14px] leading-[1.55] text-ink-2">
+                              {role.description}
+                            </p>
+                          )}
+                          {!project.isOwner && (
+                            <div className="mt-4">
+                              {role.hasApplied ? (
+                                <p className="text-[13px] text-mute">Você já se candidatou.</p>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setOpenApplicationRoleId((prev) =>
+                                      prev === role.id ? null : role.id
+                                    )
+                                  }
+                                  className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                                >
+                                  {openApplicationRoleId === role.id
+                                    ? 'Cancelar'
+                                    : 'Quero participar'}
+                                </button>
+                              )}
+                            </div>
+                          )}
                         </div>
-                        {role.description && (
-                          <p className="mt-1.5 text-[14px] leading-[1.55] text-ink-2">
-                            {role.description}
-                          </p>
-                        )}
+                        {!project.isOwner &&
+                          !role.hasApplied &&
+                          openApplicationRoleId === role.id && (
+                            <ApplicationPanel
+                              roleTitle={role.title}
+                              onClose={() => setOpenApplicationRoleId(null)}
+                              onSubmit={async (message) => {
+                                await applyToRole({ projectRoleId: role.id, message });
+                                setOpenApplicationRoleId(null);
+                              }}
+                            />
+                          )}
                       </div>
                     ))}
                   </div>

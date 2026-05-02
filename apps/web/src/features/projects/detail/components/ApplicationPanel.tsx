@@ -6,15 +6,18 @@ import { ProjectTextarea } from '../../components/ProjectTextarea';
 interface ApplicationPanelProps {
   roleTitle: string;
   onClose: () => void;
+  /** When provided, the panel submits to the API with the composed message. */
+  onSubmit?: (message: string) => Promise<void>;
 }
 
-type PanelState = 'idle' | 'submitted';
+type PanelState = 'idle' | 'submitting' | 'submitted';
 
-export function ApplicationPanel({ roleTitle, onClose }: ApplicationPanelProps) {
+export function ApplicationPanel({ roleTitle, onClose, onSubmit }: ApplicationPanelProps) {
   const [message, setMessage] = useState('');
   const [relevantSkill, setRelevantSkill] = useState('');
   const [errors, setErrors] = useState<{ message?: string; relevantSkill?: string }>({});
   const [panelState, setPanelState] = useState<PanelState>('idle');
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   function validate() {
     const next: typeof errors = {};
@@ -24,10 +27,23 @@ export function ApplicationPanel({ roleTitle, onClose }: ApplicationPanelProps) 
     return Object.keys(next).length === 0;
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!validate()) return;
-    setPanelState('submitted');
+    if (onSubmit) {
+      setPanelState('submitting');
+      setSubmitError(null);
+      try {
+        const composed = `${message.trim()}\n\nComo posso ajudar: ${relevantSkill.trim()}`;
+        await onSubmit(composed);
+        setPanelState('submitted');
+      } catch {
+        setPanelState('idle');
+        setSubmitError('Não foi possível enviar a candidatura. Tente novamente.');
+      }
+    } else {
+      setPanelState('submitted');
+    }
   }
 
   return (
@@ -55,7 +71,9 @@ export function ApplicationPanel({ roleTitle, onClose }: ApplicationPanelProps) 
         <div className="rounded-xl bg-cream px-5 py-4 ring-1 ring-line">
           <p className="text-[14px] font-medium text-ink">Candidatura recebida.</p>
           <p className="mt-1 text-[13px] leading-relaxed text-mute">
-            Candidatura ainda não está conectada ao backend.
+            {onSubmit
+              ? 'Sua candidatura foi enviada com sucesso.'
+              : 'Candidatura ainda não está conectada ao backend.'}
           </p>
         </div>
       ) : (
@@ -79,20 +97,29 @@ export function ApplicationPanel({ roleTitle, onClose }: ApplicationPanelProps) 
             />
           </div>
 
-          <div className="mt-5 flex items-center gap-3">
-            <button
-              type="submit"
-              className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-            >
-              Quero participar
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
-            >
-              Cancelar
-            </button>
+          <div className="mt-5 flex flex-col gap-3">
+            {submitError && (
+              <p role="alert" className="text-[13px] text-red-600">
+                {submitError}
+              </p>
+            )}
+            <div className="flex items-center gap-3">
+              <button
+                type="submit"
+                disabled={panelState === 'submitting'}
+                className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+              >
+                {panelState === 'submitting' ? 'Enviando…' : 'Quero participar'}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={panelState === 'submitting'}
+                className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </form>
       )}
