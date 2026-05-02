@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     if (get().hasInitialized || get().isLoading) return;
 
     if (!localStorage.getItem(TOKEN_KEY)) {
-      set({ hasInitialized: true });
+      set({ user: null, isAuthenticated: false, isLoading: false, hasInitialized: true });
       return;
     }
 
@@ -36,9 +36,17 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user, isAuthenticated: true, isLoading: false, hasInitialized: true });
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
+        // Definitively rejected — clear token and mark as done.
         logoutApi();
+        set({ user: null, isAuthenticated: false, isLoading: false, hasInitialized: true });
+      } else if (err instanceof ApiError && (err.status === 0 || err.status >= 500)) {
+        // Transient failure (network or server error) — do NOT remove the token or mark
+        // as initialized so initializeAuth can be retried when the app reconnects.
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      } else {
+        // Unexpected error — treat as permanent, but do not force logout.
+        set({ user: null, isAuthenticated: false, isLoading: false, hasInitialized: true });
       }
-      set({ user: null, isAuthenticated: false, isLoading: false, hasInitialized: true });
     }
   },
 
