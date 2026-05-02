@@ -52,6 +52,8 @@ func (s *ProjectService) CreateProject(creatorID uuid.UUID, req dto.CreateProjec
 }
 
 func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city string, offset, limit int) ([]dto.ProjectListItemResponse, error) {
+	// TODO: add paginated response metadata (page, limit, total, hasNextPage) once
+	// the frontend and API contract are aligned.
 	var (
 		projects []model.Project
 		err      error
@@ -76,14 +78,14 @@ func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city str
 }
 
 func (s *ProjectService) GetProjectsForOwner(callerID uuid.UUID, offset, limit int) ([]dto.ProjectListItemResponse, error) {
+	// TODO: add paginated response metadata (page, limit, total, hasNextPage) once
+	// the frontend and API contract are aligned.
 	projects, err := s.repo.FindByCreatorIDForList(callerID, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf("get owner projects: %w", err)
 	}
-	appliedSet, err := s.applicationRepo.FindProjectIDsWhereUserApplied(callerID)
-	if err != nil {
-		return nil, fmt.Errorf("check applied projects: %w", err)
-	}
+	// Owners cannot have applied to their own projects, so skip the applied-set query.
+	var appliedSet map[uuid.UUID]struct{}
 	responses := make([]dto.ProjectListItemResponse, len(projects))
 	for i := range projects {
 		responses[i] = mapProjectListItemResponse(&projects[i], callerID, appliedSet)
@@ -216,13 +218,15 @@ func mapProjectDetailsResponse(p *model.Project, callerID uuid.UUID) dto.Project
 	var visibleRoles []model.ProjectRole
 	if isOwner {
 		visibleRoles = p.Roles
-	} else {
+	} else if p.Status == "OPEN" {
+		// Non-owners only see OPEN roles on an OPEN project.
 		for _, r := range p.Roles {
 			if r.Status == "OPEN" {
 				visibleRoles = append(visibleRoles, r)
 			}
 		}
 	}
+	// If the project is not OPEN, non-owners see no roles (visibleRoles stays nil).
 	roles := make([]dto.ProjectRoleResponse, len(visibleRoles))
 	for i := range visibleRoles {
 		roles[i] = mapProjectRoleResponse(&visibleRoles[i], callerID)

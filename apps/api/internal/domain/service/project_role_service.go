@@ -62,13 +62,32 @@ func (s *ProjectRoleService) GetProjectRoles(callerID uuid.UUID) ([]dto.ProjectR
 }
 
 func (s *ProjectRoleService) GetProjectRolesByProject(projectID uuid.UUID, callerID uuid.UUID) ([]dto.ProjectRoleResponse, error) {
+	project, err := s.projectRepo.FindByID(projectID)
+	if err != nil {
+		return nil, fmt.Errorf("project not found: %w", err)
+	}
+	isOwner := project.CreatorID == callerID
+
 	roles, err := s.repo.FindByProjectIDWithApplications(projectID)
 	if err != nil {
 		return nil, fmt.Errorf("get project roles: %w", err)
 	}
-	responses := make([]dto.ProjectRoleResponse, len(roles))
-	for i := range roles {
-		responses[i] = mapProjectRoleResponse(&roles[i], callerID)
+
+	// Visibility rule: owners see all roles; non-owners only see OPEN roles on an OPEN project.
+	var visible []model.ProjectRole
+	if isOwner {
+		visible = roles
+	} else if project.Status == "OPEN" {
+		for _, r := range roles {
+			if r.Status == "OPEN" {
+				visible = append(visible, r)
+			}
+		}
+	}
+
+	responses := make([]dto.ProjectRoleResponse, len(visible))
+	for i := range visible {
+		responses[i] = mapProjectRoleResponse(&visible[i], callerID)
 	}
 	return responses, nil
 }

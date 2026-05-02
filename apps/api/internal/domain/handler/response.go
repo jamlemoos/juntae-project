@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"log"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -90,6 +91,12 @@ func parsePagination(c *gin.Context) (offset, limit int) {
 		}
 		limit = l
 	}
-	offset = (page - 1) * limit
+	// Use int64 arithmetic to prevent overflow for very large page values,
+	// then clamp to math.MaxInt32 (a safe upper bound for any DB offset).
+	offsetI64 := int64(page-1) * int64(limit)
+	if offsetI64 > math.MaxInt32 {
+		offsetI64 = math.MaxInt32
+	}
+	offset = int(offsetI64)
 	return
 }

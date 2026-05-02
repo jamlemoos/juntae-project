@@ -31,6 +31,7 @@ func (r *ProjectRepository) FindAllForList(offset, limit int) ([]model.Project, 
 		Preload("Creator").
 		Preload("Creator.Skills").
 		Preload("Roles").
+		Order("projects.created_at DESC, projects.id DESC").
 		Offset(offset).Limit(limit).
 		Find(&projects).Error
 	return projects, err
@@ -45,6 +46,7 @@ func (r *ProjectRepository) FindByStatusAndCreatorCityForList(status, city strin
 		Select("projects.*").
 		Joins("JOIN users ON users.id = projects.creator_id").
 		Where("projects.status = ? AND users.city = ?", status, city).
+		Order("projects.created_at DESC, projects.id DESC").
 		Offset(offset).Limit(limit).
 		Find(&projects).Error
 	return projects, err
@@ -57,6 +59,7 @@ func (r *ProjectRepository) FindByCreatorIDForList(creatorID uuid.UUID, offset, 
 		Preload("Creator.Skills").
 		Preload("Roles").
 		Where("projects.creator_id = ?", creatorID).
+		Order("projects.created_at DESC, projects.id DESC").
 		Offset(offset).Limit(limit).
 		Find(&projects).Error
 	return projects, err
