@@ -7,7 +7,6 @@ import (
 	"juntae-api/internal/domain/service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
 
 type ProjectRoleHandler struct {
@@ -33,33 +32,6 @@ func (h *ProjectRoleHandler) CreateProjectRole(c *gin.Context) {
 		return
 	}
 	respondWithJSON(c, http.StatusCreated, resp)
-}
-
-func (h *ProjectRoleHandler) GetProjectRoles(c *gin.Context) {
-	callerID, ok := getAuthUserID(c)
-	if !ok {
-		return
-	}
-	if raw := c.Query("project_id"); raw != "" {
-		projectID, err := uuid.Parse(raw)
-		if err != nil {
-			respondWithError(c, http.StatusBadRequest, "invalid project_id")
-			return
-		}
-		roles, err := h.projectRoleService.GetProjectRolesByProject(projectID, callerID)
-		if err != nil {
-			handleServiceError(c, err)
-			return
-		}
-		respondWithJSON(c, http.StatusOK, roles)
-		return
-	}
-	roles, err := h.projectRoleService.GetProjectRoles(callerID)
-	if err != nil {
-		handleServiceError(c, err)
-		return
-	}
-	respondWithJSON(c, http.StatusOK, roles)
 }
 
 func (h *ProjectRoleHandler) GetRolesByProject(c *gin.Context) {

@@ -7,8 +7,10 @@ import (
 )
 
 var (
-	ErrForbidden = errors.New("forbidden")
-	ErrConflict  = errors.New("conflict")
+	ErrForbidden     = errors.New("forbidden")
+	ErrConflict      = errors.New("conflict")
+	ErrProjectClosed = errors.New("project closed")
+	ErrRoleClosed    = errors.New("role closed")
 )
 
 func isUniqueViolation(err error) bool {

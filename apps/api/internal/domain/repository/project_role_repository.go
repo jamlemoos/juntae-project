@@ -25,16 +25,6 @@ func (r *ProjectRoleRepository) FindAll() ([]model.ProjectRole, error) {
 	return roles, err
 }
 
-func (r *ProjectRoleRepository) FindAllWithApplications() ([]model.ProjectRole, error) {
-	var roles []model.ProjectRole
-	err := r.db.
-		Preload("Applications", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, user_id, project_role_id")
-		}).
-		Find(&roles).Error
-	return roles, err
-}
-
 func (r *ProjectRoleRepository) FindByProjectIDWithApplications(projectID uuid.UUID) ([]model.ProjectRole, error) {
 	var roles []model.ProjectRole
 	err := r.db.

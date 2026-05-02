@@ -53,6 +53,7 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	protected.DELETE("/skills/:id", skillHandler.DeleteSkill)
 
 	protected.GET("/projects/stats/applications-count", projectHandler.CountApplicationsByProject)
+	protected.GET("/projects/me", projectHandler.GetMyProjects)
 	protected.GET("/projects", projectHandler.GetProjects)
 	protected.POST("/projects", projectHandler.CreateProject)
 	protected.GET("/projects/:id", projectHandler.GetProjectByID)
@@ -62,7 +63,6 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	protected.PUT("/projects/:id", projectHandler.UpdateProject)
 	protected.DELETE("/projects/:id", projectHandler.DeleteProject)
 
-	protected.GET("/project-roles", projectRoleHandler.GetProjectRoles)
 	protected.POST("/project-roles", projectRoleHandler.CreateProjectRole)
 	protected.GET("/project-roles/:id", projectRoleHandler.GetProjectRoleByID)
 	protected.PUT("/project-roles/:id", projectRoleHandler.UpdateProjectRole)

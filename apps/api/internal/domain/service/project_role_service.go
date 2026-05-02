@@ -49,26 +49,26 @@ func (s *ProjectRoleService) CreateProjectRole(callerID uuid.UUID, req dto.Creat
 	return &resp, nil
 }
 
-func (s *ProjectRoleService) GetProjectRoles(callerID uuid.UUID) ([]dto.ProjectRoleResponse, error) {
-	roles, err := s.repo.FindAllWithApplications()
-	if err != nil {
-		return nil, fmt.Errorf("get project roles: %w", err)
-	}
-	responses := make([]dto.ProjectRoleResponse, len(roles))
-	for i := range roles {
-		responses[i] = mapProjectRoleResponse(&roles[i], callerID)
-	}
-	return responses, nil
-}
-
 func (s *ProjectRoleService) GetProjectRolesByProject(projectID uuid.UUID, callerID uuid.UUID) ([]dto.ProjectRoleResponse, error) {
+	project, err := s.projectRepo.FindByID(projectID)
+	if err != nil {
+		return nil, fmt.Errorf("project not found: %w", err)
+	}
+
+	// Short-circuit: non-owners get no roles when the project is not OPEN.
+	if project.CreatorID != callerID && project.Status != "OPEN" {
+		return []dto.ProjectRoleResponse{}, nil
+	}
+
 	roles, err := s.repo.FindByProjectIDWithApplications(projectID)
 	if err != nil {
 		return nil, fmt.Errorf("get project roles: %w", err)
 	}
-	responses := make([]dto.ProjectRoleResponse, len(roles))
-	for i := range roles {
-		responses[i] = mapProjectRoleResponse(&roles[i], callerID)
+
+	visible := filterVisibleProjectRoles(project, roles, callerID)
+	responses := make([]dto.ProjectRoleResponse, len(visible))
+	for i := range visible {
+		responses[i] = mapProjectRoleResponse(&visible[i], callerID)
 	}
 	return responses, nil
 }

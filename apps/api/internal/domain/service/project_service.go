@@ -51,15 +51,17 @@ func (s *ProjectService) CreateProject(creatorID uuid.UUID, req dto.CreateProjec
 	return &resp, nil
 }
 
-func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city string) ([]dto.ProjectListItemResponse, error) {
+func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city string, offset, limit int) ([]dto.ProjectListItemResponse, error) {
+	// TODO: add paginated response metadata (page, limit, total, hasNextPage) once
+	// the frontend and API contract are aligned.
 	var (
 		projects []model.Project
 		err      error
 	)
 	if status != "" && city != "" {
-		projects, err = s.repo.FindByStatusAndCreatorCityForList(status, city)
+		projects, err = s.repo.FindByStatusAndCreatorCityForList(status, city, offset, limit)
 	} else {
-		projects, err = s.repo.FindAllForList()
+		projects, err = s.repo.FindAllForList(offset, limit)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get projects: %w", err)
@@ -68,6 +70,22 @@ func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city str
 	if err != nil {
 		return nil, fmt.Errorf("check applied projects: %w", err)
 	}
+	responses := make([]dto.ProjectListItemResponse, len(projects))
+	for i := range projects {
+		responses[i] = mapProjectListItemResponse(&projects[i], callerID, appliedSet)
+	}
+	return responses, nil
+}
+
+func (s *ProjectService) GetProjectsForOwner(callerID uuid.UUID, offset, limit int) ([]dto.ProjectListItemResponse, error) {
+	// TODO: add paginated response metadata (page, limit, total, hasNextPage) once
+	// the frontend and API contract are aligned.
+	projects, err := s.repo.FindByCreatorIDForList(callerID, offset, limit)
+	if err != nil {
+		return nil, fmt.Errorf("get owner projects: %w", err)
+	}
+	// Owners cannot have applied to their own projects, so skip the applied-set query.
+	var appliedSet map[uuid.UUID]struct{}
 	responses := make([]dto.ProjectListItemResponse, len(projects))
 	for i := range projects {
 		responses[i] = mapProjectListItemResponse(&projects[i], callerID, appliedSet)
@@ -173,12 +191,26 @@ func mapProjectResponse(p *model.Project) dto.ProjectResponse {
 }
 
 func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet map[uuid.UUID]struct{}) dto.ProjectListItemResponse {
-	var openCount int
-	for _, r := range p.Roles {
-		if r.Status == "OPEN" {
-			openCount++
+	// Apply the same visibility rules as filterVisibleProjectRoles:
+	// owners see all roles; non-owners see only OPEN roles on an OPEN project, otherwise zero.
+	isOwner := p.CreatorID == callerID
+	var openCount, totalCount int
+	if isOwner {
+		for _, r := range p.Roles {
+			if r.Status == "OPEN" {
+				openCount++
+			}
 		}
+		totalCount = len(p.Roles)
+	} else if p.Status == "OPEN" {
+		for _, r := range p.Roles {
+			if r.Status == "OPEN" {
+				openCount++
+			}
+		}
+		totalCount = openCount
 	}
+	// non-owner + non-OPEN project → openCount and totalCount remain 0
 	_, hasApplied := appliedSet[p.ID]
 	return dto.ProjectListItemResponse{
 		ID:              p.ID,
@@ -187,25 +219,45 @@ func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet
 		Status:          p.Status,
 		Creator:         mapPublicUserResponse(&p.Creator),
 		OpenRolesCount:  openCount,
-		TotalRolesCount: len(p.Roles),
+		TotalRolesCount: totalCount,
 		HasApplied:      hasApplied,
-		IsOwner:         p.CreatorID == callerID,
+		IsOwner:         isOwner,
 		CreatedAt:       p.CreatedAt,
 		UpdatedAt:       p.UpdatedAt,
 	}
 }
 
+// filterVisibleProjectRoles returns the roles a caller is allowed to see for a project.
+// Owners see all roles. Non-owners see only OPEN roles on an OPEN project; otherwise none.
+func filterVisibleProjectRoles(p *model.Project, roles []model.ProjectRole, callerID uuid.UUID) []model.ProjectRole {
+	if p.CreatorID == callerID {
+		return roles
+	}
+	if p.Status != "OPEN" {
+		return nil
+	}
+	var visible []model.ProjectRole
+	for _, r := range roles {
+		if r.Status == "OPEN" {
+			visible = append(visible, r)
+		}
+	}
+	return visible
+}
+
 func mapProjectDetailsResponse(p *model.Project, callerID uuid.UUID) dto.ProjectDetailsResponse {
-	roles := make([]dto.ProjectRoleResponse, len(p.Roles))
-	for i := range p.Roles {
-		roles[i] = mapProjectRoleResponse(&p.Roles[i], callerID)
+	isOwner := p.CreatorID == callerID
+	visibleRoles := filterVisibleProjectRoles(p, p.Roles, callerID)
+	roles := make([]dto.ProjectRoleResponse, len(visibleRoles))
+	for i := range visibleRoles {
+		roles[i] = mapProjectRoleResponse(&visibleRoles[i], callerID)
 	}
 	return dto.ProjectDetailsResponse{
 		ID:          p.ID,
 		Title:       p.Title,
 		Description: p.Description,
 		Status:      p.Status,
-		IsOwner:     p.CreatorID == callerID,
+		IsOwner:     isOwner,
 		Creator:     mapPublicUserResponse(&p.Creator),
 		Roles:       roles,
 		CreatedAt:   p.CreatedAt,
