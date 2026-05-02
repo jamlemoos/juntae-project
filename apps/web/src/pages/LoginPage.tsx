@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useForm } from '@tanstack/react-form';
 import { AuthField } from '../components/auth/AuthField';
 import { ArrowRight } from 'lucide-react';
@@ -8,16 +8,34 @@ import {
   validateEmail,
   validateLoginPassword as validatePassword,
 } from '../features/auth/utils/authValidation';
+import { useAuth } from '../features/auth/hooks/useAuth';
+import { ApiError } from '../shared/api/http';
 
 export function LoginPage() {
-  const [rememberMe, setRememberMe] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const login = useAuth((s) => s.login);
+  const navigate = useNavigate();
 
   const form = useForm({
     defaultValues: { email: '', password: '' },
-    onSubmit: async () => {
-      // TODO: call login API when backend exposes auth endpoints.
-      setServerError('Login ainda não está conectado ao backend.');
+    onSubmit: async ({ value }) => {
+      setServerError(null);
+      try {
+        await login(value.email, value.password);
+        void navigate({ to: '/projects', replace: true });
+      } catch (err) {
+        if (err instanceof ApiError) {
+          if (err.status === 401) {
+            setServerError('E-mail ou senha incorretos.');
+          } else if (err.status === 0) {
+            setServerError('Sem conexão. Verifique sua internet.');
+          } else {
+            setServerError('Algo deu errado. Tente novamente.');
+          }
+        } else {
+          setServerError('Algo deu errado. Tente novamente.');
+        }
+      }
     },
   });
 
@@ -108,16 +126,7 @@ export function LoginPage() {
                   )}
                 </form.Field>
 
-                <div className="flex items-center justify-between pt-1">
-                  <label className="flex cursor-pointer items-center gap-2 text-[13px] text-ink-2">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="h-4 w-4 cursor-pointer rounded accent-ink"
-                    />
-                    lembrar de mim
-                  </label>
+                <div className="flex justify-end pt-1">
                   <span className="text-[13px] text-mute">esqueci a senha</span>
                 </div>
               </div>

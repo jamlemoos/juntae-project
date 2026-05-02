@@ -1,21 +1,16 @@
 import { Outlet } from '@tanstack/react-router';
 import { Header } from './Header';
-import { AccessRequiredPage } from '../pages/AccessRequiredPage';
+import { ProtectedRoute } from '../features/auth/components/ProtectedRoute';
 
 export function AppLayout() {
-  // TODO: replace with real session check when backend auth is ready.
-  const isAuthenticated = true;
-
-  if (!isAuthenticated) {
-    return <AccessRequiredPage />;
-  }
-
   return (
-    <div className="min-h-screen bg-cream">
-      <Header variant="app" />
-      <main>
-        <Outlet />
-      </main>
-    </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-cream">
+        <Header variant="app" />
+        <main>
+          <Outlet />
+        </main>
+      </div>
+    </ProtectedRoute>
   );
 }
