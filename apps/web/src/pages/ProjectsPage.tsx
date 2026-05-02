@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { useProjectDrafts } from '../features/projects/hooks/useProjectDrafts';
-import { useProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
+import { useMyProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
 import { ProjectListCard } from '../features/projects/components/ProjectListCard';
 import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
@@ -16,10 +16,7 @@ export function ProjectsPage() {
     ({ data }) => data.publishStatus === 'published'
   );
 
-  const { data: apiProjects = [], isPending, isError } = useProjectsQuery();
-  // TODO: Replace client-side filter with GET /api/projects/me or GET /api/projects?owner=me
-  // once the backend exposes an owner-scoped endpoint.
-  const ownedProjects = apiProjects.filter((p) => p.isOwner);
+  const { data: ownedProjects = [], isPending, isError } = useMyProjectsQuery();
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">

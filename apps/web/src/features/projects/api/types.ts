@@ -62,10 +62,11 @@ export type ProjectDetail = {
   updatedAt: string;
 };
 
-// Both status and city must be provided together or neither (backend enforces this).
 export type GetProjectsFilter = {
-  status: ProjectStatus;
-  city: string;
+  status?: ProjectStatus;
+  city?: string;
+  page?: number;
+  limit?: number;
 };
 
 // status is required by the backend (validate:"required,oneof=OPEN IN_PROGRESS CLOSED").

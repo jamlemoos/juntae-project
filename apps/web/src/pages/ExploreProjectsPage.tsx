@@ -6,7 +6,7 @@ import { ProjectListCard } from '../features/projects/components/ProjectListCard
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ExploreProjectsPage() {
-  const { data: projects = [], isPending, isError } = useProjectsQuery();
+  const { data: projects = [], isPending, isError } = useProjectsQuery({ page: 1, limit: 20 });
   const storedProjects = useProjectDrafts();
   const localPublishedProjects = storedProjects.filter(
     ({ data }) => data.publishStatus === 'published'

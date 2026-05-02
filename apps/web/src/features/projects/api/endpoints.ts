@@ -20,10 +20,22 @@ import type {
 } from './types';
 
 export async function getProjects(filter?: GetProjectsFilter): Promise<ProjectListItem[]> {
-  const path = filter
-    ? `/projects?${new URLSearchParams({ status: filter.status, city: filter.city })}`
-    : '/projects';
+  let path = '/projects';
+  if (filter) {
+    const params = new URLSearchParams();
+    if (filter.status) params.set('status', filter.status);
+    if (filter.city) params.set('city', filter.city);
+    if (filter.page != null) params.set('page', String(filter.page));
+    if (filter.limit != null) params.set('limit', String(filter.limit));
+    const qs = params.toString();
+    if (qs) path = `/projects?${qs}`;
+  }
   const raw = await http.get<ProjectListItemApiResponse[]>(path);
+  return raw.map(mapProjectListItem);
+}
+
+export async function getMyProjects(): Promise<ProjectListItem[]> {
+  const raw = await http.get<ProjectListItemApiResponse[]>('/projects/me');
   return raw.map(mapProjectListItem);
 }
 
