@@ -17,7 +17,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (hasInitialized && !isAuthenticated) {
-      void navigate({ to: '/login' });
+      void navigate({ to: '/login', replace: true });
     }
   }, [hasInitialized, isAuthenticated, navigate]);
 

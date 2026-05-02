@@ -22,7 +22,7 @@ export function LoginPage() {
       setServerError(null);
       try {
         await login(value.email, value.password);
-        void navigate({ to: '/projects' });
+        void navigate({ to: '/projects', replace: true });
       } catch (err) {
         if (err instanceof ApiError) {
           if (err.status === 401) {
