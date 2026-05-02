@@ -47,6 +47,14 @@ function isValidMemberDraft(value: unknown): value is MemberDraft {
 
 const DRAFT_KEY_PREFIX = 'project-draft-';
 
+export function hasProjectDraft(projectId: string): boolean {
+  try {
+    return sessionStorage.getItem(`${DRAFT_KEY_PREFIX}${projectId}`) !== null;
+  } catch {
+    return false;
+  }
+}
+
 function readStored(projectId: string): ProjectData {
   try {
     const raw = sessionStorage.getItem(`${DRAFT_KEY_PREFIX}${projectId}`);

@@ -19,14 +19,12 @@ export function ApiProjectCard({ project }: ApiProjectCardProps) {
     ) : undefined;
 
   return (
-    // TODO: Enable navigation (remove navigable={false}) once ProjectDetailPage reads from the API.
     <ProjectCardShell
       id={project.id}
       title={project.title}
       description={project.description}
       badge={<StatusBadge status={project.status} />}
       footer={footer}
-      navigable={false}
     />
   );
 }

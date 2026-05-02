@@ -8,13 +8,17 @@ import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ProjectsPage() {
   const storedProjects = useProjectDrafts();
-  // TODO: Once project creation/publish uses the API, filter storedProjects to drafts only.
-  // For now, keep all locally stored projects (including published) visible so they
-  // are not silently lost before the create/publish API integration is complete.
-  const draftProjects = storedProjects;
+  // TODO: Remove localPublishedProjects section once project creation/publish uses the API.
+  const localDraftProjects = storedProjects.filter(
+    ({ data }) => data.publishStatus !== 'published'
+  );
+  const localPublishedProjects = storedProjects.filter(
+    ({ data }) => data.publishStatus === 'published'
+  );
+
   const { data: apiProjects = [], isPending, isError } = useProjectsQuery();
-  // TODO: Replace client-side isOwner filter with a dedicated backend endpoint or query param
-  // (e.g. GET /api/projects?owner=me or GET /api/projects/me) once the API exposes it.
+  // TODO: Replace client-side filter with GET /api/projects/me or GET /api/projects?owner=me
+  // once the backend exposes an owner-scoped endpoint.
   const ownedProjects = apiProjects.filter((p) => p.isOwner);
 
   return (
@@ -52,7 +56,7 @@ export function ProjectsPage() {
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <SectionLayout eyebrow="01 · rascunhos" title="Meus rascunhos" divider={false}>
-            {draftProjects.length === 0 ? (
+            {localDraftProjects.length === 0 ? (
               <div className="rounded-xl border border-dashed hairline px-6 py-10 text-center">
                 <p className="text-[14px] text-ink-2">Você ainda não começou nenhum projeto.</p>
                 <Link
@@ -65,14 +69,32 @@ export function ProjectsPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {draftProjects.map(({ id, data }) => (
+                {localDraftProjects.map(({ id, data }) => (
                   <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
                 ))}
               </div>
             )}
           </SectionLayout>
 
-          <SectionLayout eyebrow="02 · publicados" title="Projetos publicados" divider>
+          {localPublishedProjects.length > 0 && (
+            <SectionLayout
+              eyebrow="02 · publicados localmente"
+              title="Publicados localmente"
+              divider
+            >
+              <div className="flex flex-col gap-3">
+                <p className="mb-1 text-[13px] text-mute">
+                  Estes projetos foram publicados antes da integração com o servidor. Eles
+                  aparecerão na seção abaixo quando a integração estiver completa.
+                </p>
+                {localPublishedProjects.map(({ id, data }) => (
+                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                ))}
+              </div>
+            </SectionLayout>
+          )}
+
+          <SectionLayout eyebrow="03 · publicados" title="Projetos publicados" divider>
             {isPending ? (
               <p className="text-[14px] text-mute">Carregando...</p>
             ) : isError ? (
