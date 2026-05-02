@@ -4,7 +4,10 @@ import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../hooks/useAuth';
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading, hasInitialized, initializeAuth } = useAuth();
+  const isAuthenticated = useAuth((s) => s.isAuthenticated);
+  const isLoading = useAuth((s) => s.isLoading);
+  const hasInitialized = useAuth((s) => s.hasInitialized);
+  const initializeAuth = useAuth((s) => s.initializeAuth);
   const navigate = useNavigate();
 
   useEffect(() => {

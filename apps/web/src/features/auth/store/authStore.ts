@@ -8,7 +8,6 @@ type AuthState = {
   user: UserResponse | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
   hasInitialized: boolean;
   initializeAuth: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
@@ -20,11 +19,11 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: false,
-  error: null,
   hasInitialized: false,
 
   initializeAuth: async () => {
-    if (get().hasInitialized) return;
+    // Guard against duplicate calls (Strict Mode double-invoke, concurrent navigations).
+    if (get().hasInitialized || get().isLoading) return;
 
     if (!localStorage.getItem(TOKEN_KEY)) {
       set({ hasInitialized: true });
@@ -44,7 +43,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   },
 
   login: async (email: string, password: string) => {
-    set({ error: null });
     // loginApi stores the token; user comes directly from the response — no extra getMe call.
     const { user } = await loginApi({ email, password });
     set({ user, isAuthenticated: true, hasInitialized: true });
@@ -52,7 +50,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   logout: () => {
     logoutApi();
-    set({ user: null, isAuthenticated: false, error: null });
+    set({ user: null, isAuthenticated: false });
   },
 
   refreshUser: async () => {
@@ -62,7 +60,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         logoutApi();
-        set({ user: null, isAuthenticated: false, error: null });
+        set({ user: null, isAuthenticated: false });
       }
     }
   },
