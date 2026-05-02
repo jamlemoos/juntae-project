@@ -1,18 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import {
-  useProjectDrafts,
-  type ProjectDraftEntry,
-} from '../features/projects/hooks/useProjectDrafts';
-import { ProjectListCard } from '../features/projects/components/ProjectListCard';
+import { useProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
+import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
-function filterPublished(drafts: ProjectDraftEntry[]): ProjectDraftEntry[] {
-  return drafts.filter(({ data }) => data.publishStatus === 'published');
-}
-
 export function ExploreProjectsPage() {
-  const allDrafts = useProjectDrafts();
-  const publishedProjects = filterPublished(allDrafts);
+  const { data: projects = [], isPending, isError } = useProjectsQuery();
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
@@ -30,8 +22,7 @@ export function ExploreProjectsPage() {
                 Encontre projetos para construir junto
               </h1>
               <p className="mt-4 max-w-[52ch] text-[16.5px] leading-[1.6] text-ink-2">
-                Aqui aparecerão os projetos publicados quando a descoberta da comunidade estiver
-                conectada ao backend.
+                Explore projetos publicados pela comunidade e encontre onde contribuir.
               </p>
             </div>
           </div>
@@ -46,14 +37,19 @@ export function ExploreProjectsPage() {
             id="published-projects"
             divider={false}
           >
-            {publishedProjects.length === 0 ? (
+            {isPending ? (
+              <p className="text-[14px] text-mute">Carregando...</p>
+            ) : isError ? (
+              <p className="text-[14px] text-mute">
+                Não foi possível carregar os projetos. Tente novamente.
+              </p>
+            ) : projects.length === 0 ? (
               <div className="rounded-xl border border-dashed hairline px-6 py-12 text-center">
                 <p className="text-[16px] font-medium text-ink">
                   Ainda não há projetos publicados.
                 </p>
                 <p className="mx-auto mt-2 max-w-[44ch] text-[14px] leading-relaxed text-mute">
-                  Quando a descoberta estiver conectada ao backend, projetos publicados por outras
-                  pessoas aparecerão aqui.
+                  Seja o primeiro a publicar um projeto e encontrar pessoas para construir junto.
                 </p>
                 <Link
                   to="/projects/new"
@@ -64,8 +60,8 @@ export function ExploreProjectsPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {publishedProjects.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                {projects.map((project) => (
+                  <ApiProjectCard key={project.id} project={project} />
                 ))}
               </div>
             )}
