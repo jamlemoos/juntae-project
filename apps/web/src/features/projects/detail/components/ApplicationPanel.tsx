@@ -14,6 +14,12 @@ interface ApplicationPanelProps {
 
 type PanelState = 'idle' | 'submitting' | 'submitted';
 
+// message min matches the backend validate:"min=10" on the composed message field.
+// relevantSkill min is a UI-only guard; the backend receives both fields composed together.
+// TODO: if the backend ever validates sub-fields independently, align these constants with it.
+const MIN_MESSAGE_LENGTH = 10;
+const MIN_SKILL_LENGTH = 5;
+
 export function ApplicationPanel({ id, roleTitle, onClose, onSubmit }: ApplicationPanelProps) {
   const [message, setMessage] = useState('');
   const [relevantSkill, setRelevantSkill] = useState('');
@@ -23,8 +29,10 @@ export function ApplicationPanel({ id, roleTitle, onClose, onSubmit }: Applicati
 
   function validate() {
     const next: typeof errors = {};
-    if (message.trim().length === 0) next.message = 'Obrigatório';
-    if (relevantSkill.trim().length === 0) next.relevantSkill = 'Obrigatório';
+    if (message.trim().length < MIN_MESSAGE_LENGTH)
+      next.message = `Mínimo de ${MIN_MESSAGE_LENGTH} caracteres`;
+    if (relevantSkill.trim().length < MIN_SKILL_LENGTH)
+      next.relevantSkill = `Mínimo de ${MIN_SKILL_LENGTH} caracteres`;
     setErrors(next);
     return Object.keys(next).length === 0;
   }

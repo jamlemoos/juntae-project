@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { login as loginApi, logout as logoutApi } from '../api/endpoints';
 import { getMe } from '../../users/api/endpoints';
 import { ApiError, TOKEN_KEY } from '../../../shared/api/http';
+import { queryClient } from '../../../shared/api/queryClient';
 import type { UserResponse } from '../../users/api/types';
 
 type AuthState = {
@@ -55,6 +56,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       ) {
         // Non-retryable: the current session is invalid or the resource is gone — log out locally.
         logoutApi();
+        queryClient.clear();
         set({
           user: null,
           isAuthenticated: false,
@@ -86,6 +88,9 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   login: async (email: string, password: string) => {
     // loginApi stores the token; user comes directly from the response — no extra getMe call.
     const { user } = await loginApi({ email, password });
+    // Clear stale cache from any previous session before setting the new user so that
+    // isOwner/hasApplied data from another account cannot bleed into this session.
+    queryClient.clear();
     set({
       user,
       isAuthenticated: true,
@@ -97,6 +102,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   logout: () => {
     logoutApi();
+    queryClient.clear();
     set({
       user: null,
       isAuthenticated: false,
