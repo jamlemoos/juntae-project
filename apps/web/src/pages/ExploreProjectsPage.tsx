@@ -1,15 +1,17 @@
 import { Link } from '@tanstack/react-router';
-import { useProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
+import { useInfiniteProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
 import { useProjectDrafts } from '../features/projects/hooks/useProjectDrafts';
 import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { ProjectListCard } from '../features/projects/components/ProjectListCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ExploreProjectsPage() {
-  const { data: projects = [], isPending, isError } = useProjectsQuery({ page: 1, limit: 20 });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
+    useInfiniteProjectsQuery(20);
+  const projects = data?.pages.flat() ?? [];
   const storedProjects = useProjectDrafts();
   const localPublishedProjects = storedProjects.filter(
-    ({ data }) => data.publishStatus === 'published'
+    ({ data: d }) => d.publishStatus === 'published'
   );
 
   return (
@@ -69,6 +71,15 @@ export function ExploreProjectsPage() {
                 {projects.map((project) => (
                   <ApiProjectCard key={project.id} project={project} />
                 ))}
+                {hasNextPage && (
+                  <button
+                    onClick={() => fetchNextPage()}
+                    disabled={isFetchingNextPage}
+                    className="mt-2 self-center rounded-full border border-line-2 px-5 py-2 text-[13px] font-medium text-ink transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                  >
+                    {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
+                  </button>
+                )}
               </div>
             )}
           </SectionLayout>
@@ -84,8 +95,8 @@ export function ExploreProjectsPage() {
                   Estes projetos publicados estão salvos apenas neste navegador. Eles aparecem
                   separadamente porque a seção acima mostra apenas os projetos disponíveis pela API.
                 </p>
-                {localPublishedProjects.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                {localPublishedProjects.map(({ id, data: d }) => (
+                  <ProjectListCard key={id} id={id} data={d} status={d.publishStatus} />
                 ))}
               </div>
             </SectionLayout>
