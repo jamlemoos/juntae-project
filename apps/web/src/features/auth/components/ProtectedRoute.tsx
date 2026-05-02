@@ -44,7 +44,15 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex min-h-screen items-center justify-center bg-cream"
+      >
+        <span className="text-sm text-mute">Redirecionando para o login…</span>
+      </div>
+    );
   }
 
   return <>{children}</>;
