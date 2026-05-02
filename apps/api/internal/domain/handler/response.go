@@ -82,13 +82,24 @@ func handleServiceError(c *gin.Context, err error) {
 // parsePagination reads "page" and "limit" query parameters.
 // Project list endpoints are paginated by default: page=1, limit=20, max limit=50.
 // This keeps list responses bounded for MVP performance; no stable unbounded contract exists yet.
-func parsePagination(c *gin.Context) (offset, limit int) {
+//
+// Returns an error if a present param is non-numeric, zero, or negative.
+// Absent params fall back to defaults. limit > 50 is clamped silently.
+func parsePagination(c *gin.Context) (offset, limit int, err error) {
 	page := 1
 	limit = 20
-	if p, err := strconv.Atoi(c.Query("page")); err == nil && p > 0 {
+	if raw := c.Query("page"); raw != "" {
+		p, parseErr := strconv.Atoi(raw)
+		if parseErr != nil || p <= 0 {
+			return 0, 0, errors.New("page must be a positive integer")
+		}
 		page = p
 	}
-	if l, err := strconv.Atoi(c.Query("limit")); err == nil && l > 0 {
+	if raw := c.Query("limit"); raw != "" {
+		l, parseErr := strconv.Atoi(raw)
+		if parseErr != nil || l <= 0 {
+			return 0, 0, errors.New("limit must be a positive integer")
+		}
 		if l > 50 {
 			l = 50
 		}

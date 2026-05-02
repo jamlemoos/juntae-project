@@ -54,12 +54,7 @@ func (h *ProjectRoleHandler) GetProjectRoles(c *gin.Context) {
 		respondWithJSON(c, http.StatusOK, roles)
 		return
 	}
-	roles, err := h.projectRoleService.GetProjectRoles(callerID)
-	if err != nil {
-		handleServiceError(c, err)
-		return
-	}
-	respondWithJSON(c, http.StatusOK, roles)
+	respondWithError(c, http.StatusBadRequest, "project_id is required")
 }
 
 func (h *ProjectRoleHandler) GetRolesByProject(c *gin.Context) {

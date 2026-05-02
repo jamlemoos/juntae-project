@@ -45,7 +45,11 @@ func (h *ProjectHandler) GetProjects(c *gin.Context) {
 		respondWithError(c, http.StatusBadRequest, "both 'status' and 'city' query params are required when filtering")
 		return
 	}
-	offset, limit := parsePagination(c)
+	offset, limit, err := parsePagination(c)
+	if err != nil {
+		respondWithError(c, http.StatusBadRequest, err.Error())
+		return
+	}
 	projects, err := h.projectService.GetProjectsForList(callerID, status, city, offset, limit)
 	if err != nil {
 		handleServiceError(c, err)
@@ -59,7 +63,11 @@ func (h *ProjectHandler) GetMyProjects(c *gin.Context) {
 	if !ok {
 		return
 	}
-	offset, limit := parsePagination(c)
+	offset, limit, err := parsePagination(c)
+	if err != nil {
+		respondWithError(c, http.StatusBadRequest, err.Error())
+		return
+	}
 	projects, err := h.projectService.GetProjectsForOwner(callerID, offset, limit)
 	if err != nil {
 		handleServiceError(c, err)
