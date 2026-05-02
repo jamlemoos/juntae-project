@@ -73,6 +73,7 @@ export function ExploreProjectsPage() {
                 ))}
                 {hasNextPage && (
                   <button
+                    type="button"
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
                     className="mt-2 self-center rounded-full border border-line-2 px-5 py-2 text-[13px] font-medium text-ink transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
