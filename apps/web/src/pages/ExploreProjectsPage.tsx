@@ -1,10 +1,16 @@
 import { Link } from '@tanstack/react-router';
 import { useProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
+import { useProjectDrafts } from '../features/projects/hooks/useProjectDrafts';
 import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
+import { ProjectListCard } from '../features/projects/components/ProjectListCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ExploreProjectsPage() {
   const { data: projects = [], isPending, isError } = useProjectsQuery();
+  const storedProjects = useProjectDrafts();
+  const localPublishedProjects = storedProjects.filter(
+    ({ data }) => data.publishStatus === 'published'
+  );
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
@@ -66,6 +72,25 @@ export function ExploreProjectsPage() {
               </div>
             )}
           </SectionLayout>
+
+          {localPublishedProjects.length > 0 && (
+            <SectionLayout
+              eyebrow="publicados localmente"
+              title="Publicados neste navegador"
+              divider
+            >
+              <div className="flex flex-col gap-3">
+                <p className="mb-1 text-[13px] text-mute">
+                  Estes projetos foram publicados antes da integração com o servidor e continuam
+                  salvos apenas neste navegador. Eles não aparecem na seção acima porque ainda não
+                  foram migrados para a API.
+                </p>
+                {localPublishedProjects.map(({ id, data }) => (
+                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                ))}
+              </div>
+            </SectionLayout>
+          )}
         </div>
       </section>
     </div>

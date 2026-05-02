@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import {
   hasProjectDraft,
@@ -122,6 +123,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
 }
 
 function ApiProjectDetail({ projectId }: { projectId: string }) {
+  const queryClient = useQueryClient();
   const { data: project, isPending, isError } = useProjectDetailQuery(projectId);
   const [openApplicationRoleId, setOpenApplicationRoleId] = useState<string | null>(null);
 
@@ -241,6 +243,9 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                               onClose={() => setOpenApplicationRoleId(null)}
                               onSubmit={async (message) => {
                                 await applyToRole({ projectRoleId: role.id, message });
+                                await queryClient.invalidateQueries({
+                                  queryKey: ['project', projectId],
+                                });
                                 setOpenApplicationRoleId(null);
                               }}
                             />

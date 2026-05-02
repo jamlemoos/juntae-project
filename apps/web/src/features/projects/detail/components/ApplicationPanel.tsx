@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { X } from 'lucide-react';
+import { ApiError } from '../../../../shared/api/http';
 import { ProjectTextarea } from '../../components/ProjectTextarea';
 
 interface ApplicationPanelProps {
@@ -37,9 +38,21 @@ export function ApplicationPanel({ roleTitle, onClose, onSubmit }: ApplicationPa
         const composed = `${message.trim()}\n\nComo posso ajudar: ${relevantSkill.trim()}`;
         await onSubmit(composed);
         setPanelState('submitted');
-      } catch {
+      } catch (err) {
         setPanelState('idle');
-        setSubmitError('Não foi possível enviar a candidatura. Tente novamente.');
+        if (err instanceof ApiError) {
+          if (err.status === 409) {
+            setSubmitError('Você já se candidatou a esta vaga.');
+          } else if (err.status === 403) {
+            setSubmitError('Você não pode se candidatar a esta vaga.');
+          } else if (err.status === 0) {
+            setSubmitError('Não foi possível conectar ao servidor. Verifique sua conexão.');
+          } else {
+            setSubmitError('Não foi possível enviar a candidatura. Tente novamente.');
+          }
+        } else {
+          setSubmitError('Não foi possível enviar a candidatura. Tente novamente.');
+        }
       }
     } else {
       setPanelState('submitted');
