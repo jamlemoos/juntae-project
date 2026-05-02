@@ -16,6 +16,7 @@ import type {
   ProjectListItem,
   ProjectResponse,
   ProjectRole,
+  ProjectsPagination,
   UpdateProjectRequest,
 } from './types';
 
@@ -23,8 +24,10 @@ export async function getProjects(filter?: GetProjectsFilter): Promise<ProjectLi
   let path = '/projects';
   if (filter) {
     const params = new URLSearchParams();
-    if (filter.status) params.set('status', filter.status);
-    if (filter.city) params.set('city', filter.city);
+    if (filter.status && filter.city) {
+      params.set('status', filter.status);
+      params.set('city', filter.city);
+    }
     if (filter.page != null) params.set('page', String(filter.page));
     if (filter.limit != null) params.set('limit', String(filter.limit));
     const qs = params.toString();
@@ -34,8 +37,16 @@ export async function getProjects(filter?: GetProjectsFilter): Promise<ProjectLi
   return raw.map(mapProjectListItem);
 }
 
-export async function getMyProjects(): Promise<ProjectListItem[]> {
-  const raw = await http.get<ProjectListItemApiResponse[]>('/projects/me');
+export async function getMyProjects(pagination?: ProjectsPagination): Promise<ProjectListItem[]> {
+  let path = '/projects/me';
+  if (pagination) {
+    const params = new URLSearchParams();
+    if (pagination.page != null) params.set('page', String(pagination.page));
+    if (pagination.limit != null) params.set('limit', String(pagination.limit));
+    const qs = params.toString();
+    if (qs) path = `/projects/me?${qs}`;
+  }
+  const raw = await http.get<ProjectListItemApiResponse[]>(path);
   return raw.map(mapProjectListItem);
 }
 

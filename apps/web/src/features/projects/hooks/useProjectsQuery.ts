@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getMyProjects, getProjects } from '../api/endpoints';
-import type { GetProjectsFilter } from '../api/types';
+import type { GetProjectsFilter, ProjectsPagination } from '../api/types';
 
 export function useProjectsQuery(filters?: GetProjectsFilter) {
   return useQuery({
@@ -9,9 +9,9 @@ export function useProjectsQuery(filters?: GetProjectsFilter) {
   });
 }
 
-export function useMyProjectsQuery() {
+export function useMyProjectsQuery(pagination?: ProjectsPagination) {
   return useQuery({
-    queryKey: ['projects', 'me'],
-    queryFn: getMyProjects,
+    queryKey: ['projects', 'me', pagination],
+    queryFn: () => getMyProjects(pagination),
   });
 }

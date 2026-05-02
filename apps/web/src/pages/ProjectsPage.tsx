@@ -16,7 +16,11 @@ export function ProjectsPage() {
     ({ data }) => data.publishStatus === 'published'
   );
 
-  const { data: ownedProjects = [], isPending, isError } = useMyProjectsQuery();
+  const {
+    data: ownedProjects = [],
+    isPending,
+    isError,
+  } = useMyProjectsQuery({ page: 1, limit: 50 });
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
