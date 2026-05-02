@@ -7,7 +7,8 @@ import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ProjectsPage() {
-  const draftProjects = useProjectDrafts();
+  const storedProjects = useProjectDrafts();
+  const draftProjects = storedProjects.filter((p) => p.data.publishStatus !== 'published');
   const { data: apiProjects = [], isPending, isError } = useProjectsQuery();
   const ownedProjects = apiProjects.filter((p) => p.isOwner);
 
