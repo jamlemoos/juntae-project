@@ -191,12 +191,26 @@ func mapProjectResponse(p *model.Project) dto.ProjectResponse {
 }
 
 func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet map[uuid.UUID]struct{}) dto.ProjectListItemResponse {
-	var openCount int
-	for _, r := range p.Roles {
-		if r.Status == "OPEN" {
-			openCount++
+	// Apply the same visibility rules as filterVisibleProjectRoles:
+	// owners see all roles; non-owners see only OPEN roles on an OPEN project, otherwise zero.
+	isOwner := p.CreatorID == callerID
+	var openCount, totalCount int
+	if isOwner {
+		for _, r := range p.Roles {
+			if r.Status == "OPEN" {
+				openCount++
+			}
 		}
+		totalCount = len(p.Roles)
+	} else if p.Status == "OPEN" {
+		for _, r := range p.Roles {
+			if r.Status == "OPEN" {
+				openCount++
+			}
+		}
+		totalCount = openCount
 	}
+	// non-owner + non-OPEN project → openCount and totalCount remain 0
 	_, hasApplied := appliedSet[p.ID]
 	return dto.ProjectListItemResponse{
 		ID:              p.ID,
@@ -205,9 +219,9 @@ func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet
 		Status:          p.Status,
 		Creator:         mapPublicUserResponse(&p.Creator),
 		OpenRolesCount:  openCount,
-		TotalRolesCount: len(p.Roles),
+		TotalRolesCount: totalCount,
 		HasApplied:      hasApplied,
-		IsOwner:         p.CreatorID == callerID,
+		IsOwner:         isOwner,
 		CreatedAt:       p.CreatedAt,
 		UpdatedAt:       p.UpdatedAt,
 	}

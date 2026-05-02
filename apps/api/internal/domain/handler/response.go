@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"log"
-	"math"
 	"net/http"
 	"strconv"
 
@@ -83,9 +82,10 @@ func handleServiceError(c *gin.Context, err error) {
 // Project list endpoints are paginated by default: page=1, limit=20, max limit=50.
 // This keeps list responses bounded for MVP performance; no stable unbounded contract exists yet.
 //
-// Returns an error if a present param is non-numeric, zero, or negative.
-// Absent params fall back to defaults. limit > 50 is clamped silently.
+// Returns an error if a present param is non-numeric, zero, negative, or if page > maxPage.
+// Absent params fall back to defaults. limit > 50 is clamped to 50.
 func parsePagination(c *gin.Context) (offset, limit int, err error) {
+	const maxPage = 10_000
 	page := 1
 	limit = 20
 	if raw := c.Query("page"); raw != "" {
@@ -105,12 +105,9 @@ func parsePagination(c *gin.Context) (offset, limit int, err error) {
 		}
 		limit = l
 	}
-	// Use int64 arithmetic to prevent overflow for very large page values,
-	// then clamp to math.MaxInt32 (a safe upper bound for any DB offset).
-	offsetI64 := int64(page-1) * int64(limit)
-	if offsetI64 > math.MaxInt32 {
-		offsetI64 = math.MaxInt32
+	if page > maxPage {
+		return 0, 0, errors.New("page exceeds maximum allowed value (10000)")
 	}
-	offset = int(offsetI64)
+	offset = (page - 1) * limit
 	return
 }

@@ -63,7 +63,6 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	protected.PUT("/projects/:id", projectHandler.UpdateProject)
 	protected.DELETE("/projects/:id", projectHandler.DeleteProject)
 
-	protected.GET("/project-roles", projectRoleHandler.GetProjectRoles)
 	protected.POST("/project-roles", projectRoleHandler.CreateProjectRole)
 	protected.GET("/project-roles/:id", projectRoleHandler.GetProjectRoleByID)
 	protected.PUT("/project-roles/:id", projectRoleHandler.UpdateProjectRole)

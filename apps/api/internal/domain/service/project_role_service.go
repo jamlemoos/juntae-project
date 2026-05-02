@@ -49,18 +49,6 @@ func (s *ProjectRoleService) CreateProjectRole(callerID uuid.UUID, req dto.Creat
 	return &resp, nil
 }
 
-func (s *ProjectRoleService) GetProjectRoles(callerID uuid.UUID) ([]dto.ProjectRoleResponse, error) {
-	roles, err := s.repo.FindAllWithApplications()
-	if err != nil {
-		return nil, fmt.Errorf("get project roles: %w", err)
-	}
-	responses := make([]dto.ProjectRoleResponse, len(roles))
-	for i := range roles {
-		responses[i] = mapProjectRoleResponse(&roles[i], callerID)
-	}
-	return responses, nil
-}
-
 func (s *ProjectRoleService) GetProjectRolesByProject(projectID uuid.UUID, callerID uuid.UUID) ([]dto.ProjectRoleResponse, error) {
 	project, err := s.projectRepo.FindByID(projectID)
 	if err != nil {
