@@ -7,6 +7,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const isAuthenticated = useAuth((s) => s.isAuthenticated);
   const isLoading = useAuth((s) => s.isLoading);
   const hasInitialized = useAuth((s) => s.hasInitialized);
+  const initError = useAuth((s) => s.initError);
   const initializeAuth = useAuth((s) => s.initializeAuth);
   const navigate = useNavigate();
 
@@ -20,10 +21,24 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     }
   }, [hasInitialized, isAuthenticated, navigate]);
 
-  if (!hasInitialized || isLoading) {
+  if (isLoading || (!hasInitialized && !initError)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-cream">
         <span className="text-sm text-mute">Carregando…</span>
+      </div>
+    );
+  }
+
+  if (initError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream">
+        <p className="text-sm text-mute">{initError}</p>
+        <button
+          onClick={() => void initializeAuth()}
+          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90"
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }
