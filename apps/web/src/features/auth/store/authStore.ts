@@ -63,13 +63,12 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
           initError: 'Não foi possível validar sua sessão. Tente novamente.',
         });
       } else {
-        // Unexpected error — treat as permanent, but do not force logout.
+        // Unexpected error — treat as retryable: keep the token so the user can try again.
         set({
           user: null,
           isAuthenticated: false,
           isLoading: false,
-          hasInitialized: true,
-          initError: null,
+          initError: 'Não foi possível validar sua sessão. Tente novamente.',
         });
       }
     }
@@ -83,7 +82,13 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   logout: () => {
     logoutApi();
-    set({ user: null, isAuthenticated: false });
+    set({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      hasInitialized: true,
+      initError: null,
+    });
   },
 
   refreshUser: async () => {
