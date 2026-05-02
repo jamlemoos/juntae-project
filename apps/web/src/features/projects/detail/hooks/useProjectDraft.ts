@@ -47,6 +47,24 @@ function isValidMemberDraft(value: unknown): value is MemberDraft {
 
 const DRAFT_KEY_PREFIX = 'project-draft-';
 
+export function hasProjectDraft(projectId: string): boolean {
+  const key = `${DRAFT_KEY_PREFIX}${projectId}`;
+  try {
+    const raw = sessionStorage.getItem(key);
+    if (raw === null) return false;
+    const parsed: unknown = JSON.parse(raw);
+    if (parsed === null || typeof parsed !== 'object') {
+      // Corrupt entry: not a JSON object. Remove it so the API detail view can load instead.
+      sessionStorage.removeItem(key);
+      return false;
+    }
+    return true;
+  } catch {
+    // JSON.parse failed or sessionStorage unavailable — treat as no draft.
+    return false;
+  }
+}
+
 function readStored(projectId: string): ProjectData {
   try {
     const raw = sessionStorage.getItem(`${DRAFT_KEY_PREFIX}${projectId}`);

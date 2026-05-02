@@ -1,20 +1,25 @@
 import { Link } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
-import {
-  useProjectDrafts,
-  type ProjectDraftEntry,
-} from '../features/projects/hooks/useProjectDrafts';
+import { useProjectDrafts } from '../features/projects/hooks/useProjectDrafts';
+import { useProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
 import { ProjectListCard } from '../features/projects/components/ProjectListCard';
+import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ProjectsPage() {
-  const allProjects = useProjectDrafts();
-  const draftProjects = allProjects.filter(
-    ({ data }: ProjectDraftEntry) => data.publishStatus !== 'published'
+  const storedProjects = useProjectDrafts();
+  // TODO: Remove localPublishedProjects section once project creation/publish uses the API.
+  const localDraftProjects = storedProjects.filter(
+    ({ data }) => data.publishStatus !== 'published'
   );
-  const publishedProjects = allProjects.filter(
-    ({ data }: ProjectDraftEntry) => data.publishStatus === 'published'
+  const localPublishedProjects = storedProjects.filter(
+    ({ data }) => data.publishStatus === 'published'
   );
+
+  const { data: apiProjects = [], isPending, isError } = useProjectsQuery();
+  // TODO: Replace client-side filter with GET /api/projects/me or GET /api/projects?owner=me
+  // once the backend exposes an owner-scoped endpoint.
+  const ownedProjects = apiProjects.filter((p) => p.isOwner);
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
@@ -51,7 +56,7 @@ export function ProjectsPage() {
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
           <SectionLayout eyebrow="01 · rascunhos" title="Meus rascunhos" divider={false}>
-            {draftProjects.length === 0 ? (
+            {localDraftProjects.length === 0 ? (
               <div className="rounded-xl border border-dashed hairline px-6 py-10 text-center">
                 <p className="text-[14px] text-ink-2">Você ainda não começou nenhum projeto.</p>
                 <Link
@@ -64,15 +69,39 @@ export function ProjectsPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {draftProjects.map(({ id, data }) => (
+                {localDraftProjects.map(({ id, data }) => (
                   <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
                 ))}
               </div>
             )}
           </SectionLayout>
 
-          <SectionLayout eyebrow="02 · publicados" title="Projetos publicados" divider>
-            {publishedProjects.length === 0 ? (
+          {localPublishedProjects.length > 0 && (
+            <SectionLayout
+              eyebrow="02 · publicados localmente"
+              title="Publicados localmente"
+              divider
+            >
+              <div className="flex flex-col gap-3">
+                <p className="mb-1 text-[13px] text-mute">
+                  Estes projetos continuam salvos apenas neste navegador. Por isso, eles não
+                  aparecem na seção abaixo, que mostra apenas os projetos carregados pela API.
+                </p>
+                {localPublishedProjects.map(({ id, data }) => (
+                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                ))}
+              </div>
+            </SectionLayout>
+          )}
+
+          <SectionLayout eyebrow="03 · publicados" title="Projetos publicados" divider>
+            {isPending ? (
+              <p className="text-[14px] text-mute">Carregando...</p>
+            ) : isError ? (
+              <p className="text-[14px] text-mute">
+                Não foi possível carregar os projetos. Tente novamente.
+              </p>
+            ) : ownedProjects.length === 0 ? (
               <div className="rounded-xl border border-dashed hairline px-6 py-10 text-center">
                 <p className="text-[14px] text-ink-2">Você ainda não publicou nenhum projeto.</p>
                 <p className="mt-1.5 text-[13px] text-mute">
@@ -81,8 +110,8 @@ export function ProjectsPage() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {publishedProjects.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                {ownedProjects.map((project) => (
+                  <ApiProjectCard key={project.id} project={project} />
                 ))}
               </div>
             )}
