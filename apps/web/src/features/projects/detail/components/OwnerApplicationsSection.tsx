@@ -1,17 +1,17 @@
-import type { ApplicationDetailResponse } from '../../../applications/api/types';
+import type { ApplicationDetailResponse, ApplicationStatus } from '../../../applications/api/types';
 import {
   useProjectApplicationsQuery,
   useUpdateApplicationStatusMutation,
 } from '../../../applications/hooks/useApplicationsHooks';
 import { SectionLayout } from '../../../../shared/ui/SectionLayout';
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS: Record<ApplicationStatus, string> = {
   PENDING: 'Pendente',
   ACCEPTED: 'Aceito',
   REJECTED: 'Recusado',
 };
 
-function statusBadgeClass(status: string): string {
+function statusBadgeClass(status: ApplicationStatus): string {
   if (status === 'ACCEPTED') return 'bg-green-50 text-green-700 ring-1 ring-green-200';
   if (status === 'REJECTED') return 'bg-red-50 text-red-700 ring-1 ring-red-200';
   return 'bg-cream ring-1 ring-line text-mute';
@@ -37,7 +37,7 @@ function ApplicationCard({ application, onAccept, onReject, isUpdating }: Applic
         <span
           className={`mono shrink-0 rounded-full px-3 py-1 text-[11px] uppercase tracking-[.14em] ${statusBadgeClass(status)}`}
         >
-          {STATUS_LABELS[status] ?? status}
+          {STATUS_LABELS[status]}
         </span>
       </div>
 

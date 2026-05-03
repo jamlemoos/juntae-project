@@ -54,8 +54,8 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
   const workModeDisplay = formatWorkMode(project.workMode, project.city);
 
   const checklist = [
-    { label: 'Nome claro', done: project.title.trim().length > 0 },
-    { label: 'Ideia explicada', done: project.description.trim().length > 0 },
+    { label: 'Nome claro', done: project.title.trim().length >= 3 },
+    { label: 'Ideia explicada', done: project.description.trim().length >= 10 },
     { label: 'Pelo menos uma pessoa', done: true },
     { label: 'Forma de trabalho definida', done: project.workMode !== '' },
   ];
@@ -82,8 +82,8 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
     }
     try {
       const created = await createProjectMutation.mutateAsync({
-        title: project.title,
-        description: project.description,
+        title: project.title.trim(),
+        description: project.description.trim(),
         status: 'OPEN',
         roles: nonBlankRoles.map((r) => ({
           title: r.title.trim(),
@@ -430,7 +430,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
               <div className="lg:sticky lg:top-24 lg:pt-14">
                 <ApiProjectRail
                   project={project}
-                  onEdit={project.isOwner ? handleStartEditing : undefined}
+                  onEdit={project.isOwner && !isEditing ? handleStartEditing : undefined}
                 />
               </div>
             </div>

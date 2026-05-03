@@ -73,12 +73,12 @@ export function NewProjectPage() {
 
       try {
         const project = await createProjectMutation.mutateAsync({
-          title: value.title,
-          description: value.description,
+          title: value.title.trim(),
+          description: value.description.trim(),
           status: mapFormStatusToApi(value.status),
           roles: roles.map((role) => ({
-            title: role.title,
-            description: role.description,
+            title: role.title.trim(),
+            description: role.description.trim(),
             status: mapRoleStatusToApi(role.status),
           })),
         });
