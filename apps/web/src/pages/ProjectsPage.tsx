@@ -51,7 +51,7 @@ export function ProjectsPage() {
             <SectionLayout eyebrow="01 · rascunhos" title="Meus rascunhos" divider={false}>
               <div className="flex flex-col gap-3">
                 {localDraftProjects.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                  <ProjectListCard key={id} id={id} data={data} status="draft" />
                 ))}
               </div>
             </SectionLayout>

@@ -137,7 +137,6 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
                 editDraft={editDraft}
                 setEditDraft={setEditDraft}
                 roles={project.roles}
-                publishStatus={project.publishStatus}
                 onStartEditing={() => startEditing('procurando', project)}
                 onSave={handleSave}
                 onCancel={cancelEditing}
@@ -157,7 +156,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
             <div className="col-span-12 lg:col-span-4">
               <div className="lg:sticky lg:top-24 lg:pt-14">
                 <ProjectStatusRail
-                  publishStatus="draft"
+                  publishStatus={project.publishStatus}
                   checklist={checklist}
                   onPublish={handlePublish}
                   isPublishing={createProjectMutation.isPending}

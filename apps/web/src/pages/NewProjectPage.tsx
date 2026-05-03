@@ -52,14 +52,14 @@ const ROLE_STATUS_TO_API: Record<Exclude<RoleStatus, ''>, 'OPEN' | 'CLOSED'> = {
 };
 
 function isFormProjectStatus(s: string): s is FormProjectStatus {
-  return s in FORM_STATUS_TO_API;
+  return Object.hasOwn(FORM_STATUS_TO_API, s);
 }
 
 function mapFormStatusToApi(status: FormProjectStatus): ApiProjectStatus {
   return FORM_STATUS_TO_API[status];
 }
 
-function mapRoleStatusToApi(status: RoleStatus): 'OPEN' | 'CLOSED' {
+function mapRoleStatusToApi(status: RoleStatus | ''): 'OPEN' | 'CLOSED' {
   if (status === '') return 'OPEN';
   return ROLE_STATUS_TO_API[status];
 }
@@ -79,7 +79,10 @@ export function NewProjectPage() {
       if (roles.length === 0) return;
       const errors = validateRolesForSubmit(roles);
       if (errors.some((e) => e.title || e.description || e.status)) return;
-      if (!isFormProjectStatus(value.status)) return;
+      if (!isFormProjectStatus(value.status)) {
+        setSaveError('Status do projeto inválido.');
+        return;
+      }
 
       try {
         const project = await createProjectMutation.mutateAsync({
