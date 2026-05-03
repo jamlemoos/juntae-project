@@ -80,6 +80,8 @@ function ApplicationCard({ application, onAccept, onReject, isUpdating }: Applic
   );
 }
 
+type RoleGroup = { roleTitle: string; apps: ApplicationDetailResponse[] };
+
 export function OwnerApplicationsSection({ projectId }: { projectId: string }) {
   const {
     data: applications,
@@ -88,7 +90,6 @@ export function OwnerApplicationsSection({ projectId }: { projectId: string }) {
   } = useProjectApplicationsQuery(projectId);
   const updateStatusMutation = useUpdateApplicationStatusMutation(projectId);
 
-  type RoleGroup = { roleTitle: string; apps: ApplicationDetailResponse[] };
   const roleGroups = (applications ?? []).reduce<Record<string, RoleGroup>>((acc, app) => {
     const key = app.projectRoleId;
     if (!acc[key]) acc[key] = { roleTitle: app.roleTitle || 'Sem título', apps: [] };

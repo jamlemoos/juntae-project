@@ -72,6 +72,8 @@ func handleServiceError(c *gin.Context, err error) {
 		respondWithError(c, http.StatusConflict, "project is not open for applications")
 	case errors.Is(err, service.ErrRoleClosed):
 		respondWithError(c, http.StatusConflict, "role is not open for applications")
+	case errors.Is(err, service.ErrValidation):
+		respondWithError(c, http.StatusUnprocessableEntity, "invalid input")
 	default:
 		log.Printf("ERROR: internal server error: %v", err)
 		respondWithError(c, http.StatusInternalServerError, "internal server error")

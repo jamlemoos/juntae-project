@@ -5,9 +5,10 @@ import { ChecklistItem } from '../../../shared/ui/ChecklistItem';
 
 interface CompletionCardProps {
   items: CompletionItem[];
+  onEdit?: () => void;
 }
 
-export function CompletionCard({ items }: CompletionCardProps) {
+export function CompletionCard({ items, onEdit }: CompletionCardProps) {
   const done = items.filter((i) => i.done).length;
   const pct = Math.round((done / items.length) * 100);
   const isComplete = pct === 100;
@@ -49,6 +50,7 @@ export function CompletionCard({ items }: CompletionCardProps) {
 
       <button
         type="button"
+        onClick={onEdit}
         className={[
           'mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink',
           isComplete

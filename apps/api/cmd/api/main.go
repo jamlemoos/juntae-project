@@ -51,6 +51,7 @@ func main() {
 
 	auditRepo := repository.NewAuditRepository(auditDB)
 	userRepo := repository.NewUserRepository(mainDB)
+	userLinkRepo := repository.NewUserLinkRepository(mainDB)
 	skillRepo := repository.NewSkillRepository(mainDB)
 	projectRepo := repository.NewProjectRepository(mainDB)
 	projectRoleRepo := repository.NewProjectRoleRepository(mainDB)
@@ -58,6 +59,7 @@ func main() {
 
 	auditService := service.NewAuditService(auditRepo)
 	userService := service.NewUserService(userRepo, skillRepo, auditService)
+	userLinkService := service.NewUserLinkService(userLinkRepo)
 	skillService := service.NewSkillService(skillRepo, auditService)
 	projectService := service.NewProjectService(projectRepo, applicationRepo, auditService)
 	projectRoleService := service.NewProjectRoleService(projectRoleRepo, projectRepo, auditService)
@@ -65,6 +67,7 @@ func main() {
 
 	deps := router.RouterDependencies{
 		UserService:        userService,
+		UserLinkService:    userLinkService,
 		SkillService:       skillService,
 		ProjectService:     projectService,
 		ProjectRoleService: projectRoleService,

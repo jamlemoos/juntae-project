@@ -1,10 +1,12 @@
 import { Link } from '@tanstack/react-router';
+import { useAuth } from '../features/auth/hooks/useAuth';
 
 interface HeaderProps {
   variant: 'home' | 'login' | 'register' | 'app';
 }
 
 export function Header({ variant }: HeaderProps) {
+  const user = useAuth((s) => s.user);
   return (
     <header className="sticky top-0 z-30 border-b hairline bg-cream/85 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
@@ -49,7 +51,7 @@ export function Header({ variant }: HeaderProps) {
               <span className="hidden h-4 w-px bg-line sm:inline" />
               <Link to="/profile" aria-label="Meu perfil" className="flex items-center gap-2.5">
                 <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-ink-2 text-[11px] font-semibold text-cream">
-                  ?
+                  {user?.name?.charAt(0)?.toUpperCase() ?? '?'}
                 </div>
               </Link>
             </div>
