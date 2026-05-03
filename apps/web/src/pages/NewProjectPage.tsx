@@ -12,7 +12,8 @@ import {
   useProjectRoles,
   validateRolesForSubmit,
 } from '../features/projects/hooks/useProjectRoles';
-import { saveProjectDraft } from '../features/projects/detail/hooks/useProjectDraft';
+import { useCreateProjectMutation } from '../features/projects/hooks/useProjectMutations';
+import type { ProjectStatus as ApiProjectStatus } from '../features/projects/api/types';
 
 const PROJECT_STATUS_OPTIONS = [
   { value: 'idea', label: 'Só uma ideia ainda' },
@@ -40,8 +41,20 @@ function validateStatus(value: string) {
   return r.success ? undefined : r.error.issues[0]?.message;
 }
 
+function mapFormStatusToApi(status: string): ApiProjectStatus {
+  if (status === 'in_progress') return 'IN_PROGRESS';
+  if (status === 'paused') return 'CLOSED';
+  return 'OPEN';
+}
+
+function mapRoleStatusToApi(status: string): 'OPEN' | 'CLOSED' {
+  if (status === 'filled') return 'CLOSED';
+  return 'OPEN';
+}
+
 export function NewProjectPage() {
   const navigate = useNavigate();
+  const createProjectMutation = useCreateProjectMutation();
   const { roles, roleErrors, addRole, removeRole, updateRole, applyRoleValidation } =
     useProjectRoles();
   const [noRolesError, setNoRolesError] = useState<string | null>(null);
@@ -54,23 +67,23 @@ export function NewProjectPage() {
       if (roles.length === 0) return;
       const errors = validateRolesForSubmit(roles);
       if (errors.some((e) => e.title || e.description || e.status)) return;
-      const projectId = crypto.randomUUID();
-      const ok = saveProjectDraft(projectId, {
-        title: value.title,
-        description: value.description,
-        roles: roles.map((role) => ({
-          id: role.id,
-          title: role.title,
-          description: role.description,
-          status: role.status,
-        })),
-      });
-      if (!ok) {
-        setSaveError('Não foi possível salvar o rascunho. Tente novamente.');
-        return;
+
+      try {
+        const project = await createProjectMutation.mutateAsync({
+          title: value.title,
+          description: value.description,
+          status: mapFormStatusToApi(value.status),
+          roles: roles.map((role) => ({
+            title: role.title,
+            description: role.description,
+            status: mapRoleStatusToApi(role.status),
+          })),
+        });
+        setSaveError(null);
+        void navigate({ to: '/projects/$projectId', params: { projectId: project.id } });
+      } catch {
+        setSaveError('Não foi possível criar o projeto. Tente novamente.');
       }
-      setSaveError(null);
-      void navigate({ to: '/projects/$projectId', params: { projectId } });
     },
   });
 

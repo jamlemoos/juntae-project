@@ -108,6 +108,14 @@ export function saveProjectDraft(
 
 export type ProjectDraftEntry = { id: string; data: ProjectData };
 
+export function clearProjectDraft(projectId: string): void {
+  try {
+    sessionStorage.removeItem(`${DRAFT_KEY_PREFIX}${projectId}`);
+  } catch {
+    // ignore
+  }
+}
+
 export function readAllProjectDrafts(): ProjectDraftEntry[] {
   try {
     const result: ProjectDraftEntry[] = [];

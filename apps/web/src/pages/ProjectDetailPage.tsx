@@ -1,24 +1,37 @@
 import { useState } from 'react';
-import { useParams, Link } from '@tanstack/react-router';
+import { useParams, Link, useNavigate } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft } from 'lucide-react';
 import {
   hasProjectDraft,
   useProjectDraft,
+  clearProjectDraft,
 } from '../features/projects/detail/hooks/useProjectDraft';
 import { useProjectDetailEditing } from '../features/projects/detail/hooks/useProjectDetailEditing';
 import { useProjectDetailQuery } from '../features/projects/hooks/useProjectDetailQuery';
+import { useCreateProjectMutation } from '../features/projects/hooks/useProjectMutations';
+import { useUpdateProjectMutation } from '../features/projects/hooks/useProjectMutations';
 import { formatWorkMode } from '../features/projects/detail/utils';
 import { ProjectDetailHeader } from '../features/projects/detail/components/ProjectDetailHeader';
 import { ProjectStatusRail } from '../features/projects/detail/components/ProjectStatusRail';
 import { ProjectAboutSection } from '../features/projects/detail/components/ProjectAboutSection';
 import { ProjectTeamSection } from '../features/projects/detail/components/ProjectTeamSection';
 import { ProjectNeededRolesSection } from '../features/projects/detail/components/ProjectNeededRolesSection';
+import { OwnerApplicationsSection } from '../features/projects/detail/components/OwnerApplicationsSection';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 import { RailCard } from '../shared/ui/RailCard';
 import { ApplicationPanel } from '../features/projects/detail/components/ApplicationPanel';
+import { ProjectField } from '../features/projects/components/ProjectField';
+import { ProjectTextarea } from '../features/projects/components/ProjectTextarea';
+import { ProjectSelect } from '../features/projects/components/ProjectSelect';
 import { applyToRole } from '../features/applications/api/endpoints';
 import type { ProjectDetail, ProjectStatus } from '../features/projects/api/types';
+
+const API_STATUS_OPTIONS = [
+  { value: 'OPEN', label: 'Aberto' },
+  { value: 'IN_PROGRESS', label: 'Em andamento' },
+  { value: 'CLOSED', label: 'Encerrado' },
+];
 
 export function ProjectDetailPage() {
   const { projectId } = useParams({ from: '/app-layout/projects/$projectId' });
@@ -31,9 +44,12 @@ export function ProjectDetailPage() {
 }
 
 function LocalDraftDetail({ projectId }: { projectId: string }) {
+  const navigate = useNavigate();
   const { project, setProject } = useProjectDraft(projectId);
   const { editingSection, editDraft, setEditDraft, startEditing, cancelEditing } =
     useProjectDetailEditing();
+  const createProjectMutation = useCreateProjectMutation();
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   const workModeDisplay = formatWorkMode(project.workMode, project.city);
 
@@ -47,6 +63,28 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
   function handleSave() {
     setProject(editDraft);
     cancelEditing();
+  }
+
+  async function handlePublish() {
+    setPublishError(null);
+    try {
+      const created = await createProjectMutation.mutateAsync({
+        title: project.title || 'Projeto sem título',
+        description: project.description || '',
+        status: 'OPEN',
+        roles: project.roles
+          .filter((r) => r.title.trim().length > 0)
+          .map((r) => ({
+            title: r.title,
+            description: r.description,
+            status: r.status === 'filled' ? ('CLOSED' as const) : ('OPEN' as const),
+          })),
+      });
+      clearProjectDraft(projectId);
+      void navigate({ to: '/projects/$projectId', params: { projectId: created.id } });
+    } catch {
+      setPublishError('Não foi possível publicar o projeto. Tente novamente.');
+    }
   }
 
   return (
@@ -110,7 +148,9 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
                 <ProjectStatusRail
                   publishStatus={project.publishStatus}
                   checklist={checklist}
-                  onPublish={() => setProject({ ...project, publishStatus: 'published' })}
+                  onPublish={handlePublish}
+                  isPublishing={createProjectMutation.isPending}
+                  publishError={publishError}
                   onEditProject={() => startEditing('sobre', project)}
                 />
               </div>
@@ -122,10 +162,24 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
   );
 }
 
+type EditFields = {
+  title: string;
+  description: string;
+  status: ProjectStatus;
+};
+
 function ApiProjectDetail({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient();
   const { data: project, isPending, isError } = useProjectDetailQuery(projectId);
+  const updateMutation = useUpdateProjectMutation();
   const [openApplicationRoleId, setOpenApplicationRoleId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFields, setEditFields] = useState<EditFields>({
+    title: '',
+    description: '',
+    status: 'OPEN',
+  });
+  const [editError, setEditError] = useState<string | null>(null);
 
   if (isPending) {
     return (
@@ -154,6 +208,39 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
     );
   }
 
+  function handleStartEditing() {
+    setEditFields({
+      title: project!.title,
+      description: project!.description,
+      status: project!.status,
+    });
+    setEditError(null);
+    setIsEditing(true);
+  }
+
+  async function handleSaveEdit() {
+    if (!editFields.title.trim()) {
+      setEditError('O título é obrigatório.');
+      return;
+    }
+    if (!editFields.description.trim()) {
+      setEditError('A descrição é obrigatória.');
+      return;
+    }
+    try {
+      await updateMutation.mutateAsync({ id: projectId, data: editFields });
+      setIsEditing(false);
+      setEditError(null);
+    } catch {
+      setEditError('Não foi possível salvar as alterações. Tente novamente.');
+    }
+  }
+
+  function handleCancelEdit() {
+    setIsEditing(false);
+    setEditError(null);
+  }
+
   // Owners see all roles to review their project's state.
   // Non-owners only see OPEN roles, and only when the project is accepting applications.
   const visibleRoles = project.isOwner
@@ -174,13 +261,62 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
 
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
-          {project.isOwner && (
-            <div className="mx-auto max-w-[1200px] pt-6">
-              <p className="rounded-xl bg-cream-2 px-5 py-3 text-[13px] text-mute ring-1 ring-line">
-                A edição de projetos publicados pelo servidor será integrada em uma próxima etapa.
-              </p>
+          {project.isOwner && isEditing && (
+            <div className="pt-6 pb-2">
+              <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6">
+                <div className="mono mb-5 text-[11px] uppercase tracking-[.22em] text-mute">
+                  Editar projeto
+                </div>
+                <div className="flex flex-col gap-5">
+                  <ProjectField
+                    label="Nome do projeto"
+                    value={editFields.title}
+                    onChange={(e) => setEditFields((prev) => ({ ...prev, title: e.target.value }))}
+                  />
+                  <ProjectTextarea
+                    label="Descrição"
+                    value={editFields.description}
+                    rows={5}
+                    onChange={(e) =>
+                      setEditFields((prev) => ({ ...prev, description: e.target.value }))
+                    }
+                  />
+                  <ProjectSelect
+                    label="Status"
+                    options={API_STATUS_OPTIONS}
+                    value={editFields.status}
+                    onChange={(v) =>
+                      setEditFields((prev) => ({ ...prev, status: v as ProjectStatus }))
+                    }
+                  />
+                </div>
+                {editError && (
+                  <p role="alert" className="mt-3 text-[13px] text-red-600">
+                    {editError}
+                  </p>
+                )}
+                <div className="mt-6 flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleSaveEdit}
+                    disabled={updateMutation.isPending}
+                    className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+                  >
+                    {updateMutation.isPending ? 'Salvando…' : 'Salvar'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    disabled={updateMutation.isPending}
+                    className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
             </div>
           )}
+
           <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12 lg:col-span-8">
               <SectionLayout eyebrow="01 · sobre" title="Ideia" id="section-sobre">
@@ -266,6 +402,8 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                 )}
               </SectionLayout>
 
+              {project.isOwner && <OwnerApplicationsSection projectId={projectId} />}
+
               <div className="border-t pt-10 hairline">
                 <Link
                   to={project.isOwner ? '/projects' : '/explore'}
@@ -279,7 +417,10 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
 
             <div className="col-span-12 lg:col-span-4">
               <div className="lg:sticky lg:top-24 lg:pt-14">
-                <ApiProjectRail project={project} />
+                <ApiProjectRail
+                  project={project}
+                  onEdit={project.isOwner ? handleStartEditing : undefined}
+                />
               </div>
             </div>
           </div>
@@ -295,7 +436,7 @@ const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   CLOSED: 'Encerrado',
 };
 
-function ApiProjectRail({ project }: { project: ProjectDetail }) {
+function ApiProjectRail({ project, onEdit }: { project: ProjectDetail; onEdit?: () => void }) {
   return (
     <RailCard>
       <div className="mono text-[11px] uppercase tracking-[.22em] text-mute">status</div>
@@ -305,6 +446,15 @@ function ApiProjectRail({ project }: { project: ProjectDetail }) {
       <div className="dotted my-6" aria-hidden="true" />
       <div className="mono text-[11px] uppercase tracking-[.22em] text-mute">criado por</div>
       <p className="mt-2 text-[15px] font-medium text-ink">{project.creator.name}</p>
+      {onEdit && (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        >
+          Editar projeto
+        </button>
+      )}
     </RailCard>
   );
 }
