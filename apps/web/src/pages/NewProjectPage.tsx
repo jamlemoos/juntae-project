@@ -12,17 +12,19 @@ import {
   useProjectRoles,
   validateRolesForSubmit,
 } from '../features/projects/hooks/useProjectRoles';
-import { saveProjectDraft } from '../features/projects/detail/hooks/useProjectDraft';
+import { useCreateProjectMutation } from '../features/projects/hooks/useProjectMutations';
+import type { FormProjectStatus, RoleStatus } from '../features/projects/types';
+import { PROJECT_STATUS_OPTIONS } from '../features/projects/types';
+import type { ProjectStatus as ApiProjectStatus } from '../features/projects/api/types';
+import {
+  PROJECT_TITLE_MIN,
+  PROJECT_DESCRIPTION_MIN,
+  PROJECT_TITLE_ERROR,
+  PROJECT_DESCRIPTION_ERROR,
+} from '../features/projects/validation';
 
-const PROJECT_STATUS_OPTIONS = [
-  { value: 'idea', label: 'Só uma ideia ainda' },
-  { value: 'forming_team', label: 'Montando o time' },
-  { value: 'in_progress', label: 'Em andamento' },
-  { value: 'paused', label: 'Em pausa' },
-];
-
-const titleSchema = z.string().trim().min(1, 'Nome do projeto obrigatório');
-const descriptionSchema = z.string().trim().min(1, 'Conta a ideia do projeto');
+const titleSchema = z.string().trim().min(PROJECT_TITLE_MIN, PROJECT_TITLE_ERROR);
+const descriptionSchema = z.string().trim().min(PROJECT_DESCRIPTION_MIN, PROJECT_DESCRIPTION_ERROR);
 const statusSchema = z.string().trim().min(1, 'Escolha o momento do projeto');
 
 function validateTitle(value: string) {
@@ -40,8 +42,34 @@ function validateStatus(value: string) {
   return r.success ? undefined : r.error.issues[0]?.message;
 }
 
+const FORM_STATUS_TO_API: Record<FormProjectStatus, ApiProjectStatus> = {
+  idea: 'OPEN',
+  forming_team: 'OPEN',
+  in_progress: 'IN_PROGRESS',
+  closed: 'CLOSED',
+};
+
+const ROLE_STATUS_TO_API: Record<Exclude<RoleStatus, ''>, 'OPEN' | 'CLOSED'> = {
+  open: 'OPEN',
+  filled: 'CLOSED',
+};
+
+function isFormProjectStatus(s: string): s is FormProjectStatus {
+  return Object.hasOwn(FORM_STATUS_TO_API, s);
+}
+
+function mapFormStatusToApi(status: FormProjectStatus): ApiProjectStatus {
+  return FORM_STATUS_TO_API[status];
+}
+
+function mapRoleStatusToApi(status: RoleStatus | ''): 'OPEN' | 'CLOSED' {
+  if (status === '') return 'OPEN';
+  return ROLE_STATUS_TO_API[status];
+}
+
 export function NewProjectPage() {
   const navigate = useNavigate();
+  const createProjectMutation = useCreateProjectMutation();
   const { roles, roleErrors, addRole, removeRole, updateRole, applyRoleValidation } =
     useProjectRoles();
   const [noRolesError, setNoRolesError] = useState<string | null>(null);
@@ -51,26 +79,31 @@ export function NewProjectPage() {
   const form = useForm({
     defaultValues: { title: '', description: '', status: '' },
     onSubmit: async ({ value }) => {
+      setSaveError(null);
       if (roles.length === 0) return;
       const errors = validateRolesForSubmit(roles);
       if (errors.some((e) => e.title || e.description || e.status)) return;
-      const projectId = crypto.randomUUID();
-      const ok = saveProjectDraft(projectId, {
-        title: value.title,
-        description: value.description,
-        roles: roles.map((role) => ({
-          id: role.id,
-          title: role.title,
-          description: role.description,
-          status: role.status,
-        })),
-      });
-      if (!ok) {
-        setSaveError('Não foi possível salvar o rascunho. Tente novamente.');
+      if (!isFormProjectStatus(value.status)) {
+        setSaveError('Status do projeto inválido.');
         return;
       }
-      setSaveError(null);
-      void navigate({ to: '/projects/$projectId', params: { projectId } });
+
+      try {
+        const project = await createProjectMutation.mutateAsync({
+          title: value.title.trim(),
+          description: value.description.trim(),
+          status: mapFormStatusToApi(value.status),
+          roles: roles.map((role) => ({
+            title: role.title.trim(),
+            description: role.description.trim(),
+            status: mapRoleStatusToApi(role.status),
+          })),
+        });
+        setSaveError(null);
+        void navigate({ to: '/projects/$projectId', params: { projectId: project.id } });
+      } catch {
+        setSaveError('Não foi possível criar o projeto. Tente novamente.');
+      }
     },
   });
 

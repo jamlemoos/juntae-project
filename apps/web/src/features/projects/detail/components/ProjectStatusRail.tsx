@@ -6,6 +6,8 @@ interface ProjectStatusRailProps {
   publishStatus: PublishStatus;
   checklist: ChecklistItem[];
   onPublish: () => void;
+  isPublishing?: boolean;
+  publishError?: string | null;
   onEditProject: () => void;
 }
 
@@ -13,6 +15,8 @@ export function ProjectStatusRail({
   publishStatus,
   checklist,
   onPublish,
+  isPublishing,
+  publishError,
   onEditProject,
 }: ProjectStatusRailProps) {
   const isPublished = publishStatus === 'published';
@@ -56,10 +60,16 @@ export function ProjectStatusRail({
           <button
             type="button"
             onClick={onPublish}
-            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-accent px-5 py-3 text-[14px] font-medium text-cream transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            disabled={isPublishing}
+            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-accent px-5 py-3 text-[14px] font-medium text-cream transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:pointer-events-none disabled:opacity-50"
           >
-            Publicar projeto
+            {isPublishing ? 'Publicando…' : 'Publicar projeto'}
           </button>
+          {publishError && (
+            <p role="alert" className="mt-3 text-[13px] text-red-600">
+              {publishError}
+            </p>
+          )}
         </>
       )}
     </RailCard>

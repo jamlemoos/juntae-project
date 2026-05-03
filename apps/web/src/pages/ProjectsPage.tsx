@@ -7,14 +7,7 @@ import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ProjectsPage() {
-  const storedProjects = useProjectDrafts();
-  // TODO: Remove localPublishedProjects section once project creation/publish uses the API.
-  const localDraftProjects = storedProjects.filter(
-    ({ data }) => data.publishStatus !== 'published'
-  );
-  const localPublishedProjects = storedProjects.filter(
-    ({ data }) => data.publishStatus === 'published'
-  );
+  const localDraftProjects = useProjectDrafts();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteMyProjectsQuery(20);
@@ -54,46 +47,21 @@ export function ProjectsPage() {
 
       <section className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1200px] px-6 pb-24">
-          <SectionLayout eyebrow="01 · rascunhos" title="Meus rascunhos" divider={false}>
-            {localDraftProjects.length === 0 ? (
-              <div className="rounded-xl border border-dashed hairline px-6 py-10 text-center">
-                <p className="text-[14px] text-ink-2">Você ainda não começou nenhum projeto.</p>
-                <Link
-                  to="/projects/new"
-                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-accent transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
-                >
-                  <Plus size={13} aria-hidden="true" />
-                  Começar projeto
-                </Link>
-              </div>
-            ) : (
+          {localDraftProjects.length > 0 && (
+            <SectionLayout eyebrow="01 · rascunhos" title="Meus rascunhos" divider={false}>
               <div className="flex flex-col gap-3">
                 {localDraftProjects.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
-                ))}
-              </div>
-            )}
-          </SectionLayout>
-
-          {localPublishedProjects.length > 0 && (
-            <SectionLayout
-              eyebrow="02 · publicados localmente"
-              title="Publicados localmente"
-              divider
-            >
-              <div className="flex flex-col gap-3">
-                <p className="mb-1 text-[13px] text-mute">
-                  Estes projetos continuam salvos apenas neste navegador. Por isso, eles não
-                  aparecem na seção abaixo, que mostra apenas os projetos carregados pela API.
-                </p>
-                {localPublishedProjects.map(({ id, data }) => (
-                  <ProjectListCard key={id} id={id} data={data} status={data.publishStatus} />
+                  <ProjectListCard key={id} id={id} data={data} status="draft" />
                 ))}
               </div>
             </SectionLayout>
           )}
 
-          <SectionLayout eyebrow="03 · publicados" title="Projetos publicados" divider>
+          <SectionLayout
+            eyebrow={localDraftProjects.length > 0 ? '02 · publicados' : '01 · publicados'}
+            title="Projetos publicados"
+            divider={localDraftProjects.length > 0}
+          >
             {isPending ? (
               <p className="text-[14px] text-mute">Carregando...</p>
             ) : isError ? (
@@ -106,6 +74,13 @@ export function ProjectsPage() {
                 <p className="mt-1.5 text-[13px] text-mute">
                   Seus projetos aparecerão aqui quando estiverem prontos para receber pessoas.
                 </p>
+                <Link
+                  to="/projects/new"
+                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-accent transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                >
+                  <Plus size={13} aria-hidden="true" />
+                  Começar projeto
+                </Link>
               </div>
             ) : (
               <div className="flex flex-col gap-3">

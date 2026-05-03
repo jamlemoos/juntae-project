@@ -1,18 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import { useInfiniteProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
-import { useProjectDrafts } from '../features/projects/hooks/useProjectDrafts';
 import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
-import { ProjectListCard } from '../features/projects/components/ProjectListCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ExploreProjectsPage() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteProjectsQuery(20);
   const projects = data?.pages.flat() ?? [];
-  const storedProjects = useProjectDrafts();
-  const localPublishedProjects = storedProjects.filter(
-    ({ data: d }) => d.publishStatus === 'published'
-  );
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
@@ -84,24 +78,6 @@ export function ExploreProjectsPage() {
               </div>
             )}
           </SectionLayout>
-
-          {localPublishedProjects.length > 0 && (
-            <SectionLayout
-              eyebrow="publicados localmente"
-              title="Publicados neste navegador"
-              divider
-            >
-              <div className="flex flex-col gap-3">
-                <p className="mb-1 text-[13px] text-mute">
-                  Estes projetos publicados estão salvos apenas neste navegador. Eles aparecem
-                  separadamente porque a seção acima mostra apenas os projetos disponíveis pela API.
-                </p>
-                {localPublishedProjects.map(({ id, data: d }) => (
-                  <ProjectListCard key={id} id={id} data={d} status={d.publishStatus} />
-                ))}
-              </div>
-            </SectionLayout>
-          )}
         </div>
       </section>
     </div>

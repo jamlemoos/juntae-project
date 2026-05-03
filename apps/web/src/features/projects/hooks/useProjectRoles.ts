@@ -2,11 +2,20 @@ import { useState } from 'react';
 import type { RoleDraft, RoleErrors } from '../types';
 
 export function validateRolesForSubmit(roles: RoleDraft[]): RoleErrors[] {
-  return roles.map((role) => ({
-    title: role.title.trim() ? undefined : 'Nome do papel obrigatório',
-    description: role.description.trim() ? undefined : 'Descrição obrigatória',
-    status: role.status ? undefined : 'Selecione a situação',
-  }));
+  return roles.map((role) => {
+    const trimmedTitle = role.title.trim();
+    let title: string | undefined;
+    if (trimmedTitle.length === 0) {
+      title = 'Nome do papel obrigatório';
+    } else if (trimmedTitle.length < 2) {
+      title = 'O título da vaga deve ter pelo menos 2 caracteres.';
+    }
+    return {
+      title,
+      description: role.description.trim() ? undefined : 'Descrição obrigatória',
+      status: role.status ? undefined : 'Selecione a situação',
+    };
+  });
 }
 
 export function useProjectRoles() {
