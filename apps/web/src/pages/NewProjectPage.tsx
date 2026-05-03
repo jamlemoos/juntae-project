@@ -19,7 +19,7 @@ const PROJECT_STATUS_OPTIONS = [
   { value: 'idea', label: 'Só uma ideia ainda' },
   { value: 'forming_team', label: 'Montando o time' },
   { value: 'in_progress', label: 'Em andamento' },
-  { value: 'paused', label: 'Em pausa' },
+  { value: 'closed', label: 'Encerrado' },
 ];
 
 const titleSchema = z.string().trim().min(3, 'O título deve ter pelo menos 3 caracteres.');
@@ -46,7 +46,7 @@ function validateStatus(value: string) {
 
 function mapFormStatusToApi(status: string): ApiProjectStatus {
   if (status === 'in_progress') return 'IN_PROGRESS';
-  if (status === 'paused') return 'CLOSED';
+  if (status === 'closed') return 'CLOSED';
   return 'OPEN';
 }
 
