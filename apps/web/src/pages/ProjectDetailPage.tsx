@@ -75,18 +75,21 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
       setPublishError('A descrição deve ter pelo menos 10 caracteres.');
       return;
     }
+    const nonBlankRoles = project.roles.filter((r) => r.title.trim().length > 0);
+    if (nonBlankRoles.some((r) => r.title.trim().length < 2)) {
+      setPublishError('O título da vaga deve ter pelo menos 2 caracteres.');
+      return;
+    }
     try {
       const created = await createProjectMutation.mutateAsync({
         title: project.title,
         description: project.description,
         status: 'OPEN',
-        roles: project.roles
-          .filter((r) => r.title.trim().length > 0)
-          .map((r) => ({
-            title: r.title,
-            description: r.description,
-            status: r.status === 'filled' ? ('CLOSED' as const) : ('OPEN' as const),
-          })),
+        roles: nonBlankRoles.map((r) => ({
+          title: r.title.trim(),
+          description: r.description.trim(),
+          status: r.status === 'filled' ? ('CLOSED' as const) : ('OPEN' as const),
+        })),
       });
       clearProjectDraft(projectId);
       void navigate({ to: '/projects/$projectId', params: { projectId: created.id } });
@@ -154,7 +157,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
             <div className="col-span-12 lg:col-span-4">
               <div className="lg:sticky lg:top-24 lg:pt-14">
                 <ProjectStatusRail
-                  publishStatus={project.publishStatus}
+                  publishStatus="draft"
                   checklist={checklist}
                   onPublish={handlePublish}
                   isPublishing={createProjectMutation.isPending}

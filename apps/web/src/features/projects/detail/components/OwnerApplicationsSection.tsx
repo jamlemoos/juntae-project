@@ -88,15 +88,13 @@ export function OwnerApplicationsSection({ projectId }: { projectId: string }) {
   } = useProjectApplicationsQuery(projectId);
   const updateStatusMutation = useUpdateApplicationStatusMutation(projectId);
 
-  const byRole = (applications ?? []).reduce<Record<string, ApplicationDetailResponse[]>>(
-    (acc, app) => {
-      const key = app.roleTitle || 'Sem título';
-      if (!acc[key]) acc[key] = [];
-      acc[key]!.push(app);
-      return acc;
-    },
-    {}
-  );
+  type RoleGroup = { roleTitle: string; apps: ApplicationDetailResponse[] };
+  const roleGroups = (applications ?? []).reduce<Record<string, RoleGroup>>((acc, app) => {
+    const key = app.projectRoleId;
+    if (!acc[key]) acc[key] = { roleTitle: app.roleTitle || 'Sem título', apps: [] };
+    acc[key]!.apps.push(app);
+    return acc;
+  }, {});
 
   return (
     <SectionLayout
@@ -119,8 +117,8 @@ export function OwnerApplicationsSection({ projectId }: { projectId: string }) {
           </div>
         ) : (
           <div className="flex flex-col gap-8">
-            {Object.entries(byRole).map(([roleTitle, apps]) => (
-              <div key={roleTitle}>
+            {Object.entries(roleGroups).map(([roleId, { roleTitle, apps }]) => (
+              <div key={roleId}>
                 <div className="mono mb-3 text-[11px] uppercase tracking-[.18em] text-mute">
                   {roleTitle}
                 </div>

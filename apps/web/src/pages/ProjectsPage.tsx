@@ -7,10 +7,7 @@ import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
 
 export function ProjectsPage() {
-  const storedProjects = useProjectDrafts();
-  const localDraftProjects = storedProjects.filter(
-    ({ data }) => data.publishStatus !== 'published'
-  );
+  const localDraftProjects = useProjectDrafts();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
     useInfiniteMyProjectsQuery(20);
