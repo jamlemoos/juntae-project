@@ -13,17 +13,9 @@ import {
   validateRolesForSubmit,
 } from '../features/projects/hooks/useProjectRoles';
 import { useCreateProjectMutation } from '../features/projects/hooks/useProjectMutations';
-import type { RoleStatus } from '../features/projects/types';
+import type { FormProjectStatus, RoleStatus } from '../features/projects/types';
+import { PROJECT_STATUS_OPTIONS } from '../features/projects/types';
 import type { ProjectStatus as ApiProjectStatus } from '../features/projects/api/types';
-
-type FormProjectStatus = 'idea' | 'forming_team' | 'in_progress' | 'closed';
-
-const PROJECT_STATUS_OPTIONS = [
-  { value: 'idea', label: 'Só uma ideia ainda' },
-  { value: 'forming_team', label: 'Montando o time' },
-  { value: 'in_progress', label: 'Em andamento' },
-  { value: 'closed', label: 'Encerrado' },
-];
 
 const titleSchema = z.string().trim().min(3, 'O título deve ter pelo menos 3 caracteres.');
 const descriptionSchema = z
@@ -59,6 +51,10 @@ const ROLE_STATUS_TO_API: Record<Exclude<RoleStatus, ''>, 'OPEN' | 'CLOSED'> = {
   filled: 'CLOSED',
 };
 
+function isFormProjectStatus(s: string): s is FormProjectStatus {
+  return s in FORM_STATUS_TO_API;
+}
+
 function mapFormStatusToApi(status: FormProjectStatus): ApiProjectStatus {
   return FORM_STATUS_TO_API[status];
 }
@@ -83,12 +79,13 @@ export function NewProjectPage() {
       if (roles.length === 0) return;
       const errors = validateRolesForSubmit(roles);
       if (errors.some((e) => e.title || e.description || e.status)) return;
+      if (!isFormProjectStatus(value.status)) return;
 
       try {
         const project = await createProjectMutation.mutateAsync({
           title: value.title.trim(),
           description: value.description.trim(),
-          status: mapFormStatusToApi(value.status as FormProjectStatus),
+          status: mapFormStatusToApi(value.status),
           roles: roles.map((role) => ({
             title: role.title.trim(),
             description: role.description.trim(),

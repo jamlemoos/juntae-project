@@ -56,7 +56,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
   const checklist = [
     { label: 'Nome claro', done: project.title.trim().length >= 3 },
     { label: 'Ideia explicada', done: project.description.trim().length >= 10 },
-    { label: 'Pelo menos uma pessoa', done: project.roles.some((r) => r.title.trim().length >= 2) },
+    { label: 'Pelo menos uma vaga', done: project.roles.some((r) => r.title.trim().length >= 2) },
     { label: 'Forma de trabalho definida', done: project.workMode !== '' },
   ];
 

@@ -58,7 +58,7 @@ export function ProjectsPage() {
           )}
 
           <SectionLayout
-            eyebrow="02 · publicados"
+            eyebrow={localDraftProjects.length > 0 ? '02 · publicados' : '01 · publicados'}
             title="Projetos publicados"
             divider={localDraftProjects.length > 0}
           >
