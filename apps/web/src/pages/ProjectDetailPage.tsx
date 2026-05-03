@@ -67,10 +67,18 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
 
   async function handlePublish() {
     setPublishError(null);
+    if (project.title.trim().length < 3) {
+      setPublishError('O título deve ter pelo menos 3 caracteres.');
+      return;
+    }
+    if (project.description.trim().length < 10) {
+      setPublishError('A descrição deve ter pelo menos 10 caracteres.');
+      return;
+    }
     try {
       const created = await createProjectMutation.mutateAsync({
-        title: project.title || 'Projeto sem título',
-        description: project.description || '',
+        title: project.title,
+        description: project.description,
         status: 'OPEN',
         roles: project.roles
           .filter((r) => r.title.trim().length > 0)
@@ -219,12 +227,12 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
   }
 
   async function handleSaveEdit() {
-    if (!editFields.title.trim()) {
-      setEditError('O título é obrigatório.');
+    if (editFields.title.trim().length < 3) {
+      setEditError('O título deve ter pelo menos 3 caracteres.');
       return;
     }
-    if (!editFields.description.trim()) {
-      setEditError('A descrição é obrigatória.');
+    if (editFields.description.trim().length < 10) {
+      setEditError('A descrição deve ter pelo menos 10 caracteres.');
       return;
     }
     try {

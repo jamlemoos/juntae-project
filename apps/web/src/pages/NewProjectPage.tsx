@@ -22,8 +22,11 @@ const PROJECT_STATUS_OPTIONS = [
   { value: 'paused', label: 'Em pausa' },
 ];
 
-const titleSchema = z.string().trim().min(1, 'Nome do projeto obrigatório');
-const descriptionSchema = z.string().trim().min(1, 'Conta a ideia do projeto');
+const titleSchema = z.string().trim().min(3, 'O título deve ter pelo menos 3 caracteres.');
+const descriptionSchema = z
+  .string()
+  .trim()
+  .min(10, 'A descrição deve ter pelo menos 10 caracteres.');
 const statusSchema = z.string().trim().min(1, 'Escolha o momento do projeto');
 
 function validateTitle(value: string) {

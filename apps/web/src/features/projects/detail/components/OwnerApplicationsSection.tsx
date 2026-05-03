@@ -81,7 +81,11 @@ function ApplicationCard({ application, onAccept, onReject, isUpdating }: Applic
 }
 
 export function OwnerApplicationsSection({ projectId }: { projectId: string }) {
-  const { data: applications, isPending, isError } = useProjectApplicationsQuery(projectId);
+  const {
+    data: applications,
+    isPending,
+    isError: isLoadError,
+  } = useProjectApplicationsQuery(projectId);
   const updateStatusMutation = useUpdateApplicationStatusMutation(projectId);
 
   const byRole = (applications ?? []).reduce<Record<string, ApplicationDetailResponse[]>>(
@@ -101,39 +105,50 @@ export function OwnerApplicationsSection({ projectId }: { projectId: string }) {
       id="section-candidaturas"
       divider
     >
-      {isPending ? (
-        <p className="text-[14px] text-mute">Carregando candidaturas...</p>
-      ) : isError ? (
-        <p className="text-[14px] text-mute">Não foi possível carregar as candidaturas.</p>
-      ) : !applications?.length ? (
-        <div className="rounded-2xl border border-dashed border-line-2 bg-cream-2/50 p-5 md:p-6">
-          <p className="display text-[17px] font-semibold text-ink">Nenhuma candidatura ainda.</p>
-          <p className="serif italic mt-1.5 text-[14px] leading-[1.55] text-ink-2">
-            As candidaturas aparecerão aqui quando alguém se inscrever.
+      <>
+        {isPending ? (
+          <p className="text-[14px] text-mute">Carregando candidaturas...</p>
+        ) : isLoadError ? (
+          <p className="text-[14px] text-mute">Não foi possível carregar as candidaturas.</p>
+        ) : !applications?.length ? (
+          <div className="rounded-2xl border border-dashed border-line-2 bg-cream-2/50 p-5 md:p-6">
+            <p className="display text-[17px] font-semibold text-ink">Nenhuma candidatura ainda.</p>
+            <p className="serif italic mt-1.5 text-[14px] leading-[1.55] text-ink-2">
+              As candidaturas aparecerão aqui quando alguém se inscrever.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-8">
+            {Object.entries(byRole).map(([roleTitle, apps]) => (
+              <div key={roleTitle}>
+                <div className="mono mb-3 text-[11px] uppercase tracking-[.18em] text-mute">
+                  {roleTitle}
+                </div>
+                <div className="flex flex-col gap-3">
+                  {apps.map((app) => (
+                    <ApplicationCard
+                      key={app.id}
+                      application={app}
+                      isUpdating={updateStatusMutation.isPending}
+                      onAccept={() =>
+                        updateStatusMutation.mutate({ id: app.id, status: 'ACCEPTED' })
+                      }
+                      onReject={() =>
+                        updateStatusMutation.mutate({ id: app.id, status: 'REJECTED' })
+                      }
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {updateStatusMutation.isError && (
+          <p role="alert" className="mt-3 text-[13px] text-red-600">
+            Não foi possível atualizar a candidatura. Tente novamente.
           </p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-8">
-          {Object.entries(byRole).map(([roleTitle, apps]) => (
-            <div key={roleTitle}>
-              <div className="mono mb-3 text-[11px] uppercase tracking-[.18em] text-mute">
-                {roleTitle}
-              </div>
-              <div className="flex flex-col gap-3">
-                {apps.map((app) => (
-                  <ApplicationCard
-                    key={app.id}
-                    application={app}
-                    isUpdating={updateStatusMutation.isPending}
-                    onAccept={() => updateStatusMutation.mutate({ id: app.id, status: 'ACCEPTED' })}
-                    onReject={() => updateStatusMutation.mutate({ id: app.id, status: 'REJECTED' })}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+        )}
+      </>
     </SectionLayout>
   );
 }
