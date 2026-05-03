@@ -31,6 +31,8 @@ import {
   PROJECT_DESCRIPTION_MIN,
   PROJECT_TITLE_ERROR,
   PROJECT_DESCRIPTION_ERROR,
+  PROJECT_ROLE_TITLE_MIN,
+  PROJECT_ROLE_MIN_COUNT_ERROR,
 } from '../features/projects/validation';
 
 const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
@@ -70,7 +72,10 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
       label: 'Ideia explicada',
       done: project.description.trim().length >= PROJECT_DESCRIPTION_MIN,
     },
-    { label: 'Pelo menos uma vaga', done: project.roles.some((r) => r.title.trim().length >= 2) },
+    {
+      label: 'Pelo menos uma vaga',
+      done: project.roles.some((r) => r.title.trim().length >= PROJECT_ROLE_TITLE_MIN),
+    },
     { label: 'Forma de trabalho definida', done: project.workMode !== '' },
   ];
 
@@ -89,9 +94,9 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
       setPublishError(PROJECT_DESCRIPTION_ERROR);
       return;
     }
-    const validRoles = project.roles.filter((r) => r.title.trim().length >= 2);
+    const validRoles = project.roles.filter((r) => r.title.trim().length >= PROJECT_ROLE_TITLE_MIN);
     if (validRoles.length === 0) {
-      setPublishError('Adicione pelo menos uma vaga ao projeto antes de publicar.');
+      setPublishError(PROJECT_ROLE_MIN_COUNT_ERROR);
       return;
     }
     try {
