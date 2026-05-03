@@ -26,12 +26,23 @@ import { ProjectTextarea } from '../features/projects/components/ProjectTextarea
 import { ProjectSelect } from '../features/projects/components/ProjectSelect';
 import { applyToRole } from '../features/applications/api/endpoints';
 import type { ProjectDetail, ProjectStatus } from '../features/projects/api/types';
+import {
+  PROJECT_TITLE_MIN,
+  PROJECT_DESCRIPTION_MIN,
+  PROJECT_TITLE_ERROR,
+  PROJECT_DESCRIPTION_ERROR,
+} from '../features/projects/validation';
 
-const API_STATUS_OPTIONS = [
-  { value: 'OPEN', label: 'Aberto' },
-  { value: 'IN_PROGRESS', label: 'Em andamento' },
-  { value: 'CLOSED', label: 'Encerrado' },
-];
+const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
+  OPEN: 'Aberto',
+  IN_PROGRESS: 'Em andamento',
+  CLOSED: 'Encerrado',
+};
+
+const API_STATUS_OPTIONS = Object.entries(PROJECT_STATUS_LABELS).map(([value, label]) => ({
+  value: value as ProjectStatus,
+  label,
+}));
 
 export function ProjectDetailPage() {
   const { projectId } = useParams({ from: '/app-layout/projects/$projectId' });
@@ -54,8 +65,11 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
   const workModeDisplay = formatWorkMode(project.workMode, project.city);
 
   const checklist = [
-    { label: 'Nome claro', done: project.title.trim().length >= 3 },
-    { label: 'Ideia explicada', done: project.description.trim().length >= 10 },
+    { label: 'Nome claro', done: project.title.trim().length >= PROJECT_TITLE_MIN },
+    {
+      label: 'Ideia explicada',
+      done: project.description.trim().length >= PROJECT_DESCRIPTION_MIN,
+    },
     { label: 'Pelo menos uma vaga', done: project.roles.some((r) => r.title.trim().length >= 2) },
     { label: 'Forma de trabalho definida', done: project.workMode !== '' },
   ];
@@ -67,12 +81,12 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
 
   async function handlePublish() {
     setPublishError(null);
-    if (project.title.trim().length < 3) {
-      setPublishError('O título deve ter pelo menos 3 caracteres.');
+    if (project.title.trim().length < PROJECT_TITLE_MIN) {
+      setPublishError(PROJECT_TITLE_ERROR);
       return;
     }
-    if (project.description.trim().length < 10) {
-      setPublishError('A descrição deve ter pelo menos 10 caracteres.');
+    if (project.description.trim().length < PROJECT_DESCRIPTION_MIN) {
+      setPublishError(PROJECT_DESCRIPTION_ERROR);
       return;
     }
     const validRoles = project.roles.filter((r) => r.title.trim().length >= 2);
@@ -229,12 +243,12 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
   }
 
   async function handleSaveEdit() {
-    if (editFields.title.trim().length < 3) {
-      setEditError('O título deve ter pelo menos 3 caracteres.');
+    if (editFields.title.trim().length < PROJECT_TITLE_MIN) {
+      setEditError(PROJECT_TITLE_ERROR);
       return;
     }
-    if (editFields.description.trim().length < 10) {
-      setEditError('A descrição deve ter pelo menos 10 caracteres.');
+    if (editFields.description.trim().length < PROJECT_DESCRIPTION_MIN) {
+      setEditError(PROJECT_DESCRIPTION_ERROR);
       return;
     }
     try {
@@ -446,12 +460,6 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
     </div>
   );
 }
-
-const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
-  OPEN: 'Aberto',
-  IN_PROGRESS: 'Em andamento',
-  CLOSED: 'Encerrado',
-};
 
 function ApiProjectRail({ project, onEdit }: { project: ProjectDetail; onEdit?: () => void }) {
   return (

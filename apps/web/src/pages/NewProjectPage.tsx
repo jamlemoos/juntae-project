@@ -16,12 +16,15 @@ import { useCreateProjectMutation } from '../features/projects/hooks/useProjectM
 import type { FormProjectStatus, RoleStatus } from '../features/projects/types';
 import { PROJECT_STATUS_OPTIONS } from '../features/projects/types';
 import type { ProjectStatus as ApiProjectStatus } from '../features/projects/api/types';
+import {
+  PROJECT_TITLE_MIN,
+  PROJECT_DESCRIPTION_MIN,
+  PROJECT_TITLE_ERROR,
+  PROJECT_DESCRIPTION_ERROR,
+} from '../features/projects/validation';
 
-const titleSchema = z.string().trim().min(3, 'O título deve ter pelo menos 3 caracteres.');
-const descriptionSchema = z
-  .string()
-  .trim()
-  .min(10, 'A descrição deve ter pelo menos 10 caracteres.');
+const titleSchema = z.string().trim().min(PROJECT_TITLE_MIN, PROJECT_TITLE_ERROR);
+const descriptionSchema = z.string().trim().min(PROJECT_DESCRIPTION_MIN, PROJECT_DESCRIPTION_ERROR);
 const statusSchema = z.string().trim().min(1, 'Escolha o momento do projeto');
 
 function validateTitle(value: string) {
@@ -76,6 +79,7 @@ export function NewProjectPage() {
   const form = useForm({
     defaultValues: { title: '', description: '', status: '' },
     onSubmit: async ({ value }) => {
+      setSaveError(null);
       if (roles.length === 0) return;
       const errors = validateRolesForSubmit(roles);
       if (errors.some((e) => e.title || e.description || e.status)) return;
