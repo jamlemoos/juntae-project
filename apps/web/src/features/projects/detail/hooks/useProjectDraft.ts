@@ -23,11 +23,6 @@ function readStoredWorkMode(value: unknown): ProjectData['workMode'] {
   return '';
 }
 
-function readStoredPublishStatus(value: unknown): ProjectData['publishStatus'] {
-  if (value === 'published') return 'published';
-  return 'draft';
-}
-
 function isValidRoleDraft(value: unknown): value is RoleDraft {
   if (!value || typeof value !== 'object') return false;
   const obj = value as Record<string, unknown>;
@@ -77,7 +72,7 @@ function readStored(projectId: string): ProjectData {
       city: readStoredString(stored.city),
       roles: Array.isArray(stored.roles) ? stored.roles.filter(isValidRoleDraft) : [],
       members: Array.isArray(stored.members) ? stored.members.filter(isValidMemberDraft) : [],
-      publishStatus: readStoredPublishStatus(stored.publishStatus),
+      publishStatus: 'draft',
     };
   } catch {
     return emptyProject();

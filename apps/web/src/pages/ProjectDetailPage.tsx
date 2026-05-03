@@ -239,7 +239,14 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
       return;
     }
     try {
-      await updateMutation.mutateAsync({ id: projectId, data: editFields });
+      await updateMutation.mutateAsync({
+        id: projectId,
+        data: {
+          title: editFields.title.trim(),
+          description: editFields.description.trim(),
+          status: editFields.status,
+        },
+      });
       setIsEditing(false);
       setEditError(null);
     } catch {
