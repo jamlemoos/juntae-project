@@ -56,7 +56,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
   const checklist = [
     { label: 'Nome claro', done: project.title.trim().length >= 3 },
     { label: 'Ideia explicada', done: project.description.trim().length >= 10 },
-    { label: 'Pelo menos uma pessoa', done: true },
+    { label: 'Pelo menos uma pessoa', done: project.roles.some((r) => r.title.trim().length >= 2) },
     { label: 'Forma de trabalho definida', done: project.workMode !== '' },
   ];
 
@@ -75,9 +75,9 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
       setPublishError('A descrição deve ter pelo menos 10 caracteres.');
       return;
     }
-    const nonBlankRoles = project.roles.filter((r) => r.title.trim().length > 0);
-    if (nonBlankRoles.some((r) => r.title.trim().length < 2)) {
-      setPublishError('O título da vaga deve ter pelo menos 2 caracteres.');
+    const validRoles = project.roles.filter((r) => r.title.trim().length >= 2);
+    if (validRoles.length === 0) {
+      setPublishError('Adicione pelo menos uma vaga ao projeto antes de publicar.');
       return;
     }
     try {
@@ -85,7 +85,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
         title: project.title.trim(),
         description: project.description.trim(),
         status: 'OPEN',
-        roles: nonBlankRoles.map((r) => ({
+        roles: validRoles.map((r) => ({
           title: r.title.trim(),
           description: r.description.trim(),
           status: r.status === 'filled' ? ('CLOSED' as const) : ('OPEN' as const),

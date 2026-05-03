@@ -13,7 +13,10 @@ import {
   validateRolesForSubmit,
 } from '../features/projects/hooks/useProjectRoles';
 import { useCreateProjectMutation } from '../features/projects/hooks/useProjectMutations';
+import type { RoleStatus } from '../features/projects/types';
 import type { ProjectStatus as ApiProjectStatus } from '../features/projects/api/types';
+
+type FormProjectStatus = 'idea' | 'forming_team' | 'in_progress' | 'closed';
 
 const PROJECT_STATUS_OPTIONS = [
   { value: 'idea', label: 'Só uma ideia ainda' },
@@ -44,15 +47,25 @@ function validateStatus(value: string) {
   return r.success ? undefined : r.error.issues[0]?.message;
 }
 
-function mapFormStatusToApi(status: string): ApiProjectStatus {
-  if (status === 'in_progress') return 'IN_PROGRESS';
-  if (status === 'closed') return 'CLOSED';
-  return 'OPEN';
+const FORM_STATUS_TO_API: Record<FormProjectStatus, ApiProjectStatus> = {
+  idea: 'OPEN',
+  forming_team: 'OPEN',
+  in_progress: 'IN_PROGRESS',
+  closed: 'CLOSED',
+};
+
+const ROLE_STATUS_TO_API: Record<Exclude<RoleStatus, ''>, 'OPEN' | 'CLOSED'> = {
+  open: 'OPEN',
+  filled: 'CLOSED',
+};
+
+function mapFormStatusToApi(status: FormProjectStatus): ApiProjectStatus {
+  return FORM_STATUS_TO_API[status];
 }
 
-function mapRoleStatusToApi(status: string): 'OPEN' | 'CLOSED' {
-  if (status === 'filled') return 'CLOSED';
-  return 'OPEN';
+function mapRoleStatusToApi(status: RoleStatus): 'OPEN' | 'CLOSED' {
+  if (status === '') return 'OPEN';
+  return ROLE_STATUS_TO_API[status];
 }
 
 export function NewProjectPage() {
@@ -75,7 +88,7 @@ export function NewProjectPage() {
         const project = await createProjectMutation.mutateAsync({
           title: value.title.trim(),
           description: value.description.trim(),
-          status: mapFormStatusToApi(value.status),
+          status: mapFormStatusToApi(value.status as FormProjectStatus),
           roles: roles.map((role) => ({
             title: role.title.trim(),
             description: role.description.trim(),
