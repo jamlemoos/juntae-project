@@ -4,6 +4,7 @@ const nameSchema = z.string().min(2, 'Nome deve ter pelo menos 2 caracteres');
 const emailSchema = z.string().min(1, 'E-mail obrigatório').email('E-mail inválido');
 const loginPasswordSchema = z.string().min(1, 'Senha obrigatória');
 const registerPasswordSchema = z.string().min(8, 'Senha deve ter pelo menos 8 caracteres');
+const citySchema = z.string().min(2, 'Cidade deve ter pelo menos 2 caracteres');
 
 export function validateName(value: string) {
   const r = nameSchema.safeParse(value);
@@ -28,4 +29,9 @@ export function validateRegisterPassword(value: string) {
 export function validateConfirmPassword(value: string, password: string) {
   if (!value) return 'Confirme sua senha';
   if (value !== password) return 'As senhas não coincidem';
+}
+
+export function validateCity(value: string) {
+  const r = citySchema.safeParse(value);
+  return r.success ? undefined : r.error.issues[0]?.message;
 }

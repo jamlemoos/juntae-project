@@ -16,7 +16,6 @@ type PanelState = 'idle' | 'submitting' | 'submitted';
 
 // message min matches the backend validate:"min=10" on the composed message field.
 // relevantSkill min is a UI-only guard; the backend receives both fields composed together.
-// TODO: if the backend ever validates sub-fields independently, align these constants with it.
 const MIN_MESSAGE_LENGTH = 10;
 const MIN_SKILL_LENGTH = 5;
 
@@ -93,9 +92,7 @@ export function ApplicationPanel({ id, roleTitle, onClose, onSubmit }: Applicati
         <div className="rounded-xl bg-cream px-5 py-4 ring-1 ring-line">
           <p className="text-[14px] font-medium text-ink">Candidatura recebida.</p>
           <p className="mt-1 text-[13px] leading-relaxed text-mute">
-            {onSubmit
-              ? 'Sua candidatura foi enviada com sucesso.'
-              : 'Candidatura ainda não está conectada ao backend.'}
+            Sua candidatura foi enviada com sucesso.
           </p>
         </div>
       ) : (

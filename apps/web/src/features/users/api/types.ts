@@ -11,3 +11,11 @@ export type UserResponse = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type UpdateUserRequest = {
+  name: string;
+  email: string;
+  bio?: string;
+  city: string;
+  skillIds?: string[];
+};

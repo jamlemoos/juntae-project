@@ -11,6 +11,7 @@ var (
 	ErrConflict      = errors.New("conflict")
 	ErrProjectClosed = errors.New("project closed")
 	ErrRoleClosed    = errors.New("role closed")
+	ErrValidation    = errors.New("validation error")
 )
 
 func isUniqueViolation(err error) bool {

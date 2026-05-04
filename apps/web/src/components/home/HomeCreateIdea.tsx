@@ -1,6 +1,12 @@
+import { Link } from '@tanstack/react-router';
+import { ArrowRight } from 'lucide-react';
+import { useAuth } from '../../features/auth/hooks/useAuth';
+
 const EXAMPLE_ROLES = ['dev front-end', 'dev back-end', 'designer de produto'];
 
 export function HomeCreateIdea() {
+  const isAuthenticated = useAuth((s) => s.isAuthenticated);
+
   return (
     <section
       id="sua-vez"
@@ -20,17 +26,23 @@ export function HomeCreateIdea() {
             pessoas certas. Sem pressão, sem prazo e dá pra voltar depois.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <button
-              type="button"
-              disabled
-              aria-disabled="true"
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white opacity-60 disabled:cursor-not-allowed"
-            >
-              Contar minha ideia
-            </button>
-            <span className="text-[13.5px] text-mute">
-              em breve — por enquanto, veja exemplos de convite
-            </span>
+            {isAuthenticated ? (
+              <Link
+                to="/projects/new"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                Criar meu projeto
+                <ArrowRight size={14} aria-hidden="true" />
+              </Link>
+            ) : (
+              <Link
+                to="/register"
+                className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                Contar minha ideia
+                <ArrowRight size={14} aria-hidden="true" />
+              </Link>
+            )}
           </div>
         </div>
 

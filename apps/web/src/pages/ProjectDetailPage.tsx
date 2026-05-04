@@ -9,8 +9,10 @@ import {
 } from '../features/projects/detail/hooks/useProjectDraft';
 import { useProjectDetailEditing } from '../features/projects/detail/hooks/useProjectDetailEditing';
 import { useProjectDetailQuery } from '../features/projects/hooks/useProjectDetailQuery';
-import { useCreateProjectMutation } from '../features/projects/hooks/useProjectMutations';
-import { useUpdateProjectMutation } from '../features/projects/hooks/useProjectMutations';
+import {
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+} from '../features/projects/hooks/useProjectMutations';
 import { formatWorkMode } from '../features/projects/detail/utils';
 import { ProjectDetailHeader } from '../features/projects/detail/components/ProjectDetailHeader';
 import { ProjectStatusRail } from '../features/projects/detail/components/ProjectStatusRail';
@@ -25,7 +27,18 @@ import { ProjectField } from '../features/projects/components/ProjectField';
 import { ProjectTextarea } from '../features/projects/components/ProjectTextarea';
 import { ProjectSelect } from '../features/projects/components/ProjectSelect';
 import { applyToRole } from '../features/applications/api/endpoints';
-import type { ProjectDetail, ProjectStatus } from '../features/projects/api/types';
+import {
+  useCreateProjectRoleMutation,
+  useDeleteProjectRoleMutation,
+  useUpdateProjectRoleMutation,
+} from '../features/projects/hooks/useProjectRoleMutations';
+import type {
+  ProjectDetail,
+  ProjectRole,
+  ProjectStatus,
+  RoleStatus,
+  UpdateProjectRoleRequest,
+} from '../features/projects/api/types';
 import {
   PROJECT_TITLE_MIN,
   PROJECT_DESCRIPTION_MIN,
@@ -197,10 +210,19 @@ type EditFields = {
   status: ProjectStatus;
 };
 
+const ROLE_STATUS_OPTIONS = [
+  { value: 'OPEN', label: 'Aberta' },
+  { value: 'CLOSED', label: 'Fechada' },
+];
+
 function ApiProjectDetail({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient();
   const { data: project, isPending, isError } = useProjectDetailQuery(projectId);
   const updateMutation = useUpdateProjectMutation();
+  const createRoleMutation = useCreateProjectRoleMutation(projectId);
+  const updateRoleMutation = useUpdateProjectRoleMutation(projectId);
+  const deleteRoleMutation = useDeleteProjectRoleMutation(projectId);
+
   const [openApplicationRoleId, setOpenApplicationRoleId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editFields, setEditFields] = useState<EditFields>({
@@ -209,6 +231,14 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
     status: 'OPEN',
   });
   const [editError, setEditError] = useState<string | null>(null);
+
+  // Role form state — shared between add and edit modes
+  const [addingRole, setAddingRole] = useState(false);
+  const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
+  const [roleTitle, setRoleTitle] = useState('');
+  const [roleDescription, setRoleDescription] = useState('');
+  const [roleStatus, setRoleStatus] = useState<RoleStatus>('OPEN');
+  const [roleFormError, setRoleFormError] = useState<string | null>(null);
 
   if (isPending) {
     return (
@@ -277,8 +307,77 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
     setEditError(null);
   }
 
-  // Owners see all roles to review their project's state.
-  // Non-owners only see OPEN roles, and only when the project is accepting applications.
+  function handleStartAddRole() {
+    setRoleTitle('');
+    setRoleDescription('');
+    setRoleStatus('OPEN');
+    setRoleFormError(null);
+    setEditingRoleId(null);
+    setAddingRole(true);
+  }
+
+  function handleStartEditRole(role: ProjectRole) {
+    setRoleTitle(role.title);
+    setRoleDescription(role.description);
+    setRoleStatus(role.status);
+    setRoleFormError(null);
+    setAddingRole(false);
+    setEditingRoleId(role.id);
+  }
+
+  function handleCancelRoleForm() {
+    setAddingRole(false);
+    setEditingRoleId(null);
+    setRoleFormError(null);
+  }
+
+  async function handleSaveNewRole() {
+    if (roleTitle.trim().length < 2) {
+      setRoleFormError('Nome do papel deve ter pelo menos 2 caracteres.');
+      return;
+    }
+    try {
+      await createRoleMutation.mutateAsync({
+        projectId,
+        title: roleTitle.trim(),
+        description: roleDescription.trim(),
+        status: roleStatus,
+      });
+      setAddingRole(false);
+      setRoleFormError(null);
+    } catch {
+      setRoleFormError('Não foi possível adicionar a vaga. Tente novamente.');
+    }
+  }
+
+  async function handleSaveEditRole(id: string) {
+    if (roleTitle.trim().length < 2) {
+      setRoleFormError('Nome do papel deve ter pelo menos 2 caracteres.');
+      return;
+    }
+    const data: UpdateProjectRoleRequest = {
+      title: roleTitle.trim(),
+      description: roleDescription.trim(),
+      status: roleStatus,
+    };
+    try {
+      await updateRoleMutation.mutateAsync({ id, data });
+      setEditingRoleId(null);
+      setRoleFormError(null);
+    } catch {
+      setRoleFormError('Não foi possível salvar as alterações. Tente novamente.');
+    }
+  }
+
+  async function handleDeleteRole(id: string) {
+    try {
+      await deleteRoleMutation.mutateAsync(id);
+    } catch {
+      // deletion failure is silent at MVP scope
+    }
+  }
+
+  // Owners see all roles. Non-owners see only OPEN roles on OPEN projects.
   const visibleRoles = project.isOwner
     ? project.roles
     : project.status === 'OPEN'
@@ -373,26 +472,78 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                 id="section-procurando"
                 divider
               >
-                {visibleRoles.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-line-2 bg-cream-2/50 p-5 md:p-6">
-                    <p className="display text-[17px] font-semibold text-ink">
-                      {!project.isOwner && project.status !== 'OPEN'
-                        ? 'Este projeto não está aceitando candidaturas no momento.'
-                        : 'Sem vagas abertas no momento.'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    {visibleRoles.map((role) => (
-                      <div key={role.id}>
+                <div className="flex flex-col gap-4">
+                  {visibleRoles.length === 0 && !addingRole && (
+                    <div className="rounded-2xl border border-dashed border-line-2 bg-cream-2/50 p-5 md:p-6">
+                      <p className="display text-[17px] font-semibold text-ink">
+                        {project.isOwner
+                          ? 'Nenhuma vaga cadastrada ainda.'
+                          : project.status !== 'OPEN'
+                            ? 'Este projeto não está aceitando candidaturas no momento.'
+                            : 'Sem vagas abertas no momento.'}
+                      </p>
+                    </div>
+                  )}
+
+                  {visibleRoles.map((role) => (
+                    <div key={role.id}>
+                      {editingRoleId === role.id ? (
+                        <RoleFormCard
+                          title={roleTitle}
+                          description={roleDescription}
+                          status={roleStatus}
+                          error={roleFormError}
+                          isSaving={updateRoleMutation.isPending}
+                          onChangeTitle={setRoleTitle}
+                          onChangeDescription={setRoleDescription}
+                          onChangeStatus={(v) => setRoleStatus(v as RoleStatus)}
+                          onSave={() => void handleSaveEditRole(role.id)}
+                          onCancel={handleCancelRoleForm}
+                        />
+                      ) : (
                         <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-line md:p-6">
-                          <div className="display text-[16px] font-semibold text-ink">
-                            {role.title || 'Papel sem título'}
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                              <div className="display text-[16px] font-semibold text-ink">
+                                {role.title || 'Papel sem título'}
+                              </div>
+                              {role.description && (
+                                <p className="mt-1.5 text-[14px] leading-[1.55] text-ink-2">
+                                  {role.description}
+                                </p>
+                              )}
+                            </div>
+                            {project.isOwner && (
+                              <span
+                                className={[
+                                  'mono shrink-0 rounded-full px-2.5 py-1 text-[11px] uppercase tracking-[.14em]',
+                                  role.status === 'OPEN'
+                                    ? 'bg-cream ring-1 ring-line text-mute'
+                                    : 'bg-cream-2 ring-1 ring-line-2 text-mute',
+                                ].join(' ')}
+                              >
+                                {role.status === 'OPEN' ? 'aberta' : 'fechada'}
+                              </span>
+                            )}
                           </div>
-                          {role.description && (
-                            <p className="mt-1.5 text-[14px] leading-[1.55] text-ink-2">
-                              {role.description}
-                            </p>
+                          {project.isOwner && (
+                            <div className="mt-4 flex items-center gap-2 border-t pt-4 hairline">
+                              <button
+                                type="button"
+                                onClick={() => handleStartEditRole(role)}
+                                className="inline-flex h-8 items-center rounded-full px-4 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                              >
+                                Editar
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void handleDeleteRole(role.id)}
+                                disabled={deleteRoleMutation.isPending}
+                                className="inline-flex h-8 items-center rounded-full px-4 text-[13px] font-medium text-accent ring-1 ring-accent/30 transition-colors hover:bg-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
+                              >
+                                Remover
+                              </button>
+                            </div>
                           )}
                           {canApply && (
                             <div className="mt-4">
@@ -418,24 +569,51 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                             </div>
                           )}
                         </div>
-                        {canApply && !role.hasApplied && openApplicationRoleId === role.id && (
-                          <ApplicationPanel
-                            id={`application-panel-${role.id}`}
-                            roleTitle={role.title}
-                            onClose={() => setOpenApplicationRoleId(null)}
-                            onSubmit={async (message) => {
-                              await applyToRole({ projectRoleId: role.id, message });
-                              await queryClient.invalidateQueries({
-                                queryKey: ['project', projectId],
-                              });
-                              setOpenApplicationRoleId(null);
-                            }}
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      )}
+                      {canApply && !role.hasApplied && openApplicationRoleId === role.id && (
+                        <ApplicationPanel
+                          id={`application-panel-${role.id}`}
+                          roleTitle={role.title}
+                          onClose={() => setOpenApplicationRoleId(null)}
+                          onSubmit={async (message) => {
+                            await applyToRole({ projectRoleId: role.id, message });
+                            await queryClient.invalidateQueries({
+                              queryKey: ['project', projectId],
+                            });
+                            setOpenApplicationRoleId(null);
+                          }}
+                        />
+                      )}
+                    </div>
+                  ))}
+
+                  {project.isOwner && (
+                    <div>
+                      {addingRole ? (
+                        <RoleFormCard
+                          title={roleTitle}
+                          description={roleDescription}
+                          status={roleStatus}
+                          error={roleFormError}
+                          isSaving={createRoleMutation.isPending}
+                          onChangeTitle={setRoleTitle}
+                          onChangeDescription={setRoleDescription}
+                          onChangeStatus={(v) => setRoleStatus(v as RoleStatus)}
+                          onSave={() => void handleSaveNewRole()}
+                          onCancel={handleCancelRoleForm}
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleStartAddRole}
+                          className="w-full rounded-2xl border border-dashed border-line-2 py-4 text-[14px] font-medium text-mute transition-colors hover:border-ink hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                        >
+                          + Adicionar vaga
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </SectionLayout>
 
               {project.isOwner && <OwnerApplicationsSection projectId={projectId} />}
@@ -462,6 +640,82 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+interface RoleFormCardProps {
+  title: string;
+  description: string;
+  status: string;
+  error: string | null;
+  isSaving: boolean;
+  onChangeTitle: (v: string) => void;
+  onChangeDescription: (v: string) => void;
+  onChangeStatus: (v: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}
+
+function RoleFormCard({
+  title,
+  description,
+  status,
+  error,
+  isSaving,
+  onChangeTitle,
+  onChangeDescription,
+  onChangeStatus,
+  onSave,
+  onCancel,
+}: RoleFormCardProps) {
+  return (
+    <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-ink/20 md:p-6">
+      <div className="flex flex-col gap-4">
+        <ProjectField
+          label="Função"
+          placeholder="Ex: Dev front-end, Designer, Redator…"
+          value={title}
+          onChange={(e) => onChangeTitle(e.target.value)}
+        />
+        <ProjectTextarea
+          label="O que essa pessoa faria?"
+          placeholder="Descreva o que espera dessa pessoa…"
+          rows={3}
+          value={description}
+          onChange={(e) => onChangeDescription(e.target.value)}
+        />
+        <ProjectSelect
+          label="Situação"
+          options={ROLE_STATUS_OPTIONS}
+          placeholder="Status da vaga"
+          value={status}
+          onChange={onChangeStatus}
+        />
+      </div>
+      {error && (
+        <p role="alert" className="mt-3 text-[13px] text-red-600">
+          {error}
+        </p>
+      )}
+      <div className="mt-5 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={isSaving}
+          className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+        >
+          {isSaving ? 'Salvando…' : 'Salvar'}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isSaving}
+          className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+        >
+          Cancelar
+        </button>
+      </div>
     </div>
   );
 }

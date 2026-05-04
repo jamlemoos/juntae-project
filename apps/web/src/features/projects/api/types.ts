@@ -88,3 +88,17 @@ export type UpdateProjectRequest = {
   description: string;
   status: ProjectStatus;
 };
+
+// project_id is required by the backend (POST /project-roles).
+export type CreateProjectRoleRequest = {
+  projectId: string;
+  title: string;
+  description?: string;
+  status: RoleStatus;
+};
+
+export type UpdateProjectRoleRequest = {
+  title: string;
+  description?: string;
+  status: RoleStatus;
+};

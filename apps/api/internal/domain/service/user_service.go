@@ -105,16 +105,20 @@ func (s *UserService) UpdateUser(id uuid.UUID, callerID uuid.UUID, req dto.Updat
 	user.Bio = req.Bio
 	user.City = req.City
 
+	// Always replace skills so an empty list correctly clears all skills.
+	var skills []model.Skill
 	if len(req.SkillIDs) > 0 {
-		skills, err := s.skillRepo.FindByIDs(req.SkillIDs)
+		var err error
+		skills, err = s.skillRepo.FindByIDs(req.SkillIDs)
 		if err != nil {
 			return nil, fmt.Errorf("load skills: %w", err)
 		}
-		if err := s.repo.ReplaceSkills(user, skills); err != nil {
-			return nil, fmt.Errorf("replace skills: %w", err)
-		}
-		user.Skills = skills
 	}
+	if err := s.repo.ReplaceSkills(user, skills); err != nil {
+		return nil, fmt.Errorf("replace skills: %w", err)
+	}
+	user.Skills = skills
+
 	if err := s.repo.Update(user); err != nil {
 		return nil, fmt.Errorf("update user: %w", err)
 	}

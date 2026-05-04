@@ -2,6 +2,8 @@ package router
 
 import (
 	"net/http"
+	"os"
+	"strings"
 
 	"juntae-api/internal/domain/handler"
 	"juntae-api/internal/domain/service"
@@ -12,20 +14,46 @@ import (
 
 type RouterDependencies struct {
 	UserService        *service.UserService
+	UserLinkService    *service.UserLinkService
 	SkillService       *service.SkillService
 	ProjectService     *service.ProjectService
 	ProjectRoleService *service.ProjectRoleService
 	ApplicationService *service.ApplicationService
 }
 
+var defaultOrigins = []string{
+	"http://localhost:5173",
+	"http://127.0.0.1:5173",
+}
+
+func resolveAllowedOrigins() []string {
+	raw := os.Getenv("ALLOWED_ORIGINS")
+	if raw == "" {
+		return defaultOrigins
+	}
+	var origins []string
+	for _, o := range strings.Split(raw, ",") {
+		if trimmed := strings.TrimSpace(o); trimmed != "" {
+			origins = append(origins, trimmed)
+		}
+	}
+	if len(origins) == 0 {
+		return defaultOrigins
+	}
+	return origins
+}
+
 func SetupRouter(deps RouterDependencies) *gin.Engine {
 	r := gin.Default()
+
+	r.Use(middleware.CORSMiddleware(resolveAllowedOrigins()))
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "service": "juntae-api"})
 	})
 
 	userHandler := handler.NewUserHandler(deps.UserService)
+	userLinkHandler := handler.NewUserLinkHandler(deps.UserLinkService)
 	skillHandler := handler.NewSkillHandler(deps.SkillService)
 	projectHandler := handler.NewProjectHandler(deps.ProjectService)
 	projectRoleHandler := handler.NewProjectRoleHandler(deps.ProjectRoleService)
@@ -44,6 +72,10 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 
 	protected.GET("/users", userHandler.GetUsers)
 	protected.GET("/users/me", userHandler.GetMe)
+	protected.GET("/users/me/links", userLinkHandler.GetMyLinks)
+	protected.POST("/users/me/links", userLinkHandler.CreateLink)
+	protected.PUT("/users/me/links/:id", userLinkHandler.UpdateLink)
+	protected.DELETE("/users/me/links/:id", userLinkHandler.DeleteLink)
 	protected.GET("/users/:id", userHandler.GetUserByID)
 	protected.PUT("/users/:id", userHandler.UpdateUser)
 	protected.DELETE("/users/:id", userHandler.DeleteUser)
