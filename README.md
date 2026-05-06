@@ -125,26 +125,19 @@ A documentação cobre todos os endpoints: autenticação, usuários, perfil est
 
 ## Build e deploy
 
-### Build da API
+### Build local da API
 
 ```bash
 cd apps/api
-go build -o bin/juntae-api cmd/api/main.go
+go build -o bin/api ./cmd/api
 ```
 
-### Build do frontend
+### Build local do frontend
 
 ```bash
 cd apps/web
 npm run build
 ```
-
-### Modo de produção
-
-1. Configure `APP_ENV=production` e defina um `JWT_SECRET` forte.
-2. Defina `ALLOWED_ORIGINS` com os domínios reais (sem wildcards).
-3. Use um proxy reverso (nginx / Caddy) na frente da API.
-4. Sirva o `dist/` do frontend via CDN ou servidor estático.
 
 ---
 

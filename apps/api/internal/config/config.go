@@ -12,14 +12,20 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	appPort := os.Getenv("APP_PORT")
+	appPort := os.Getenv("PORT")
+	if appPort == "" {
+		appPort = os.Getenv("APP_PORT")
+	}
 	if appPort == "" {
 		appPort = "8080"
 	}
 
 	mainDatabaseURL := os.Getenv("MAIN_DATABASE_URL")
 	if mainDatabaseURL == "" {
-		return nil, fmt.Errorf("MAIN_DATABASE_URL environment variable is required")
+		mainDatabaseURL = os.Getenv("DATABASE_URL")
+	}
+	if mainDatabaseURL == "" {
+		return nil, fmt.Errorf("MAIN_DATABASE_URL (or DATABASE_URL) environment variable is required")
 	}
 
 	auditDatabaseURL := os.Getenv("AUDIT_DATABASE_URL")
