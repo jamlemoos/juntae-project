@@ -1,6 +1,7 @@
 package router
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -29,16 +30,28 @@ var defaultOrigins = []string{
 	"http://127.0.0.1:5173",
 }
 
+// normalizeOrigin trims whitespace and removes a trailing slash.
+func normalizeOrigin(o string) string {
+	return strings.TrimRight(strings.TrimSpace(o), "/")
+}
+
 func resolveAllowedOrigins() []string {
 	raw := os.Getenv("ALLOWED_ORIGINS")
 	if raw == "" {
 		return defaultOrigins
 	}
+	appEnv := os.Getenv("APP_ENV")
 	var origins []string
 	for _, o := range strings.Split(raw, ",") {
-		if trimmed := strings.TrimSpace(o); trimmed != "" {
-			origins = append(origins, trimmed)
+		normalized := normalizeOrigin(o)
+		if normalized == "" {
+			continue
 		}
+		if normalized == "*" && appEnv == "production" {
+			log.Println("[CORS] wildcard '*' is not permitted in production — skipping")
+			continue
+		}
+		origins = append(origins, normalized)
 	}
 	if len(origins) == 0 {
 		return defaultOrigins
@@ -49,7 +62,9 @@ func resolveAllowedOrigins() []string {
 func SetupRouter(deps RouterDependencies) *gin.Engine {
 	r := gin.Default()
 
-	r.Use(middleware.CORSMiddleware(resolveAllowedOrigins()))
+	allowedOrigins := resolveAllowedOrigins()
+	log.Printf("[CORS] allowed origins: %v", allowedOrigins)
+	r.Use(middleware.CORSMiddleware(allowedOrigins))
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "service": "juntae-api"})
