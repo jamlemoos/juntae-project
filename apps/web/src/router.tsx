@@ -2,8 +2,8 @@ import { createRootRoute, createRoute, createRouter, Outlet } from '@tanstack/re
 import { AppLayout } from './layouts/AppLayout';
 import { AuthLayout } from './layouts/AuthLayout';
 import { PublicLayout } from './layouts/PublicLayout';
+import { HomeRoute } from './features/auth/components/HomeRoute';
 import { ExploreProjectsPage } from './pages/ExploreProjectsPage';
-import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { NewProjectPage } from './pages/NewProjectPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -39,7 +39,7 @@ const appLayoutRoute = createRoute({
 const indexRoute = createRoute({
   getParentRoute: () => publicLayoutRoute,
   path: '/',
-  component: HomePage,
+  component: HomeRoute,
 });
 
 const loginRoute = createRoute({

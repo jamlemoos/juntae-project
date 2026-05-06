@@ -232,7 +232,6 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
   });
   const [editError, setEditError] = useState<string | null>(null);
 
-  // Role form state — shared between add and edit modes
   const [addingRole, setAddingRole] = useState(false);
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
   const [roleTitle, setRoleTitle] = useState('');

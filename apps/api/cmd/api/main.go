@@ -1,8 +1,19 @@
+// @title			Juntaê API
+// @version			1.0
+// @description		API da plataforma Juntaê — conexão de pessoas, skills, projetos e candidaturas.
+// @host			localhost:8080
+// @BasePath		/api
+// @schemes			http https
+// @securityDefinitions.apikey	BearerAuth
+// @in				header
+// @name			Authorization
+// @description		JWT token no formato: Bearer {token}
 package main
 
 import (
 	"log"
 
+	_ "juntae-api/docs"
 	"juntae-api/internal/config"
 	"juntae-api/internal/database"
 	"juntae-api/internal/domain/repository"
@@ -52,6 +63,7 @@ func main() {
 	auditRepo := repository.NewAuditRepository(auditDB)
 	userRepo := repository.NewUserRepository(mainDB)
 	userLinkRepo := repository.NewUserLinkRepository(mainDB)
+	userProfileRepo := repository.NewUserProfileRepository(mainDB)
 	skillRepo := repository.NewSkillRepository(mainDB)
 	projectRepo := repository.NewProjectRepository(mainDB)
 	projectRoleRepo := repository.NewProjectRoleRepository(mainDB)
@@ -60,6 +72,7 @@ func main() {
 	auditService := service.NewAuditService(auditRepo)
 	userService := service.NewUserService(userRepo, skillRepo, auditService)
 	userLinkService := service.NewUserLinkService(userLinkRepo)
+	userProfileService := service.NewUserProfileService(userProfileRepo)
 	skillService := service.NewSkillService(skillRepo, auditService)
 	projectService := service.NewProjectService(projectRepo, applicationRepo, auditService)
 	projectRoleService := service.NewProjectRoleService(projectRoleRepo, projectRepo, auditService)
@@ -68,6 +81,7 @@ func main() {
 	deps := router.RouterDependencies{
 		UserService:        userService,
 		UserLinkService:    userLinkService,
+		UserProfileService: userProfileService,
 		SkillService:       skillService,
 		ProjectService:     projectService,
 		ProjectRoleService: projectRoleService,

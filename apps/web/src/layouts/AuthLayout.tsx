@@ -1,5 +1,10 @@
 import { Outlet } from '@tanstack/react-router';
+import { PublicOnlyRoute } from '../features/auth/components/PublicOnlyRoute';
 
 export function AuthLayout() {
-  return <Outlet />;
+  return (
+    <PublicOnlyRoute>
+      <Outlet />
+    </PublicOnlyRoute>
+  );
 }

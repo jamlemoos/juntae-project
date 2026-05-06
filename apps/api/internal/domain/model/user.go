@@ -18,6 +18,7 @@ type User struct {
 	Skills       []Skill       `gorm:"many2many:user_skills;"`
 	Projects     []Project     `gorm:"foreignKey:CreatorID"`
 	Applications []Application `gorm:"foreignKey:UserID"`
+	Profile      *UserProfile  `gorm:"foreignKey:UserID"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

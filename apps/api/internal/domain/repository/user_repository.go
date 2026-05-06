@@ -42,8 +42,13 @@ func (r *UserRepository) Delete(id uuid.UUID) error {
 	return r.db.Delete(&model.User{}, "id = ?", id).Error
 }
 
-func (r *UserRepository) ReplaceSkills(user *model.User, skills []model.Skill) error {
-	return r.db.Model(user).Association("Skills").Replace(skills)
+func (r *UserRepository) UpdateWithSkills(user *model.User, skills []model.Skill) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Model(user).Association("Skills").Replace(skills); err != nil {
+			return err
+		}
+		return tx.Save(user).Error
+	})
 }
 
 func (r *UserRepository) FindSkillsByIDs(ids []uuid.UUID) ([]model.Skill, error) {

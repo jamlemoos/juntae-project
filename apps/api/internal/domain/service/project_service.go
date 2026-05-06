@@ -52,8 +52,6 @@ func (s *ProjectService) CreateProject(creatorID uuid.UUID, req dto.CreateProjec
 }
 
 func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city string, offset, limit int) ([]dto.ProjectListItemResponse, error) {
-	// TODO: add paginated response metadata (page, limit, total, hasNextPage) once
-	// the frontend and API contract are aligned.
 	var (
 		projects []model.Project
 		err      error
@@ -78,13 +76,11 @@ func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city str
 }
 
 func (s *ProjectService) GetProjectsForOwner(callerID uuid.UUID, offset, limit int) ([]dto.ProjectListItemResponse, error) {
-	// TODO: add paginated response metadata (page, limit, total, hasNextPage) once
-	// the frontend and API contract are aligned.
 	projects, err := s.repo.FindByCreatorIDForList(callerID, offset, limit)
 	if err != nil {
 		return nil, fmt.Errorf("get owner projects: %w", err)
 	}
-	// Owners cannot have applied to their own projects, so skip the applied-set query.
+
 	var appliedSet map[uuid.UUID]struct{}
 	responses := make([]dto.ProjectListItemResponse, len(projects))
 	for i := range projects {
@@ -191,8 +187,6 @@ func mapProjectResponse(p *model.Project) dto.ProjectResponse {
 }
 
 func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet map[uuid.UUID]struct{}) dto.ProjectListItemResponse {
-	// Apply the same visibility rules as filterVisibleProjectRoles:
-	// owners see all roles; non-owners see only OPEN roles on an OPEN project, otherwise zero.
 	isOwner := p.CreatorID == callerID
 	var openCount, totalCount int
 	if isOwner {
@@ -210,7 +204,7 @@ func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet
 		}
 		totalCount = openCount
 	}
-	// non-owner + non-OPEN project → openCount and totalCount remain 0
+
 	_, hasApplied := appliedSet[p.ID]
 	return dto.ProjectListItemResponse{
 		ID:              p.ID,
@@ -227,8 +221,6 @@ func mapProjectListItemResponse(p *model.Project, callerID uuid.UUID, appliedSet
 	}
 }
 
-// filterVisibleProjectRoles returns the roles a caller is allowed to see for a project.
-// Owners see all roles. Non-owners see only OPEN roles on an OPEN project; otherwise none.
 func filterVisibleProjectRoles(p *model.Project, roles []model.ProjectRole, callerID uuid.UUID) []model.ProjectRole {
 	if p.CreatorID == callerID {
 		return roles

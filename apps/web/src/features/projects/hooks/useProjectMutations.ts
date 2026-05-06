@@ -22,7 +22,6 @@ export function useUpdateProjectMutation() {
     mutationFn: ({ id, data }: { id: string; data: UpdateProjectRequest }) =>
       updateProject(id, data),
     onSuccess: (_result, { id }) => {
-      // Detail page for this project
       void queryClient.invalidateQueries({ queryKey: ['project', id] });
       // Owner's lists — project may change position or visibility
       void queryClient.invalidateQueries({ queryKey: ['projects', 'me'] });

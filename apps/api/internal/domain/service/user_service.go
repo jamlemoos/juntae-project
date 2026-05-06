@@ -105,7 +105,6 @@ func (s *UserService) UpdateUser(id uuid.UUID, callerID uuid.UUID, req dto.Updat
 	user.Bio = req.Bio
 	user.City = req.City
 
-	// Always replace skills so an empty list correctly clears all skills.
 	var skills []model.Skill
 	if len(req.SkillIDs) > 0 {
 		var err error
@@ -114,14 +113,10 @@ func (s *UserService) UpdateUser(id uuid.UUID, callerID uuid.UUID, req dto.Updat
 			return nil, fmt.Errorf("load skills: %w", err)
 		}
 	}
-	if err := s.repo.ReplaceSkills(user, skills); err != nil {
-		return nil, fmt.Errorf("replace skills: %w", err)
-	}
-	user.Skills = skills
-
-	if err := s.repo.Update(user); err != nil {
+	if err := s.repo.UpdateWithSkills(user, skills); err != nil {
 		return nil, fmt.Errorf("update user: %w", err)
 	}
+	user.Skills = skills
 
 	if err := s.audit.LogAction("UPDATE", "User", user.ID, fmt.Sprintf("User updated profile: %s", user.Email)); err != nil {
 		log.Printf("WARN: audit log failed for user update %s: %v", user.ID, err)

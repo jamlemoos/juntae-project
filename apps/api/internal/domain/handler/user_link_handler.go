@@ -17,6 +17,15 @@ func NewUserLinkHandler(svc *service.UserLinkService) *UserLinkHandler {
 	return &UserLinkHandler{service: svc}
 }
 
+// GetMyLinks godoc
+//
+//	@Summary		List current user's external links
+//	@Tags			links
+//	@Produce		json
+//	@Success		200	{array}		dto.UserLinkResponse
+//	@Failure		401	{object}	map[string]string
+//	@Router			/users/me/links [get]
+//	@Security		BearerAuth
 func (h *UserLinkHandler) GetMyLinks(c *gin.Context) {
 	callerID, ok := getAuthUserID(c)
 	if !ok {
@@ -30,6 +39,19 @@ func (h *UserLinkHandler) GetMyLinks(c *gin.Context) {
 	respondWithJSON(c, http.StatusOK, links)
 }
 
+// CreateLink godoc
+//
+//	@Summary		Add an external link to current user's profile
+//	@Tags			links
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		dto.CreateUserLinkRequest	true	"Link data"
+//	@Success		201		{object}	dto.UserLinkResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		401		{object}	map[string]string
+//	@Failure		422		{object}	map[string]string	"URL must be http or https"
+//	@Router			/users/me/links [post]
+//	@Security		BearerAuth
 func (h *UserLinkHandler) CreateLink(c *gin.Context) {
 	callerID, ok := getAuthUserID(c)
 	if !ok {
@@ -47,6 +69,20 @@ func (h *UserLinkHandler) CreateLink(c *gin.Context) {
 	respondWithJSON(c, http.StatusCreated, link)
 }
 
+// UpdateLink godoc
+//
+//	@Summary		Update an external link (owner only)
+//	@Tags			links
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string						true	"Link UUID"
+//	@Param			body	body		dto.UpdateUserLinkRequest	true	"Updated link data"
+//	@Success		200		{object}	dto.UserLinkResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		401		{object}	map[string]string
+//	@Failure		404		{object}	map[string]string
+//	@Router			/users/me/links/{id} [put]
+//	@Security		BearerAuth
 func (h *UserLinkHandler) UpdateLink(c *gin.Context) {
 	id, ok := parseUUIDParam(c, "id")
 	if !ok {
@@ -68,6 +104,16 @@ func (h *UserLinkHandler) UpdateLink(c *gin.Context) {
 	respondWithJSON(c, http.StatusOK, link)
 }
 
+// DeleteLink godoc
+//
+//	@Summary		Delete an external link (owner only)
+//	@Tags			links
+//	@Param			id	path	string	true	"Link UUID"
+//	@Success		204
+//	@Failure		401	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Router			/users/me/links/{id} [delete]
+//	@Security		BearerAuth
 func (h *UserLinkHandler) DeleteLink(c *gin.Context) {
 	id, ok := parseUUIDParam(c, "id")
 	if !ok {

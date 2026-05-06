@@ -13,6 +13,7 @@ func RunMainMigrations(db *gorm.DB) error {
 		&model.ProjectRole{},
 		&model.Application{},
 		&model.UserLink{},
+		&model.UserProfile{},
 	)
 }
 

@@ -10,11 +10,14 @@ import (
 	"juntae-api/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type RouterDependencies struct {
 	UserService        *service.UserService
 	UserLinkService    *service.UserLinkService
+	UserProfileService *service.UserProfileService
 	SkillService       *service.SkillService
 	ProjectService     *service.ProjectService
 	ProjectRoleService *service.ProjectRoleService
@@ -51,9 +54,11 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok", "service": "juntae-api"})
 	})
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	userHandler := handler.NewUserHandler(deps.UserService)
 	userLinkHandler := handler.NewUserLinkHandler(deps.UserLinkService)
+	userProfileHandler := handler.NewUserProfileHandler(deps.UserProfileService)
 	skillHandler := handler.NewSkillHandler(deps.SkillService)
 	projectHandler := handler.NewProjectHandler(deps.ProjectService)
 	projectRoleHandler := handler.NewProjectRoleHandler(deps.ProjectRoleService)
@@ -72,6 +77,8 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 
 	protected.GET("/users", userHandler.GetUsers)
 	protected.GET("/users/me", userHandler.GetMe)
+	protected.GET("/users/me/profile", userProfileHandler.GetMyProfile)
+	protected.PUT("/users/me/profile", userProfileHandler.UpsertProfile)
 	protected.GET("/users/me/links", userLinkHandler.GetMyLinks)
 	protected.POST("/users/me/links", userLinkHandler.CreateLink)
 	protected.PUT("/users/me/links/:id", userLinkHandler.UpdateLink)
@@ -80,9 +87,10 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	protected.PUT("/users/:id", userHandler.UpdateUser)
 	protected.DELETE("/users/:id", userHandler.DeleteUser)
 
-	protected.POST("/skills", skillHandler.CreateSkill)
-	protected.PUT("/skills/:id", skillHandler.UpdateSkill)
-	protected.DELETE("/skills/:id", skillHandler.DeleteSkill)
+	adminOnly := protected.Group("", middleware.RequireRole("admin"))
+	adminOnly.POST("/skills", skillHandler.CreateSkill)
+	adminOnly.PUT("/skills/:id", skillHandler.UpdateSkill)
+	adminOnly.DELETE("/skills/:id", skillHandler.DeleteSkill)
 
 	protected.GET("/projects/stats/applications-count", projectHandler.CountApplicationsByProject)
 	protected.GET("/projects/me", projectHandler.GetMyProjects)

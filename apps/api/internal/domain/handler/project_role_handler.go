@@ -17,6 +17,19 @@ func NewProjectRoleHandler(projectRoleService *service.ProjectRoleService) *Proj
 	return &ProjectRoleHandler{projectRoleService: projectRoleService}
 }
 
+// CreateProjectRole godoc
+//
+//	@Summary		Create a role for a project (project owner only)
+//	@Tags			project-roles
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		dto.CreateProjectRoleRequest	true	"Role data"
+//	@Success		201		{object}	dto.ProjectRoleResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		401		{object}	map[string]string
+//	@Failure		403		{object}	map[string]string
+//	@Router			/project-roles [post]
+//	@Security		BearerAuth
 func (h *ProjectRoleHandler) CreateProjectRole(c *gin.Context) {
 	callerID, ok := getAuthUserID(c)
 	if !ok {
@@ -34,6 +47,17 @@ func (h *ProjectRoleHandler) CreateProjectRole(c *gin.Context) {
 	respondWithJSON(c, http.StatusCreated, resp)
 }
 
+// GetRolesByProject godoc
+//
+//	@Summary		List roles for a project
+//	@Tags			project-roles
+//	@Produce		json
+//	@Param			id	path		string	true	"Project UUID"
+//	@Success		200	{array}		dto.ProjectRoleResponse
+//	@Failure		401	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Router			/projects/{id}/roles [get]
+//	@Security		BearerAuth
 func (h *ProjectRoleHandler) GetRolesByProject(c *gin.Context) {
 	projectID, ok := parseUUIDParam(c, "id")
 	if !ok {
@@ -51,6 +75,18 @@ func (h *ProjectRoleHandler) GetRolesByProject(c *gin.Context) {
 	respondWithJSON(c, http.StatusOK, roles)
 }
 
+// GetProjectRoleByID godoc
+//
+//	@Summary		Get a project role by ID
+//	@Tags			project-roles
+//	@Produce		json
+//	@Param			id	path		string	true	"ProjectRole UUID"
+//	@Success		200	{object}	dto.ProjectRoleResponse
+//	@Failure		400	{object}	map[string]string
+//	@Failure		401	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Router			/project-roles/{id} [get]
+//	@Security		BearerAuth
 func (h *ProjectRoleHandler) GetProjectRoleByID(c *gin.Context) {
 	id, ok := parseUUIDParam(c, "id")
 	if !ok {
@@ -68,6 +104,20 @@ func (h *ProjectRoleHandler) GetProjectRoleByID(c *gin.Context) {
 	respondWithJSON(c, http.StatusOK, role)
 }
 
+// UpdateProjectRole godoc
+//
+//	@Summary		Update a project role (project owner only)
+//	@Tags			project-roles
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string						true	"ProjectRole UUID"
+//	@Param			body	body		dto.UpdateProjectRoleRequest	true	"Role data"
+//	@Success		200		{object}	dto.ProjectRoleResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		401		{object}	map[string]string
+//	@Failure		403		{object}	map[string]string
+//	@Router			/project-roles/{id} [put]
+//	@Security		BearerAuth
 func (h *ProjectRoleHandler) UpdateProjectRole(c *gin.Context) {
 	id, ok := parseUUIDParam(c, "id")
 	if !ok {
@@ -89,6 +139,17 @@ func (h *ProjectRoleHandler) UpdateProjectRole(c *gin.Context) {
 	respondWithJSON(c, http.StatusOK, resp)
 }
 
+// DeleteProjectRole godoc
+//
+//	@Summary		Delete a project role (project owner only)
+//	@Tags			project-roles
+//	@Param			id	path	string	true	"ProjectRole UUID"
+//	@Success		204
+//	@Failure		401	{object}	map[string]string
+//	@Failure		403	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Router			/project-roles/{id} [delete]
+//	@Security		BearerAuth
 func (h *ProjectRoleHandler) DeleteProjectRole(c *gin.Context) {
 	id, ok := parseUUIDParam(c, "id")
 	if !ok {

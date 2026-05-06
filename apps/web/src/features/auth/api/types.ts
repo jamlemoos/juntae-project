@@ -5,8 +5,6 @@ export type LoginRequest = {
   password: string;
 };
 
-// city is required by the backend (validate:"required,min=2").
-// skillIds maps to backend field skill_ids ([]uuid.UUID).
 export type RegisterRequest = {
   name: string;
   email: string;

@@ -14,6 +14,17 @@ const (
 	ContextKeyRole   = "auth_role"
 )
 
+func RequireRole(role string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		val, exists := c.Get(ContextKeyRole)
+		if !exists || val.(string) != role {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "forbidden"})
+			return
+		}
+		c.Next()
+	}
+}
+
 func RequireAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
