@@ -33,7 +33,7 @@ export function ProjectRoleCard({ role, onApply }: ProjectRoleCardProps) {
           <button
             type="button"
             onClick={onApply}
-            className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="inline-flex h-9 cursor-pointer items-center rounded-full bg-primary px-5 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Quero participar
           </button>

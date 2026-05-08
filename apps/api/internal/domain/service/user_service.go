@@ -42,7 +42,24 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*dto.UserResponse, 
 		Bio:      req.Bio,
 		City:     req.City,
 	}
-	if len(req.SkillIDs) > 0 {
+	if len(req.SkillNames) > 0 {
+		seen := map[string]struct{}{}
+		for _, raw := range req.SkillNames {
+			normalized := strings.ToLower(strings.TrimSpace(raw))
+			if normalized == "" {
+				continue
+			}
+			if _, dup := seen[normalized]; dup {
+				continue
+			}
+			seen[normalized] = struct{}{}
+			skill, serr := s.skillRepo.FindOrCreateByName(normalized)
+			if serr != nil {
+				return nil, fmt.Errorf("resolve skill %q: %w", normalized, serr)
+			}
+			user.Skills = append(user.Skills, *skill)
+		}
+	} else if len(req.SkillIDs) > 0 {
 		skills, err := s.skillRepo.FindByIDs(req.SkillIDs)
 		if err != nil {
 			return nil, fmt.Errorf("load skills: %w", err)
@@ -106,8 +123,24 @@ func (s *UserService) UpdateUser(id uuid.UUID, callerID uuid.UUID, req dto.Updat
 	user.City = req.City
 
 	var skills []model.Skill
-	if len(req.SkillIDs) > 0 {
-		var err error
+	if len(req.SkillNames) > 0 {
+		seen := map[string]struct{}{}
+		for _, raw := range req.SkillNames {
+			normalized := strings.ToLower(strings.TrimSpace(raw))
+			if normalized == "" {
+				continue
+			}
+			if _, dup := seen[normalized]; dup {
+				continue
+			}
+			seen[normalized] = struct{}{}
+			skill, serr := s.skillRepo.FindOrCreateByName(normalized)
+			if serr != nil {
+				return nil, fmt.Errorf("resolve skill %q: %w", normalized, serr)
+			}
+			skills = append(skills, *skill)
+		}
+	} else if len(req.SkillIDs) > 0 {
 		skills, err = s.skillRepo.FindByIDs(req.SkillIDs)
 		if err != nil {
 			return nil, fmt.Errorf("load skills: %w", err)

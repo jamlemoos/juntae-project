@@ -8,7 +8,7 @@ interface HeaderProps {
 export function Header({ variant }: HeaderProps) {
   const user = useAuth((s) => s.user);
   return (
-    <header className="sticky top-0 z-30 border-b hairline bg-cream/85 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b hairline bg-cream/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-6">
         <div className="flex items-center gap-10">
           <Link
@@ -16,7 +16,7 @@ export function Header({ variant }: HeaderProps) {
             className="display flex items-center gap-1.5 text-[22px] font-extrabold tracking-tight text-ink"
           >
             Juntaê
-            <span className="serif relative -top-0.5 text-[26px] leading-none text-accent">,</span>
+            <span className="serif relative -top-0.5 text-[26px] leading-none text-primary">,</span>
           </Link>
           {variant === 'app' ? (
             <nav
@@ -50,7 +50,7 @@ export function Header({ variant }: HeaderProps) {
               </Link>
               <span className="hidden h-4 w-px bg-line sm:inline" />
               <Link to="/profile" aria-label="Meu perfil" className="flex items-center gap-2.5">
-                <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-ink-2 text-[11px] font-semibold text-cream">
+                <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-primary/10 text-[11px] font-semibold text-primary ring-1 ring-primary/20">
                   {user?.name?.charAt(0)?.toUpperCase() ?? '?'}
                 </div>
               </Link>
@@ -63,7 +63,7 @@ export function Header({ variant }: HeaderProps) {
               </Link>
               <Link
                 to="/register"
-                className="inline-flex h-9 items-center justify-center rounded-full bg-ink px-4 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="inline-flex h-9 cursor-pointer items-center justify-center rounded-full bg-primary px-4 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 Criar conta
               </Link>

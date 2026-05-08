@@ -48,7 +48,7 @@ export function ProfileHero({ name, email, avatarInitial, memberSince }: Profile
           <div className="col-span-12 lg:col-span-3 lg:text-right">
             <p className="serif italic max-w-[28ch] text-[17px] leading-[1.5] text-ink-2 lg:ml-auto">
               Seu jeito de aparecer pra quem quer construir{' '}
-              <span className="text-accent">junto</span>.
+              <span className="text-secondary">junto</span>.
             </p>
           </div>
         </div>

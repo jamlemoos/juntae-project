@@ -35,7 +35,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
         <p className="text-sm text-mute">{initError}</p>
         <button
           onClick={() => void initializeAuth()}
-          className="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90"
+          className="cursor-pointer rounded-md bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand/90"
         >
           Tentar novamente
         </button>

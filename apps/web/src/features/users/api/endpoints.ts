@@ -15,10 +15,10 @@ export async function getUserById(id: string): Promise<PublicUserResponse> {
 }
 
 export async function updateUser(id: string, data: UpdateUserRequest): Promise<UserResponse> {
-  const { skillIds, ...rest } = data;
+  const { skillNames, ...rest } = data;
   const raw = await http.put<UserApiResponse>(`/users/${id}`, {
     ...rest,
-    skill_ids: skillIds ?? [],
+    skills: skillNames ?? [],
   });
   return mapUser(raw);
 }

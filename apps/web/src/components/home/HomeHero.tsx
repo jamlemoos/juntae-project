@@ -7,7 +7,7 @@ export function HomeHero() {
       <div className="relative mx-auto max-w-[1200px] px-6 pb-24 pt-20 md:pb-28 md:pt-24">
         <div className="max-w-[960px]">
           <h1 className="display text-[56px] font-bold leading-[1.0] text-ink md:text-[80px] lg:text-[92px]">
-            Tire sua ideia do papel <span className="text-accent">com um time.</span>
+            Tire sua ideia do papel <span className="text-secondary">com um time.</span>
           </h1>
 
           <p className="mt-7 max-w-xl text-[17px] leading-[1.6] text-ink-2">
@@ -18,7 +18,7 @@ export function HomeHero() {
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link
               to="/register"
-              className="inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-[15px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               Criar uma conta
               <ArrowRight size={14} aria-hidden="true" />

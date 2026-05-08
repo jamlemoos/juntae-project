@@ -103,9 +103,10 @@ func SetupRouter(deps RouterDependencies) *gin.Engine {
 	protected.DELETE("/users/:id", userHandler.DeleteUser)
 
 	adminOnly := protected.Group("", middleware.RequireRole("admin"))
-	adminOnly.POST("/skills", skillHandler.CreateSkill)
 	adminOnly.PUT("/skills/:id", skillHandler.UpdateSkill)
 	adminOnly.DELETE("/skills/:id", skillHandler.DeleteSkill)
+
+	protected.POST("/skills", skillHandler.CreateSkill)
 
 	protected.GET("/projects/stats/applications-count", projectHandler.CountApplicationsByProject)
 	protected.GET("/projects/me", projectHandler.GetMyProjects)

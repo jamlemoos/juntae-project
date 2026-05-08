@@ -17,5 +17,5 @@ export type UpdateUserRequest = {
   email: string;
   bio?: string;
   city: string;
-  skillIds?: string[];
+  skillNames?: string[];
 };

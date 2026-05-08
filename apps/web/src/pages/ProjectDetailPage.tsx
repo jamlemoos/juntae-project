@@ -177,7 +177,7 @@ function LocalDraftDetail({ projectId }: { projectId: string }) {
               <div className="border-t pt-10 hairline">
                 <Link
                   to="/projects"
-                  className="inline-flex items-center gap-2 text-[14px] text-ink-2 transition-colors hover:text-ink"
+                  className="inline-flex cursor-pointer items-center gap-2 text-[14px] text-ink-2 transition-colors hover:text-ink"
                 >
                   <ArrowLeft size={14} aria-hidden="true" />
                   Voltar para projetos
@@ -256,7 +256,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
           <p className="text-[14px] text-mute">Não foi possível carregar o projeto.</p>
           <Link
             to="/explore"
-            className="mt-4 inline-flex items-center gap-2 text-[14px] text-ink-2 transition-colors hover:text-ink"
+            className="mt-4 inline-flex cursor-pointer items-center gap-2 text-[14px] text-ink-2 transition-colors hover:text-ink"
           >
             <ArrowLeft size={14} aria-hidden="true" />
             Voltar para explorar
@@ -434,7 +434,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                     type="button"
                     onClick={handleSaveEdit}
                     disabled={updateMutation.isPending}
-                    className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+                    className="inline-flex h-9 cursor-pointer items-center rounded-full bg-primary px-5 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {updateMutation.isPending ? 'Salvando…' : 'Salvar'}
                   </button>
@@ -442,7 +442,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                     type="button"
                     onClick={handleCancelEdit}
                     disabled={updateMutation.isPending}
-                    className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+                    className="inline-flex h-9 cursor-pointer items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Cancelar
                   </button>
@@ -530,7 +530,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                               <button
                                 type="button"
                                 onClick={() => handleStartEditRole(role)}
-                                className="inline-flex h-8 items-center rounded-full px-4 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                                className="inline-flex h-8 cursor-pointer items-center rounded-full px-4 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                               >
                                 Editar
                               </button>
@@ -538,7 +538,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                                 type="button"
                                 onClick={() => void handleDeleteRole(role.id)}
                                 disabled={deleteRoleMutation.isPending}
-                                className="inline-flex h-8 items-center rounded-full px-4 text-[13px] font-medium text-accent ring-1 ring-accent/30 transition-colors hover:bg-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50"
+                                className="inline-flex h-8 cursor-pointer items-center rounded-full px-4 text-[13px] font-medium text-error ring-1 ring-error/30 transition-colors hover:bg-error/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 Remover
                               </button>
@@ -558,7 +558,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                                       prev === role.id ? null : role.id
                                     )
                                   }
-                                  className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                                  className="inline-flex h-9 cursor-pointer items-center rounded-full bg-primary px-5 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                                 >
                                   {openApplicationRoleId === role.id
                                     ? 'Cancelar'
@@ -605,7 +605,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
                         <button
                           type="button"
                           onClick={handleStartAddRole}
-                          className="w-full rounded-2xl border border-dashed border-line-2 py-4 text-[14px] font-medium text-mute transition-colors hover:border-ink hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                          className="w-full cursor-pointer rounded-2xl border border-dashed border-line-2 py-4 text-[14px] font-medium text-mute transition-colors hover:border-ink hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                         >
                           + Adicionar vaga
                         </button>
@@ -620,7 +620,7 @@ function ApiProjectDetail({ projectId }: { projectId: string }) {
               <div className="border-t pt-10 hairline">
                 <Link
                   to={project.isOwner ? '/projects' : '/explore'}
-                  className="inline-flex items-center gap-2 text-[14px] text-ink-2 transition-colors hover:text-ink"
+                  className="inline-flex cursor-pointer items-center gap-2 text-[14px] text-ink-2 transition-colors hover:text-ink"
                 >
                   <ArrowLeft size={14} aria-hidden="true" />
                   {project.isOwner ? 'Voltar para projetos' : 'Voltar para explorar'}
@@ -669,7 +669,7 @@ function RoleFormCard({
   onCancel,
 }: RoleFormCardProps) {
   return (
-    <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-ink/20 md:p-6">
+    <div className="rounded-2xl bg-cream-2 p-5 ring-1 ring-primary/10 md:p-6">
       <div className="flex flex-col gap-4">
         <ProjectField
           label="Função"
@@ -702,7 +702,7 @@ function RoleFormCard({
           type="button"
           onClick={onSave}
           disabled={isSaving}
-          className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+          className="inline-flex h-9 cursor-pointer items-center rounded-full bg-primary px-5 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSaving ? 'Salvando…' : 'Salvar'}
         </button>
@@ -710,7 +710,7 @@ function RoleFormCard({
           type="button"
           onClick={onCancel}
           disabled={isSaving}
-          className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+          className="inline-flex h-9 cursor-pointer items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         >
           Cancelar
         </button>
@@ -733,7 +733,7 @@ function ApiProjectRail({ project, onEdit }: { project: ProjectDetail; onEdit?: 
         <button
           type="button"
           onClick={onEdit}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="mt-6 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           Editar projeto
         </button>

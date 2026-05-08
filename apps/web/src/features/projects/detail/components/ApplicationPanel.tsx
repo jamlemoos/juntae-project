@@ -82,7 +82,7 @@ export function ApplicationPanel({ id, roleTitle, onClose, onSubmit }: Applicati
           type="button"
           aria-label="Fechar candidatura"
           onClick={onClose}
-          className="mt-0.5 shrink-0 rounded text-mute transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="mt-0.5 shrink-0 cursor-pointer rounded text-mute transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <X size={16} aria-hidden="true" />
         </button>
@@ -126,7 +126,7 @@ export function ApplicationPanel({ id, roleTitle, onClose, onSubmit }: Applicati
               <button
                 type="submit"
                 disabled={panelState === 'submitting'}
-                className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+                className="inline-flex h-9 cursor-pointer items-center rounded-full bg-primary px-5 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {panelState === 'submitting' ? 'Enviando…' : 'Quero participar'}
               </button>
@@ -134,7 +134,7 @@ export function ApplicationPanel({ id, roleTitle, onClose, onSubmit }: Applicati
                 type="button"
                 onClick={onClose}
                 disabled={panelState === 'submitting'}
-                className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+                className="inline-flex h-9 cursor-pointer items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancelar
               </button>

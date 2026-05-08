@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ApiError } from '../../../shared/api/http';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { validateName, validateEmail, validateCity } from '../../auth/utils/authValidation';
@@ -12,7 +12,7 @@ export type ProfileEditFormValues = {
   city: string;
   headline: string;
   availability: string;
-  selectedSkillIds: string[];
+  draftSkillNames: string[];
 };
 
 export type UseProfileEditFormReturn = {
@@ -27,7 +27,8 @@ export type UseProfileEditFormReturn = {
     key: K,
     value: ProfileEditFormValues[K]
   ) => void;
-  toggleSkill: (id: string) => void;
+  addSkill: (name: string) => void;
+  removeSkill: (name: string) => void;
   save: () => Promise<void>;
 };
 
@@ -38,7 +39,7 @@ const EMPTY_FIELDS: ProfileEditFormValues = {
   city: '',
   headline: '',
   availability: 'available',
-  selectedSkillIds: [],
+  draftSkillNames: [],
 };
 
 export function useProfileEditForm(): UseProfileEditFormReturn {
@@ -52,6 +53,10 @@ export function useProfileEditForm(): UseProfileEditFormReturn {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  // Always reflects the latest fields value — prevents stale closures in save()
+  const fieldsRef = useRef<ProfileEditFormValues>(EMPTY_FIELDS);
+  fieldsRef.current = fields;
+
   function startEdit() {
     setFields({
       name: user?.name ?? '',
@@ -60,7 +65,7 @@ export function useProfileEditForm(): UseProfileEditFormReturn {
       city: user?.city ?? '',
       headline: myProfile?.headline ?? '',
       availability: myProfile?.availability ?? 'available',
-      selectedSkillIds: user?.skills?.map((s) => s.id) ?? [],
+      draftSkillNames: user?.skills?.map((s) => s.name) ?? [],
     });
     setErrors({});
     setSaveError(null);
@@ -78,24 +83,32 @@ export function useProfileEditForm(): UseProfileEditFormReturn {
     setFields((prev) => ({ ...prev, [key]: value }));
   }
 
-  function toggleSkill(id: string) {
+  function addSkill(name: string) {
+    const normalized = name.trim().toLowerCase();
+    if (!normalized) return;
+    setFields((prev) => {
+      if (prev.draftSkillNames.some((s) => s.toLowerCase() === normalized)) return prev;
+      return { ...prev, draftSkillNames: [...prev.draftSkillNames, normalized] };
+    });
+  }
+
+  function removeSkill(name: string) {
     setFields((prev) => ({
       ...prev,
-      selectedSkillIds: prev.selectedSkillIds.includes(id)
-        ? prev.selectedSkillIds.filter((x) => x !== id)
-        : [...prev.selectedSkillIds, id],
+      draftSkillNames: prev.draftSkillNames.filter((s) => s !== name),
     }));
   }
 
   async function save() {
+    const currentFields = fieldsRef.current;
     if (!user) return;
 
     const errs: Record<string, string> = {};
-    const nameErr = validateName(fields.name);
+    const nameErr = validateName(currentFields.name);
     if (nameErr) errs.name = nameErr;
-    const emailErr = validateEmail(fields.email);
+    const emailErr = validateEmail(currentFields.email);
     if (emailErr) errs.email = emailErr;
-    const cityErr = validateCity(fields.city);
+    const cityErr = validateCity(currentFields.city);
     if (cityErr) errs.city = cityErr;
 
     if (Object.keys(errs).length > 0) {
@@ -108,16 +121,16 @@ export function useProfileEditForm(): UseProfileEditFormReturn {
       await updateMutation.mutateAsync({
         id: user.id,
         data: {
-          name: fields.name,
-          email: fields.email,
-          bio: fields.bio,
-          city: fields.city,
-          skillIds: fields.selectedSkillIds,
+          name: currentFields.name,
+          email: currentFields.email,
+          bio: currentFields.bio,
+          city: currentFields.city,
+          skillNames: currentFields.draftSkillNames,
         },
       });
       await upsertProfileMutation.mutateAsync({
-        headline: fields.headline.trim(),
-        availability: fields.availability,
+        headline: currentFields.headline.trim(),
+        availability: currentFields.availability,
       });
       setIsEditing(false);
     } catch (err) {
@@ -144,7 +157,8 @@ export function useProfileEditForm(): UseProfileEditFormReturn {
     startEdit,
     cancelEdit,
     setField,
-    toggleSkill,
+    addSkill,
+    removeSkill,
     save,
   };
 }

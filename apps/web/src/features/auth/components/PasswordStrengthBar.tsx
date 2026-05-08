@@ -8,7 +8,7 @@ export function PasswordStrengthBar({ score }: PasswordStrengthBarProps) {
       {[0, 1, 2, 3].map((i) => (
         <span
           key={i}
-          className={`h-[3px] flex-1 rounded-full transition-colors ${i < score ? 'bg-accent' : 'bg-line'}`}
+          className={`h-[3px] flex-1 rounded-full transition-colors ${i < score ? 'bg-primary' : 'bg-line'}`}
         />
       ))}
     </div>

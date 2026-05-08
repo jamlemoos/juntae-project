@@ -28,7 +28,7 @@ export function RoleCard({ index, role, errors, onChange, onRemove }: RoleCardPr
           type="button"
           onClick={onRemove}
           aria-label={`Remover papel ${index + 1}`}
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full text-mute transition hover:bg-cream hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-mute transition hover:bg-cream hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <X size={14} aria-hidden="true" />
         </button>

@@ -144,7 +144,7 @@ export function NewProjectPage() {
             <div className="col-span-12 lg:col-span-4 lg:text-right">
               <p className="serif italic max-w-[28ch] text-[17px] leading-[1.5] text-ink-2 lg:ml-auto">
                 "Conta sua ideia e quem você precisa para{' '}
-                <span className="text-accent">começar</span>."
+                <span className="text-secondary">começar</span>."
               </p>
             </div>
           </div>
@@ -283,7 +283,7 @@ export function NewProjectPage() {
                           Adicione pelo menos uma pessoa pra esse projeto sair do papel.
                         </p>
                         {noRolesError && (
-                          <p role="alert" className="mt-3 text-[13px] font-medium text-accent">
+                          <p role="alert" className="mt-3 text-[13px] font-medium text-error">
                             {noRolesError}
                           </p>
                         )}
@@ -306,7 +306,7 @@ export function NewProjectPage() {
                     <button
                       type="button"
                       onClick={handleAddRole}
-                      className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                      className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                     >
                       <Plus size={14} aria-hidden="true" />
                       adicionar pessoa
@@ -318,7 +318,7 @@ export function NewProjectPage() {
                   <button
                     type="submit"
                     disabled={form.state.isSubmitting}
-                    className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-8 text-[15px] font-medium text-cream transition-colors hover:brightness-105 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full bg-primary px-8 text-[15px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
                     {form.state.isSubmitting ? 'Criando…' : 'Criar projeto'}
                     {!form.state.isSubmitting && <ArrowRight size={14} aria-hidden="true" />}

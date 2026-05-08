@@ -52,10 +52,10 @@ export function CompletionCard({ items, onEdit }: CompletionCardProps) {
         type="button"
         onClick={onEdit}
         className={[
-          'mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full py-3 text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink',
+          'mt-5 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full py-3 text-[14px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
           isComplete
             ? 'ring-1 ring-line text-ink hover:bg-cream-2'
-            : 'bg-accent text-cream hover:bg-accent/90',
+            : 'bg-primary text-white hover:bg-primary-hover active:bg-primary-active',
         ].join(' ')}
       >
         {ctaLabel}

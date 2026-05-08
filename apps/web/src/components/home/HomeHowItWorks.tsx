@@ -28,7 +28,7 @@ export function HomeHowItWorks() {
             como funciona
           </div>
           <h2 className="display text-[40px] font-bold leading-[1.02] md:text-[54px]">
-            Da ideia ao time, <span className="text-accent">em três passos.</span>
+            Da ideia ao time, <span className="text-secondary">em três passos.</span>
           </h2>
         </div>
 
@@ -36,7 +36,7 @@ export function HomeHowItWorks() {
           {steps.map((s, i) => (
             <div key={s.n} className="relative col-span-12 md:col-span-4">
               <div className="mb-4 flex items-baseline gap-3">
-                <span className="display tnum text-[44px] font-bold leading-none text-accent">
+                <span className="display tnum text-[44px] font-bold leading-none text-primary">
                   {s.n}
                 </span>
                 {i < steps.length - 1 && (
@@ -58,7 +58,7 @@ export function HomeHowItWorks() {
           </p>
           <Link
             to="/register"
-            className="inline-flex h-11 items-center gap-2 rounded-full bg-ink px-5 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-primary px-5 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Criar uma conta <ArrowRight size={14} aria-hidden="true" />
           </Link>

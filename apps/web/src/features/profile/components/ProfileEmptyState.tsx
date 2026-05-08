@@ -15,7 +15,7 @@ export function ProfileEmptyState({ children, cta, onCta }: ProfileEmptyStatePro
         <button
           type="button"
           onClick={onCta}
-          className="ulink mt-4 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-accent"
+          className="ulink mt-4 inline-flex items-center gap-1.5 text-[13.5px] font-medium text-error cursor-pointer"
         >
           {cta} <ArrowRight size={14} aria-hidden="true" />
         </button>

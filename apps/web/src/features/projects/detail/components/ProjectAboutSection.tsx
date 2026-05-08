@@ -43,7 +43,7 @@ export function ProjectAboutSection({
             type="button"
             aria-label="Editar seção Sobre"
             onClick={onStartEditing}
-            className="mt-1 inline-flex shrink-0 items-center gap-1.5 rounded text-[13px] text-mute transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="mt-1 inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded text-[13px] text-mute transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <Pencil size={13} aria-hidden="true" />
             editar
@@ -83,14 +83,14 @@ export function ProjectAboutSection({
             <button
               type="button"
               onClick={onSave}
-              className="inline-flex h-9 items-center rounded-full bg-ink px-5 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              className="inline-flex h-9 cursor-pointer items-center rounded-full bg-primary px-5 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               Salvar
             </button>
             <button
               type="button"
               onClick={onCancel}
-              className="inline-flex h-9 items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+              className="inline-flex h-9 cursor-pointer items-center rounded-full px-5 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               Cancelar
             </button>

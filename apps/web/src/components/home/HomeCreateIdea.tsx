@@ -18,8 +18,8 @@ export function HomeCreateIdea() {
             sua vez
           </div>
           <h2 className="display max-w-[16ch] text-[44px] font-bold leading-[1.02] md:text-[64px]">
-            Você tem uma ideia <span className="serif font-medium text-accent">boa</span> parada em
-            algum lugar?
+            Você tem uma ideia <span className="serif font-medium text-secondary">boa</span> parada
+            em algum lugar?
           </h2>
           <p className="mt-6 max-w-lg text-[16.5px] leading-[1.6] text-ink-2">
             Conta pra gente em algumas frases. A gente te ajuda a formatar o convite e mostra pras
@@ -29,7 +29,7 @@ export function HomeCreateIdea() {
             {isAuthenticated ? (
               <Link
                 to="/projects/new"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-[15px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 Criar meu projeto
                 <ArrowRight size={14} aria-hidden="true" />
@@ -37,7 +37,7 @@ export function HomeCreateIdea() {
             ) : (
               <Link
                 to="/register"
-                className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-[15px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 Contar minha ideia
                 <ArrowRight size={14} aria-hidden="true" />
@@ -50,7 +50,7 @@ export function HomeCreateIdea() {
           <div className="lift relative rounded-[28px] bg-cream-2 p-7 ring-1 ring-line">
             <div className="mb-5 flex items-center gap-3">
               <span
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink text-[12px] font-semibold text-cream"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[12px] font-semibold text-primary ring-1 ring-primary/20"
                 aria-hidden="true"
               >
                 Vo

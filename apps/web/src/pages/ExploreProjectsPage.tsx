@@ -55,7 +55,7 @@ export function ExploreProjectsPage() {
                 </p>
                 <Link
                   to="/projects/new"
-                  className="mt-6 inline-flex items-center gap-1.5 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-cream transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                  className="mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
                   Começar um projeto
                 </Link>
@@ -70,7 +70,7 @@ export function ExploreProjectsPage() {
                     type="button"
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
-                    className="mt-2 self-center rounded-full border border-line-2 px-5 py-2 text-[13px] font-medium text-ink transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                    className="mt-2 cursor-pointer self-center rounded-full border border-line-2 px-5 py-2 text-[13px] font-medium text-ink transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
                     {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
                   </button>

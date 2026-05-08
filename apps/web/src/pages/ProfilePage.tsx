@@ -6,7 +6,6 @@ import { ProfileEditForm } from '../features/profile/components/ProfileEditForm'
 import { useAuth } from '../features/auth/hooks/useAuth';
 import { useProfileEditForm } from '../features/profile/hooks/useProfileEditForm';
 import { useMyProfileQuery } from '../features/users/hooks/useProfileQuery';
-import { useSkillsQuery } from '../features/skills/hooks/useSkillsQuery';
 import {
   getAvatarInitial,
   getMemberSince,
@@ -18,7 +17,6 @@ export function ProfilePage() {
   const logout = useAuth((s) => s.logout);
   const form = useProfileEditForm();
   const { data: myProfile } = useMyProfileQuery();
-  const { data: availableSkills } = useSkillsQuery();
 
   const avatarInitial = getAvatarInitial(user?.name);
   const memberSince = getMemberSince(user?.createdAt);
@@ -43,9 +41,9 @@ export function ProfilePage() {
                   errors={form.errors}
                   saveError={form.saveError}
                   isSaving={form.isSaving}
-                  availableSkills={availableSkills ?? []}
                   onSetField={form.setField}
-                  onToggleSkill={form.toggleSkill}
+                  onAddSkill={form.addSkill}
+                  onRemoveSkill={form.removeSkill}
                   onSave={() => void form.save()}
                   onCancel={form.cancelEdit}
                 />
@@ -65,10 +63,10 @@ export function ProfilePage() {
                       <button
                         type="button"
                         onClick={logout}
-                        className="inline-flex w-full items-center justify-between gap-2 text-accent"
+                        className="inline-flex w-full cursor-pointer items-center justify-between gap-2 text-error hover:text-red-700 transition-colors"
                       >
                         Sair da Juntaê
-                        <span className="text-accent">
+                        <span className="text-error">
                           <ArrowRight size={14} aria-hidden="true" />
                         </span>
                       </button>

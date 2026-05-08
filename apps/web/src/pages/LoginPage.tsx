@@ -4,6 +4,7 @@ import { useForm } from '@tanstack/react-form';
 import { AuthField } from '../components/auth/AuthField';
 import { ArrowRight } from 'lucide-react';
 import { Header } from '../layouts/Header';
+import { Button } from '../shared/ui/Button';
 import {
   validateEmail,
   validateLoginPassword as validatePassword,
@@ -47,7 +48,8 @@ export function LoginPage() {
         <div className="relative mx-auto grid max-w-[1200px] grid-cols-12 items-center gap-8 px-6 py-20">
           <div className="col-span-12 lg:col-span-7">
             <h1 className="display max-w-[14ch] text-[56px] font-bold leading-[1.0] text-ink md:text-[72px] lg:text-[80px]">
-              De volta pra <span className="serif italic font-medium text-accent">construir</span>.
+              De volta pra{' '}
+              <span className="serif italic font-medium text-secondary">construir</span>.
             </h1>
             <p className="mt-7 max-w-md text-[16.5px] leading-[1.6] text-ink-2">
               Continua de onde parou: seu time, suas conversas e os projetos que você está
@@ -69,7 +71,7 @@ export function LoginPage() {
                 <div className="flex items-center gap-3">
                   <span
                     aria-hidden="true"
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink text-[13px] font-semibold text-cream"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[13px] font-semibold text-primary ring-1 ring-primary/20"
                   >
                     V
                   </span>
@@ -134,19 +136,20 @@ export function LoginPage() {
               <div className="dotted my-7 text-line-2" aria-hidden="true" />
 
               {serverError && (
-                <p role="alert" className="mb-4 text-center text-[13px] text-accent">
+                <p role="alert" className="mb-4 text-center text-[13px] text-error">
                   {serverError}
                 </p>
               )}
 
-              <button
+              <Button
                 type="submit"
+                size="lg"
                 disabled={form.state.isSubmitting}
-                className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+                className="w-full rounded-full"
               >
                 {form.state.isSubmitting ? 'Entrando…' : 'Entrar'}
                 {!form.state.isSubmitting && <ArrowRight size={14} aria-hidden="true" />}
-              </button>
+              </Button>
 
               <p className="mt-5 text-center text-[13.5px] text-ink-2">
                 primeira vez?{' '}
