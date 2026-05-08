@@ -1,46 +1,83 @@
-interface Skill {
-  id: string;
-  name: string;
-}
+import { useState } from 'react';
+import { X } from 'lucide-react';
 
 interface ProfileSkillsSelectorProps {
-  availableSkills: Skill[];
-  selectedSkillIds: string[];
-  onToggle: (id: string) => void;
+  skills: string[];
+  onAddSkill: (name: string) => void;
+  onRemoveSkill: (name: string) => void;
+  disabled?: boolean;
 }
 
 export function ProfileSkillsSelector({
-  availableSkills,
-  selectedSkillIds,
-  onToggle,
+  skills,
+  onAddSkill,
+  onRemoveSkill,
+  disabled,
 }: ProfileSkillsSelectorProps) {
-  if (availableSkills.length === 0) return null;
+  const [inputValue, setInputValue] = useState('');
+
+  function handleAdd() {
+    const name = inputValue.trim();
+    if (!name) return;
+    onAddSkill(name);
+    setInputValue('');
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAdd();
+    }
+  }
 
   return (
     <div>
       <div className="mb-2.5 text-[12px] font-medium uppercase tracking-[.18em] text-mute">
         skills
       </div>
-      <div className="flex flex-wrap gap-2">
-        {availableSkills.map((skill) => {
-          const selected = selectedSkillIds.includes(skill.id);
-          return (
-            <button
-              key={skill.id}
-              type="button"
-              onClick={() => onToggle(skill.id)}
-              className={[
-                'inline-flex h-8 items-center rounded-full px-3.5 text-[13px] transition',
-                selected
-                  ? 'bg-ink text-cream ring-1 ring-ink'
-                  : 'bg-transparent text-mute ring-1 ring-dashed ring-line-2 hover:text-ink hover:ring-ink',
-              ].join(' ')}
+
+      {skills.length === 0 ? (
+        <p className="mb-3 text-[13px] text-mute">Nenhuma skill adicionada ainda.</p>
+      ) : (
+        <div className="mb-3 flex flex-wrap gap-2">
+          {skills.map((name) => (
+            <span
+              key={name}
+              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-primary/10 pl-3.5 pr-2 text-[13px] text-primary ring-1 ring-primary/30"
             >
-              {selected ? '✓ ' : '+ '}
-              {skill.name}
-            </button>
-          );
-        })}
+              {name}
+              <button
+                type="button"
+                onClick={() => onRemoveSkill(name)}
+                disabled={disabled}
+                aria-label={`Remover ${name}`}
+                className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-primary/60 transition hover:bg-primary/20 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <X size={11} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          disabled={disabled}
+          placeholder="ex: frontend, design…"
+          className="min-w-0 flex-1 rounded-xl bg-cream px-4 py-2 text-[13px] text-ink ring-1 ring-line placeholder:text-mute focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+        />
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={!inputValue.trim() || disabled}
+          className="cursor-pointer rounded-xl px-4 py-2 text-[13px] font-medium text-primary ring-1 ring-primary/50 transition hover:bg-primary/5 active:bg-primary/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Adicionar
+        </button>
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export function ProjectTextarea({
           {label}
         </label>
         {error && (
-          <span id={errorId} role="alert" className="text-[11.5px] font-medium text-accent">
+          <span id={errorId} role="alert" className="text-[11.5px] font-medium text-error">
             {error}
           </span>
         )}
@@ -41,7 +41,7 @@ export function ProjectTextarea({
           'w-full resize-y rounded-xl bg-cream px-4 py-3 text-[15px] text-ink',
           'placeholder:font-normal placeholder:text-mute',
           'outline-none ring-1 transition',
-          error ? 'ring-accent' : 'ring-line hover:ring-line-2 focus:ring-ink',
+          error ? 'ring-error' : 'ring-line hover:ring-line-2 focus:ring-primary',
           className,
         ]
           .filter(Boolean)

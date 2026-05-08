@@ -35,7 +35,7 @@ export function ProjectStatusRail({
           <button
             type="button"
             onClick={onEditProject}
-            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-ink px-5 py-3 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Editar projeto
           </button>
@@ -61,7 +61,7 @@ export function ProjectStatusRail({
             type="button"
             onClick={onPublish}
             disabled={isPublishing}
-            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-accent px-5 py-3 text-[14px] font-medium text-cream transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:pointer-events-none disabled:opacity-50"
+            className="mt-6 inline-flex w-full cursor-pointer items-center justify-center rounded-full bg-primary px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPublishing ? 'Publicando…' : 'Publicar projeto'}
           </button>

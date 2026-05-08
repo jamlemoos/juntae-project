@@ -10,7 +10,7 @@ export function Footer() {
           <div className="col-span-12 md:col-span-6">
             <div className="display text-[64px] font-bold leading-[0.95] tracking-tight md:text-[80px]">
               Juntaê
-              <span className="serif font-normal text-accent">,</span>
+              <span className="serif font-normal text-primary">,</span>
             </div>
             <p className="mt-4 max-w-md text-[15px] text-white/60">
               Um lugar calmo pra encontrar quem topa construir junto.

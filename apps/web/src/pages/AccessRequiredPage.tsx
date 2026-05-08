@@ -10,7 +10,7 @@ export function AccessRequiredPage() {
           className="display mb-12 inline-flex items-center gap-1.5 text-[22px] font-extrabold tracking-tight text-ink"
         >
           Juntaê
-          <span className="serif relative -top-0.5 text-[26px] leading-none text-accent">,</span>
+          <span className="serif relative -top-0.5 text-[26px] leading-none text-primary">,</span>
         </Link>
         <h1 className="display text-[28px] font-bold leading-tight text-ink">
           Entre para ver projetos e formar times.
@@ -21,13 +21,13 @@ export function AccessRequiredPage() {
         <div className="mt-8 flex flex-col gap-3">
           <Link
             to="/login"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-[15px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Entrar <ArrowRight size={14} aria-hidden="true" />
           </Link>
           <Link
             to="/register"
-            className="inline-flex h-12 items-center justify-center rounded-full text-[15px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+            className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full text-[15px] font-medium text-ink ring-1 ring-line-2 transition-colors hover:border-primary/30 hover:bg-cream-2 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             Criar conta
           </Link>

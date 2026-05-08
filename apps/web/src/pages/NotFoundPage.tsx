@@ -12,7 +12,7 @@ export function NotFoundPage() {
       </p>
       <Link
         to="/"
-        className="mt-8 inline-flex h-11 items-center gap-2 rounded-full bg-ink px-6 text-[14px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+        className="mt-8 inline-flex h-11 cursor-pointer items-center gap-2 rounded-full bg-primary px-6 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
       >
         Voltar pra home
       </Link>

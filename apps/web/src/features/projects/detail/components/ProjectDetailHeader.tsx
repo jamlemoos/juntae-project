@@ -33,7 +33,7 @@ export function ProjectDetailHeader({
                 <span className="mono inline-flex items-center gap-1.5 rounded-full bg-cream-2 px-3 py-1 text-[11px] uppercase tracking-[.18em] text-ink ring-1 ring-line">
                   <span
                     className="h-1.5 w-1.5 rounded-full"
-                    style={{ background: 'var(--color-accent)' }}
+                    style={{ background: 'var(--color-secondary)' }}
                     aria-hidden="true"
                   />
                   publicado
@@ -73,7 +73,7 @@ export function ProjectDetailHeader({
           <div className="col-span-12 lg:col-span-3 lg:text-right">
             <p className="serif italic max-w-[28ch] text-[17px] leading-[1.5] text-ink-2 lg:ml-auto">
               "O primeiro passo é ter a ideia no papel.{' '}
-              <span className="text-accent">O time vem depois.</span>"
+              <span className="text-secondary">O time vem depois.</span>"
             </p>
           </div>
         </div>

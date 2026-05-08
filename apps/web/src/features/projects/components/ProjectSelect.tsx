@@ -99,10 +99,10 @@ export function ProjectSelect({
   }
 
   const ringClass = error
-    ? 'ring-accent'
+    ? 'ring-error'
     : open
-      ? 'ring-ink'
-      : 'ring-line hover:ring-line-2 focus:ring-ink';
+      ? 'ring-primary'
+      : 'ring-line hover:ring-line-2 focus:ring-primary';
 
   return (
     <div>
@@ -114,7 +114,7 @@ export function ProjectSelect({
           {label}
         </span>
         {error && (
-          <span id={errorId} role="alert" className="text-[11.5px] font-medium text-accent">
+          <span id={errorId} role="alert" className="text-[11.5px] font-medium text-error">
             {error}
           </span>
         )}
@@ -182,7 +182,7 @@ export function ProjectSelect({
               >
                 <span>{opt.label}</span>
                 {opt.value === value && (
-                  <Check size={13} aria-hidden="true" className="text-accent" />
+                  <Check size={13} aria-hidden="true" className="text-primary" />
                 )}
               </li>
             ))}

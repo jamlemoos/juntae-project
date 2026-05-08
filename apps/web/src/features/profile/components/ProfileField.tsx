@@ -23,11 +23,11 @@ export function ProfileField({ label, error, ...props }: ProfileFieldProps) {
         aria-describedby={error ? `${id}-err` : undefined}
         className={[
           'w-full rounded-xl bg-cream px-4 py-3 text-[14.5px] text-ink placeholder:text-mute focus:outline-none focus:ring-2',
-          error ? 'ring-1 ring-accent focus:ring-accent' : 'ring-1 ring-line focus:ring-ink',
+          error ? 'ring-1 ring-error focus:ring-error' : 'ring-1 ring-line focus:ring-primary',
         ].join(' ')}
       />
       {error && (
-        <p id={`${id}-err`} className="mt-1 text-[12px] text-accent">
+        <p id={`${id}-err`} className="mt-1 text-[12px] text-error">
           {error}
         </p>
       )}

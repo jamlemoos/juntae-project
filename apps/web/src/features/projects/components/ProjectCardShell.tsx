@@ -21,7 +21,7 @@ export function ProjectCardShell({ id, title, description, badge, footer }: Proj
     <Link
       to="/projects/$projectId"
       params={{ projectId: id }}
-      className="lift block rounded-xl border hairline bg-cream-2/30 p-5 transition-colors hover:border-line-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+      className="lift block cursor-pointer rounded-xl border hairline bg-cream-2/30 p-5 transition-colors hover:border-primary/30 hover:bg-cream-2/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
     >
       <div className="flex items-start justify-between gap-4">
         <p className="display text-[15px] font-semibold text-ink">{title || 'Projeto sem nome'}</p>

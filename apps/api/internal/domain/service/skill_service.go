@@ -1,14 +1,17 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strings"
 
 	"juntae-api/internal/domain/dto"
 	"juntae-api/internal/domain/model"
 	"juntae-api/internal/domain/repository"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type SkillService struct {
@@ -21,9 +24,27 @@ func NewSkillService(repo *repository.SkillRepository, audit *AuditService) *Ski
 }
 
 func (s *SkillService) CreateSkill(req dto.CreateSkillRequest) (*dto.SkillResponse, error) {
-	skill := &model.Skill{Name: req.Name}
+	name := strings.ToLower(strings.TrimSpace(req.Name))
+
+	// return existing skill if name already taken (case-insensitive)
+	existing, err := s.repo.FindByName(name)
+	if err == nil {
+		resp := mapSkillResponse(existing)
+		return &resp, nil
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("find skill: %w", err)
+	}
+
+	skill := &model.Skill{Name: name}
 	if err := s.repo.Create(skill); err != nil {
 		if isUniqueViolation(err) {
+			// race condition: try to find again
+			existing, ferr := s.repo.FindByName(name)
+			if ferr == nil {
+				resp := mapSkillResponse(existing)
+				return &resp, nil
+			}
 			return nil, ErrConflict
 		}
 		return nil, fmt.Errorf("create skill: %w", err)

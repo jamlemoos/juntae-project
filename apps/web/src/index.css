@@ -3,40 +3,62 @@
 /* ─── Google Fonts loaded via index.html ─────────────────────────────────── */
 
 @theme {
-  /* ── Handoff palette (source of truth: Juntae Home.html) ── */
-  --color-cream: #f7f1e6;
-  --color-cream-2: #efe7d5;
-  --color-cream-3: #e5dac2;
-  --color-ink: #2a2620;
-  --color-ink-2: #4a4339;
-  --color-mute: #8a8070;
-  --color-line: #e2d6bd;
-  --color-line-2: #d6c6a5;
-  --color-accent: #c8563c;
-  --color-sage: #9ba888;
-  --color-honey: #e0a64b;
-  --color-sky: #7fa3b8;
+  /* ── Juntaê brand palette ── */
+  /* Background / surface scale — very light lavender neutrals */
+  --color-cream: #fafaff;
+  --color-cream-2: #f4f4ff;
+  --color-cream-3: #ebebfc;
 
-  /* ── Legacy aliases (kept for existing UI components) ── */
-  --color-brand-50: #fbeee9;
-  --color-brand-100: #f6d8cd;
-  --color-brand-200: #e9b6a3;
-  --color-brand-500: #c8563c;
-  --color-brand-600: #a8451e;
-  --color-surface: #f7f1e6;
-  --color-surface-raised: #efe7d5;
-  --color-surface-subtle: #e5dac2;
-  --color-border: #e2d6bd;
-  --color-content: #2a2620;
-  --color-content-secondary: #4a4339;
-  --color-content-tertiary: #8a8070;
-  --color-content-inverse: #f7f1e6;
-  --color-success: #4f6f52;
-  --color-success-light: #e6ede1;
-  --color-warning: #9a6a1f;
-  --color-warning-light: #f5e8c8;
-  --color-error: #b13a2e;
-  --color-error-light: #f4d8d3;
+  /* Text scale — strong neutrals */
+  --color-ink: #18181b;
+  --color-ink-2: #3f3f46;
+  --color-mute: #71717a;
+
+  /* Borders */
+  --color-line: #e4e4e7;
+  --color-line-2: #d4d4d8;
+
+  /* Primary — purple/violet */
+  --color-primary: #6d28d9;
+  --color-primary-hover: #5b21b6;
+  --color-primary-active: #4c1d95;
+  --color-primary-light: #ede9fe;
+
+  /* Secondary — cyan */
+  --color-secondary: #06b6d4;
+  --color-secondary-hover: #0891b2;
+  --color-secondary-light: #cffafe;
+
+  /* Accent — cyan (same hue as secondary, used for decorative highlights) */
+  --color-accent: #06b6d4;
+  --color-accent-hover: #0891b2;
+  --color-accent-light: #cffafe;
+
+  /* Semantic — sage/sky repurposed as tinted neutrals */
+  --color-sage: #7c3aed;
+  --color-honey: #06b6d4;
+  --color-sky: #06b6d4;
+
+  /* ── Semantic aliases ── */
+  --color-brand-50: #ede9fe;
+  --color-brand-100: #ddd6fe;
+  --color-brand-200: #c4b5fd;
+  --color-brand-500: #6d28d9;
+  --color-brand-600: #5b21b6;
+  --color-surface: #fafaff;
+  --color-surface-raised: #f4f4ff;
+  --color-surface-subtle: #ebebfc;
+  --color-border: #e4e4e7;
+  --color-content: #18181b;
+  --color-content-secondary: #3f3f46;
+  --color-content-tertiary: #71717a;
+  --color-content-inverse: #ffffff;
+  --color-success: #15803d;
+  --color-success-light: #dcfce7;
+  --color-warning: #b45309;
+  --color-warning-light: #fef3c7;
+  --color-error: #b91c1c;
+  --color-error-light: #fee2e2;
 }
 
 @layer base {
@@ -76,11 +98,11 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Paper texture — subtle radial gradients on cream bg */
+  /* Subtle gradient wash — brand tint */
   .paper-tex {
     background-image:
-      radial-gradient(1200px 400px at 10% 0%, rgba(200, 86, 60, 0.06), transparent 60%),
-      radial-gradient(900px 500px at 95% 10%, rgba(155, 168, 136, 0.1), transparent 60%);
+      radial-gradient(1200px 400px at 10% 0%, rgba(109, 40, 217, 0.06), transparent 60%),
+      radial-gradient(900px 500px at 95% 10%, rgba(6, 182, 212, 0.07), transparent 60%);
   }
 
   /* Animated underline link */

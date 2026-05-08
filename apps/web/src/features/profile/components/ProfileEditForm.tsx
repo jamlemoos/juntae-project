@@ -11,12 +11,12 @@ interface ProfileEditFormProps {
   errors: Record<string, string>;
   saveError: string | null;
   isSaving: boolean;
-  availableSkills: { id: string; name: string }[];
   onSetField: <K extends keyof ProfileEditFormValues>(
     key: K,
     value: ProfileEditFormValues[K]
   ) => void;
-  onToggleSkill: (id: string) => void;
+  onAddSkill: (name: string) => void;
+  onRemoveSkill: (name: string) => void;
   onSave: () => void;
   onCancel: () => void;
 }
@@ -26,9 +26,9 @@ export function ProfileEditForm({
   errors,
   saveError,
   isSaving,
-  availableSkills,
   onSetField,
-  onToggleSkill,
+  onAddSkill,
+  onRemoveSkill,
   onSave,
   onCancel,
 }: ProfileEditFormProps) {
@@ -46,7 +46,7 @@ export function ProfileEditForm({
           type="button"
           onClick={onCancel}
           aria-label="Cancelar edição"
-          className="flex h-8 w-8 items-center justify-center rounded-full text-mute ring-1 ring-line transition hover:text-ink"
+          className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-mute ring-1 ring-line transition hover:text-ink"
         >
           <X size={14} />
         </button>
@@ -91,7 +91,7 @@ export function ProfileEditForm({
             id={availabilityId}
             value={fields.availability}
             onChange={(e) => onSetField('availability', e.target.value)}
-            className="w-full rounded-xl bg-cream px-4 py-3 text-[14px] text-ink ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-ink"
+            className="w-full rounded-xl bg-cream px-4 py-3 text-[14px] text-ink ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {AVAILABILITY_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>
@@ -113,19 +113,20 @@ export function ProfileEditForm({
             onChange={(e) => onSetField('bio', e.target.value)}
             rows={4}
             placeholder="Conte como você gosta de contribuir…"
-            className="w-full resize-none rounded-xl bg-cream px-4 py-3 text-[14.5px] text-ink ring-1 ring-line placeholder:text-mute focus:outline-none focus:ring-2 focus:ring-ink"
+            className="w-full resize-none rounded-xl bg-cream px-4 py-3 text-[14.5px] text-ink ring-1 ring-line placeholder:text-mute focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
         <ProfileSkillsSelector
-          availableSkills={availableSkills}
-          selectedSkillIds={fields.selectedSkillIds}
-          onToggle={onToggleSkill}
+          skills={fields.draftSkillNames}
+          onAddSkill={onAddSkill}
+          onRemoveSkill={onRemoveSkill}
+          disabled={isSaving}
         />
       </div>
 
       {saveError && (
-        <p role="alert" className="mt-5 text-center text-[13px] text-accent">
+        <p role="alert" className="mt-5 text-center text-[13px] text-error">
           {saveError}
         </p>
       )}
@@ -135,7 +136,7 @@ export function ProfileEditForm({
           type="button"
           onClick={onSave}
           disabled={isSaving}
-          className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-ink text-[14px] font-medium text-cream transition-colors hover:bg-black disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink"
+          className="inline-flex h-11 flex-1 cursor-pointer items-center justify-center rounded-full bg-primary text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           {isSaving ? 'Salvando…' : 'Salvar alterações'}
         </button>
@@ -143,7 +144,7 @@ export function ProfileEditForm({
           type="button"
           onClick={onCancel}
           disabled={isSaving}
-          className="inline-flex h-11 items-center rounded-full px-5 text-[14px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex h-11 cursor-pointer items-center rounded-full px-5 text-[14px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancelar
         </button>

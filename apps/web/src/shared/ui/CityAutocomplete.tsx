@@ -105,10 +105,10 @@ export function CityAutocomplete({
   }
 
   const ringClass = error
-    ? 'ring-accent'
+    ? 'ring-error'
     : open
-      ? 'ring-ink'
-      : 'ring-line hover:ring-line-2 focus:ring-ink';
+      ? 'ring-primary'
+      : 'ring-line hover:ring-line-2 focus:ring-primary';
 
   const showDropdown = open && (isLoading || options.length > 0);
 
@@ -122,7 +122,7 @@ export function CityAutocomplete({
           {label}
         </label>
         {error && (
-          <span id={errorId} role="alert" className="text-[11.5px] font-medium text-accent">
+          <span id={errorId} role="alert" className="text-[11.5px] font-medium text-error">
             {error}
           </span>
         )}

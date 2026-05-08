@@ -35,7 +35,7 @@ export function ProjectsPage() {
             <div className="col-span-12 lg:col-span-4 lg:text-right">
               <Link
                 to="/projects/new"
-                className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-cream transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 <Plus size={15} aria-hidden="true" />
                 Começar projeto
@@ -76,7 +76,7 @@ export function ProjectsPage() {
                 </p>
                 <Link
                   to="/projects/new"
-                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] text-accent transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                  className="mt-4 inline-flex cursor-pointer items-center gap-1.5 text-[13px] text-primary transition-colors hover:text-primary-hover focus-visible:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
                   <Plus size={13} aria-hidden="true" />
                   Começar projeto
@@ -92,7 +92,7 @@ export function ProjectsPage() {
                     type="button"
                     onClick={() => fetchNextPage()}
                     disabled={isFetchingNextPage}
-                    className="mt-2 self-center rounded-full border border-line-2 px-5 py-2 text-[13px] font-medium text-ink transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-line-2 focus-visible:ring-offset-2 focus-visible:ring-offset-cream"
+                    className="mt-2 cursor-pointer self-center rounded-full border border-line-2 px-5 py-2 text-[13px] font-medium text-ink transition-colors hover:border-primary/30 hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
                     {isFetchingNextPage ? 'Carregando...' : 'Carregar mais'}
                   </button>

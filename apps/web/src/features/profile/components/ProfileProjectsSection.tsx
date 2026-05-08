@@ -22,14 +22,14 @@ export function ProfileProjectsSection() {
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <Link
             to="/projects/new"
-            className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-cream transition-colors hover:bg-black"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active"
           >
             Criar projeto
             <ArrowRight size={14} aria-hidden="true" />
           </Link>
           <Link
             to="/projects"
-            className="inline-flex items-center rounded-full px-5 py-2.5 text-[14px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2"
+            className="inline-flex cursor-pointer items-center rounded-full px-5 py-2.5 text-[14px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2"
           >
             Explorar projetos
           </Link>

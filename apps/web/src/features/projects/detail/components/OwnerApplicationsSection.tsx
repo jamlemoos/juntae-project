@@ -62,7 +62,7 @@ function ApplicationCard({ application, onAccept, onReject, isUpdating }: Applic
             type="button"
             onClick={onAccept}
             disabled={isUpdating}
-            className="inline-flex h-8 items-center rounded-full bg-ink px-4 text-[13px] font-medium text-cream transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+            className="inline-flex h-8 cursor-pointer items-center rounded-full bg-primary px-4 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Aceitar
           </button>
@@ -70,7 +70,7 @@ function ApplicationCard({ application, onAccept, onReject, isUpdating }: Applic
             type="button"
             onClick={onReject}
             disabled={isUpdating}
-            className="inline-flex h-8 items-center rounded-full px-4 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink disabled:opacity-60"
+            className="inline-flex h-8 cursor-pointer items-center rounded-full px-4 text-[13px] font-medium text-ink ring-1 ring-line transition-colors hover:bg-cream-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Recusar
           </button>

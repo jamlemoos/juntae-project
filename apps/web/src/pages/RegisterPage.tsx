@@ -6,6 +6,7 @@ import { PasswordStrengthBar } from '../features/auth/components/PasswordStrengt
 import { AuthField } from '../components/auth/AuthField';
 import { ArrowRight } from 'lucide-react';
 import { Header } from '../layouts/Header';
+import { Button } from '../shared/ui/Button';
 import {
   validateName,
   validateEmail,
@@ -69,8 +70,8 @@ export function RegisterPage() {
             </div>
             <h1 className="display max-w-[15ch] text-[52px] font-bold leading-[1.0] text-ink md:text-[68px] lg:text-[78px]">
               Você não tá entrando num{' '}
-              <span className="serif italic font-medium text-accent">site,</span> tá entrando numa{' '}
-              <span className="text-accent">comunidade.</span>
+              <span className="serif italic font-medium text-secondary">site,</span> tá entrando
+              numa <span className="text-primary">comunidade.</span>
             </h1>
             <p className="mt-7 max-w-md text-[16.5px] leading-[1.6] text-ink-2">
               Cria sua conta em um minuto. Depois você decide se quer começar um projeto ou entrar
@@ -92,7 +93,7 @@ export function RegisterPage() {
             {registrationSucceeded ? (
               <div className="lift relative rounded-[28px] bg-cream-2 p-7 ring-1 ring-line md:p-8">
                 <div className="flex flex-col items-center gap-5 py-4 text-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink text-[20px] font-bold text-cream">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-[20px] font-bold text-primary ring-1 ring-primary/20">
                     ✓
                   </div>
                   <div>
@@ -103,7 +104,7 @@ export function RegisterPage() {
                   </div>
                   <Link
                     to="/login"
-                    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-primary px-6 text-[15px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
                     Fazer login <ArrowRight size={14} aria-hidden="true" />
                   </Link>
@@ -123,7 +124,7 @@ export function RegisterPage() {
                   <div className="flex items-center gap-3">
                     <span
                       aria-hidden="true"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-ink text-[13px] font-semibold text-cream"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-[13px] font-semibold text-primary ring-1 ring-primary/20"
                     >
                       V
                     </span>
@@ -264,7 +265,7 @@ export function RegisterPage() {
                     type="checkbox"
                     checked={termsAccepted}
                     onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="mt-[2px] h-4 w-4 shrink-0 cursor-pointer rounded accent-ink"
+                    className="mt-[2px] h-4 w-4 shrink-0 cursor-pointer rounded accent-primary"
                   />
                   <span>
                     topo os{' '}
@@ -280,19 +281,20 @@ export function RegisterPage() {
                 </label>
 
                 {serverError && (
-                  <p role="alert" className="mb-4 text-center text-[13px] text-accent">
+                  <p role="alert" className="mb-4 text-center text-[13px] text-error">
                     {serverError}
                   </p>
                 )}
 
-                <button
+                <Button
                   type="submit"
+                  size="lg"
                   disabled={form.state.isSubmitting || !termsAccepted}
-                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-accent px-6 text-[15px] font-medium text-white transition-colors hover:brightness-105 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  className="w-full rounded-full"
                 >
                   {form.state.isSubmitting ? 'Criando conta…' : 'Criar conta'}
                   {!form.state.isSubmitting && <ArrowRight size={14} aria-hidden="true" />}
-                </button>
+                </Button>
 
                 <p className="mt-5 text-center text-[13.5px] text-ink-2">
                   já está dentro?{' '}
