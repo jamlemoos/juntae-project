@@ -3,6 +3,7 @@ package service
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"juntae-api/internal/domain/dto"
 	"juntae-api/internal/domain/model"
@@ -51,15 +52,20 @@ func (s *ProjectService) CreateProject(creatorID uuid.UUID, req dto.CreateProjec
 	return &resp, nil
 }
 
-func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, status, city string, offset, limit int) ([]dto.ProjectListItemResponse, error) {
+func (s *ProjectService) GetProjectsForList(callerID uuid.UUID, q, status, city string, offset, limit int) ([]dto.ProjectListItemResponse, error) {
 	var (
 		projects []model.Project
 		err      error
 	)
-	if status != "" && city != "" {
+	if city != "" {
 		projects, err = s.repo.FindByStatusAndCreatorCityForList(status, city, offset, limit)
 	} else {
-		projects, err = s.repo.FindAllForList(offset, limit)
+		var statuses []string
+		if status != "" {
+			statuses = strings.Split(status, ",")
+		}
+		filters := repository.ProjectSearchFilters{Q: q, Statuses: statuses}
+		projects, err = s.repo.SearchForList(filters, offset, limit)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("get projects: %w", err)

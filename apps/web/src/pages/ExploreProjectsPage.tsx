@@ -1,12 +1,44 @@
+import { useState, useEffect } from 'react';
 import { Link } from '@tanstack/react-router';
 import { useInfiniteProjectsQuery } from '../features/projects/hooks/useProjectsQuery';
 import { ApiProjectCard } from '../features/projects/components/ApiProjectCard';
 import { SectionLayout } from '../shared/ui/SectionLayout';
+import type { ProjectSearchFilter } from '../features/projects/api/types';
+
+const STATUS_FILTER_OPTIONS: { label: string; value: string | undefined }[] = [
+  { label: 'Todos', value: undefined },
+  { label: 'Abertos', value: 'OPEN' },
+  { label: 'Fechados/indisponíveis', value: 'IN_PROGRESS,CLOSED' },
+];
 
 export function ExploreProjectsPage() {
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedQ, setDebouncedQ] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQ(searchInput.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const hasFilters = !!debouncedQ || !!statusFilter;
+
+  const filters: ProjectSearchFilter | undefined = hasFilters
+    ? {
+        ...(debouncedQ ? { q: debouncedQ } : {}),
+        ...(statusFilter ? { status: statusFilter } : {}),
+      }
+    : undefined;
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, isError } =
-    useInfiniteProjectsQuery(20);
+    useInfiniteProjectsQuery(20, filters);
   const projects = data?.pages.flat() ?? [];
+
+  function clearFilters() {
+    setSearchInput('');
+    setDebouncedQ('');
+    setStatusFilter(undefined);
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
@@ -39,6 +71,41 @@ export function ExploreProjectsPage() {
             id="published-projects"
             divider={false}
           >
+            <div className="mb-6 flex flex-col gap-3">
+              <input
+                type="search"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Buscar projetos..."
+                className="w-full max-w-md rounded-lg border border-line-2 bg-cream px-4 py-2.5 text-[14px] text-ink placeholder:text-mute focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                {STATUS_FILTER_OPTIONS.map((option) => (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() => setStatusFilter(option.value)}
+                    className={`rounded-full border px-4 py-1.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                      statusFilter === option.value
+                        ? 'border-primary/40 bg-primary/10 text-primary'
+                        : 'border-line-2 bg-cream text-ink-2 hover:border-primary/30 hover:text-primary'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+                {hasFilters && (
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="rounded-full border border-line-2 px-4 py-1.5 text-[13px] text-mute transition-colors hover:border-line hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  >
+                    Limpar filtros
+                  </button>
+                )}
+              </div>
+            </div>
+
             {isPending ? (
               <p className="text-[14px] text-mute">Carregando...</p>
             ) : isError ? (
@@ -47,18 +114,37 @@ export function ExploreProjectsPage() {
               </p>
             ) : projects.length === 0 ? (
               <div className="rounded-xl border border-dashed hairline px-6 py-12 text-center">
-                <p className="text-[16px] font-medium text-ink">
-                  Ainda não há projetos publicados.
-                </p>
-                <p className="mx-auto mt-2 max-w-[44ch] text-[14px] leading-relaxed text-mute">
-                  Seja o primeiro a publicar um projeto e encontrar pessoas para construir junto.
-                </p>
-                <Link
-                  to="/projects/new"
-                  className="mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                >
-                  Começar um projeto
-                </Link>
+                {hasFilters ? (
+                  <>
+                    <p className="text-[16px] font-medium text-ink">Nenhum projeto encontrado.</p>
+                    <p className="mx-auto mt-2 max-w-[44ch] text-[14px] leading-relaxed text-mute">
+                      Tente ajustar os filtros ou buscar com outros termos.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={clearFilters}
+                      className="mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-line-2 px-5 py-2.5 text-[14px] font-medium text-ink transition-colors hover:border-primary/30 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    >
+                      Limpar filtros
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[16px] font-medium text-ink">
+                      Ainda não há projetos publicados.
+                    </p>
+                    <p className="mx-auto mt-2 max-w-[44ch] text-[14px] leading-relaxed text-mute">
+                      Seja o primeiro a publicar um projeto e encontrar pessoas para construir
+                      junto.
+                    </p>
+                    <Link
+                      to="/projects/new"
+                      className="mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-primary-hover active:bg-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    >
+                      Começar um projeto
+                    </Link>
+                  </>
+                )}
               </div>
             ) : (
               <div className="flex flex-col gap-3">

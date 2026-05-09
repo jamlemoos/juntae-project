@@ -24,15 +24,8 @@ export async function getProjects(filter?: GetProjectsFilter): Promise<ProjectLi
   let path = '/projects';
   if (filter) {
     const params = new URLSearchParams();
-    const hasStatus = filter.status != null;
-    const hasCity = filter.city != null;
-    if (hasStatus !== hasCity) {
-      throw new Error('Invalid projects filter: status and city must be provided together');
-    }
-    if (filter.status != null && filter.city != null) {
-      params.set('status', filter.status);
-      params.set('city', filter.city);
-    }
+    if (filter.q) params.set('q', filter.q);
+    if (filter.status != null) params.set('status', filter.status);
     if (filter.page != null) params.set('page', String(filter.page));
     if (filter.limit != null) params.set('limit', String(filter.limit));
     const qs = params.toString();

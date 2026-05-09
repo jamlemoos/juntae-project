@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { getMyProjects, getProjects } from '../api/endpoints';
-import type { GetProjectsFilter, ProjectsPagination } from '../api/types';
+import type { GetProjectsFilter, ProjectSearchFilter, ProjectsPagination } from '../api/types';
 
 const PROJECTS_PAGE_LIMIT_MAX = 50;
 
@@ -22,11 +22,12 @@ export function useMyProjectsQuery(pagination?: ProjectsPagination) {
   });
 }
 
-export function useInfiniteProjectsQuery(limit = 20) {
+export function useInfiniteProjectsQuery(limit = 20, filters?: ProjectSearchFilter) {
   const normalizedLimit = normalizeProjectsLimit(limit);
   return useInfiniteQuery({
-    queryKey: ['projects', 'infinite', { limit: normalizedLimit }],
-    queryFn: ({ pageParam }) => getProjects({ page: pageParam, limit: normalizedLimit }),
+    queryKey: ['projects', 'infinite', { limit: normalizedLimit, ...filters }],
+    queryFn: ({ pageParam }) =>
+      getProjects({ ...filters, page: pageParam, limit: normalizedLimit }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _allPages, lastPageParam) =>
       lastPage.length === normalizedLimit ? lastPageParam + 1 : undefined,

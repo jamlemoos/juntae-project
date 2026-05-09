@@ -57,9 +57,10 @@ export type ProjectDetail = {
   updatedAt: string;
 };
 
-type ProjectSearchFilter =
-  | { status?: never; city?: never }
-  | { status: ProjectStatus; city: string };
+export type ProjectSearchFilter = {
+  q?: string;
+  status?: string;
+};
 
 export type ProjectsPagination = {
   page?: number;

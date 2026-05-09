@@ -48,11 +48,12 @@ func (h *ProjectHandler) CreateProject(c *gin.Context) {
 
 // GetProjects godoc
 //
-//	@Summary		List projects (optionally filtered by status and city)
+//	@Summary		List projects with optional search and filters
 //	@Tags			projects
 //	@Produce		json
-//	@Param			status	query		string	false	"Filter by status (OPEN, IN_PROGRESS, CLOSED)"
-//	@Param			city	query		string	false	"Filter by creator's city"
+//	@Param			q		query		string	false	"Search by project title (case-insensitive)"
+//	@Param			status	query		string	false	"Filter by status: OPEN, IN_PROGRESS, CLOSED (comma-separated for multiple, e.g. IN_PROGRESS,CLOSED)"
+//	@Param			city	query		string	false	"Filter by creator's city (requires status)"
 //	@Param			page	query		int		false	"Page number (default 1)"
 //	@Param			limit	query		int		false	"Items per page (default 20, max 50)"
 //	@Success		200		{array}		dto.ProjectListItemResponse
@@ -65,10 +66,11 @@ func (h *ProjectHandler) GetProjects(c *gin.Context) {
 	if !ok {
 		return
 	}
+	q := c.Query("q")
 	status := c.Query("status")
 	city := c.Query("city")
-	if (status == "") != (city == "") {
-		respondWithError(c, http.StatusBadRequest, "both 'status' and 'city' query params are required when filtering")
+	if city != "" && status == "" {
+		respondWithError(c, http.StatusBadRequest, "'status' is required when 'city' is provided")
 		return
 	}
 	offset, limit, err := parsePagination(c)
@@ -76,7 +78,7 @@ func (h *ProjectHandler) GetProjects(c *gin.Context) {
 		respondWithError(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	projects, err := h.projectService.GetProjectsForList(callerID, status, city, offset, limit)
+	projects, err := h.projectService.GetProjectsForList(callerID, q, status, city, offset, limit)
 	if err != nil {
 		handleServiceError(c, err)
 		return

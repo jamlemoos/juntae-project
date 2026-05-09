@@ -7,6 +7,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type ProjectSearchFilters struct {
+	Q        string
+	Statuses []string
+}
+
 type ProjectApplicationCount struct {
 	ProjectID         uuid.UUID
 	Title             string
@@ -34,6 +39,26 @@ func (r *ProjectRepository) FindAllForList(offset, limit int) ([]model.Project, 
 		Order("projects.created_at DESC, projects.id DESC").
 		Offset(offset).Limit(limit).
 		Find(&projects).Error
+	return projects, err
+}
+
+func (r *ProjectRepository) SearchForList(filters ProjectSearchFilters, offset, limit int) ([]model.Project, error) {
+	var projects []model.Project
+	q := r.db.
+		Preload("Creator").
+		Preload("Creator.Skills").
+		Preload("Roles").
+		Order("projects.created_at DESC, projects.id DESC").
+		Offset(offset).Limit(limit)
+
+	if filters.Q != "" {
+		q = q.Where("projects.title ILIKE ?", "%"+filters.Q+"%")
+	}
+	if len(filters.Statuses) > 0 {
+		q = q.Where("projects.status IN ?", filters.Statuses)
+	}
+
+	err := q.Find(&projects).Error
 	return projects, err
 }
 
